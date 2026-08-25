@@ -47,8 +47,8 @@
 
 ### Hermes 启动与模型配置
 
-![Hermes 启动与模型配置](./screenshots/hermes-startup.png)
+![Hermes 启动与模型配置](https://cdn.jsdelivr.net/gh/wwuhuasheng/memory-rhinobird-homework@main/wuyue/week1/screenshots/hermes-startup.png)
 
 ### Hermes 对话记录
 
-![Hermes 对话记录](./screenshots/hermes-memory-conversation.png)
+![Hermes 对话记录](https://cdn.jsdelivr.net/gh/wwuhuasheng/memory-rhinobird-homework@main/wuyue/week1/screenshots/hermes-memory-conversation.png)
