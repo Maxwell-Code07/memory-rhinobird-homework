@@ -1,0 +1,15 @@
+[tdai-gateway] [memory-tdai] [pipeline-factory] [L2] No new L1 records since cursor (session=20260822_130425_fbef15, updatedAfter=(full)), skipping scene extraction
+[tdai-gateway] [memory-tdai] [pipeline] [20260822_131202_e58699] L2 running: l2_pending_l1_count=1
+[tdai-gateway] [memory-tdai] [pipeline-factory] [L2] No new L1 records since cursor (session=20260822_131202_e58699, updatedAfter=(full)), skipping scene extraction
+[tdai-gateway] [memory-tdai] [pipeline] [20260822_121618_5847bc] L2 running: l2_pending_l1_count=0
+[tdai-gateway] [memory-tdai] [pipeline-factory] [L2] No new L1 records since cursor (session=20260822_121618_5847bc, updatedAfter=(full)), skipping scene extraction
+[tdai-gateway] [memory-tdai] [capture] L0 capture cursor (per-session, atomic): afterTimestamp=1787375532783 session=20260822_130425_fbef15
+[tdai-gateway] [memory-tdai][l0] Extracted 2 user/assistant messages from 2 total
+[tdai-gateway] [memory-tdai][l0] First captured message: role=user, ts=1787375812309, date=2026-08-22T05:16:52.309Z, content=检查插件是否装有“Tencent DB agent memory”这个插件？
+[tdai-gateway] [memory-tdai] [capture] L0 recorded: 2 messages for session 20260822_130425_fbef15
+[tdai-gateway] [memory-tdai] [capture] [L0-vec-index] Check: filteredMessages=2, vectorStore=available, embeddingService=UNAVAILABLE
+[tdai-gateway] [memory-tdai] [capture] [L0-vec-index] START indexing 2 message(s) for session 20260822_130425_fbef15 (mode=async-bg)
+[tdai-gateway] [memory-tdai] [capture] [L0-vec-index] DONE: 2/2 records written (metadata-only, embed=background)
+[tdai-gateway] [memory-tdai] [capture] Scheduler notified of conversation round (sessionKey=20260822_130425_fbef15)
+[tdai-gateway] [memory-tdai] [capture] ⏱ Capture timing: total=29ms, l0Record+checkpoint=12ms, l0VecIndex=14ms (metadata-only, embed=background, msgs=2), notify=3ms
+[tdai-gateway] Capture completed in 30ms: l0=2
