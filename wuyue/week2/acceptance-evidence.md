@@ -100,14 +100,3 @@ positional arguments:
 ```
 
 帮助命令正常返回 Hermes CLI 内容，证明容器内 Hermes 进程可以启动。
-
-## 作业要求核对
-
-| 要求 | 结果 | 依据 |
-|---|---|---|
-| 版本号参数化 | 符合 | Dockerfile 声明 `ARG HERMES_VERSION`，构建命令使用 `--build-arg` |
-| 干净镜像 | 符合 | 只安装 Hermes 运行所需依赖，未安装 TencentDB-Agent-Memory |
-| 不 COPY 本仓库源码 | 符合 | Dockerfile 没有 `COPY` 作业仓库的指令，源码从上游按版本下载 |
-| 预装 Node.js | 符合 | 基础镜像为 Node 22 Bookworm slim，实测 `v22.23.2` |
-| Dockerfile 有使用说明 | 符合 | Dockerfile 顶部注释和 `README.md` 均给出构建、运行命令 |
-
