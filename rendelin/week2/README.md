@@ -1,40 +1,95 @@
-# 第 2 周作业 —— 交付物 A：Hermes 版本兼容检测 Dockerfile
+# 第 2 周作业：按版本号构建 Hermes 镜像
 
-## 项目说明
+本目录提交 `Dockerfile` 和本 `README.md`。
 
-按传入的 Hermes 版本号，构建一个装好了那个版本 Hermes 的干净基线镜像：
+`Dockerfile` 根据传入的 Hermes 版本号，构建一个装好了对应版本 Hermes 的干净镜像。只装 Hermes 本体。
 
-- 预装 **Node.js 26 LTS**（Hermes 要求 ≥26；记忆插件 Gateway 要求 ≥22.16）
-- 用官方 `install.sh --branch <tag>` 无头安装目标版本（非交互）
-- **构建期版本断言**：装完跑 `hermes --version`，解析出的 release 日期必须等于 `HERMES_VERSION`
-- **镜像启动自动跑自动对话**：`CMD` 跑 `entrypoint.sh` → 生成模型配置 → 跑 `soak.mjs`
+## 基础镜像与依赖
+
+- 基础镜像 `node:26-bookworm-slim`（Debian 12，自带 Node 26）
+- 这个版本同时满足记忆插件 Gateway 对 Node ≥ 22.16 的依赖
+
+Hermes 用官方 `install.sh --branch <tag>` 安装，非交互。
+
+## 版本号怎么传
+
+构建时用 `--build-arg` 传入：
+
 ```bash
-# 构建（版本号用带 v 前缀的 git tag）
-docker build --build-arg HERMES_VERSION=v2026.8.19 -t hermes-version-compat:v2026.8.19 .
+docker build --build-arg HERMES_VERSION=v2026.8.19 -t my-hermes:v2026.8.19 .
 ```
 
-## 跨周依赖（重要）
-
-题目要求交付物 A"镜像启动后自动执行自动对话（交付物 B）"，所以 Dockerfile 里 COPY 了三个文件、并在启动时运行它们：
+Hermes 的版本号有两套写法，`hermes --version` 会同时输出：
 
 ```
-COPY soak.mjs /opt/hermes-version-compat/soak.mjs
-COPY entrypoint.sh /opt/hermes-version-compat/entrypoint.sh
-COPY conversation.jsonl /opt/hermes-version-compat/conversation.jsonl
-CMD ["bash", "/opt/hermes-version-compat/entrypoint.sh"]
+Hermes Agent v0.20.5 (2026.8.19)
 ```
 
-这三个文件属于**第 3 周交付物**，放在第 3 周作业文件夹里。所以：
+前面 `v0.20.5` 是语义化版本，括号里的 `2026.8.19` 是日期发布版，两者是同一个版本。
 
-- 只拿这一份 Dockerfile 单独放，`docker build` 会因为缺少 COPY 的文件而失败。这是题目"第 2 周只交 Dockerfile、但 Dockerfile 又要自动跑第 3 周 soak"带来的必然情况。
-- 实际构建时，把第 3 周的 `soak.mjs`、`entrypoint.sh`、`conversation.jsonl` 放到与本 Dockerfile 同目录（或者直接在第 3 周文件夹里构建），然后：
+构建时**必须用日期 tag**。Hermes 的 git tag 全部是日期格式
 
-  ```bash
-  docker build --build-arg HERMES_VERSION=v2026.8.19 -t hermes-version-compat:v2026.8.19 .
-  docker run --rm -e MODEL_API_KEY=.. -e MODEL_BASE_URL=.. -e MODEL_NAME=.. -e MODEL_PROVIDER=custom \
-    -e SOAK_ROUNDS=14 hermes-version-compat:v2026.8.19
-  ```
+Dockerfile 会做两层校验：
 
-网络方面：国内打不开 GitHub 时要用代理（见第 3 周 README 的代理说明；构建时用 `--build-arg HTTP_PROXY/HTTPS_PROXY=<可达地址>`，Docker Desktop 用 `http://host.docker.internal:7890`）。
+- 格式校验：版本号必须形如 `vYYYY.M.D` 或 `YYYY.M.D`，不合法直接构建失败
+- 版本断言：构建完成后跑 `hermes --version`，把语义化版本和日期都抠出来打印，日期必须等于传入的 `HERMES_VERSION`，不一致则构建失败
 
-感谢老师评阅
+## 构建
+
+构建时要把代理显式传给 `docker build`。Docker 的 `buildx` 不会继承 shell 里的 `HTTP_PROXY`，拉 `node:26-bookworm-slim` 基础镜像时如果直连 Docker Hub，国内环境会超时。
+
+Windows / PowerShell（实际终端效果）：
+
+![Windows 构建命令](屏幕截图 2026-08-28 115554.png)
+
+Linux / macOS / Git Bash：
+
+```bash
+docker build --build-arg HERMES_VERSION=v2026.8.19 \
+  --build-arg HTTP_PROXY=http://127.0.0.1:7890 \
+  --build-arg HTTPS_PROXY=http://127.0.0.1:7890 \
+  -t my-hermes:v2026.8.19 .
+```
+
+参数说明：
+
+- `--build-arg HERMES_VERSION=...`：版本号（日期 tag）
+- `--build-arg HTTP_PROXY / HTTPS_PROXY`：给镜像构建用的代理
+- `-t`：镜像名和标签
+
+如果本机不需要代理就能连通 Docker Hub，去掉两个 `PROXY` 参数即可。
+
+## 验证
+
+镜像默认启动会先打印 Hermes 版本，然后启动 headless 后端服务并**持续运行**（不退出），不需要模型密钥：
+
+```bash
+docker run --rm -e HERMES_HOME=/opt/data my-hermes:v2026.8.19
+```
+
+启动输出（验收标准 2：版本一致）：
+
+![运行验证输出](屏幕截图 2026-08-28 115541.png)
+
+`v0.20.5` 和 `2026.8.19` 与传入的版本一致，即验收 2 通过。
+
+Hermes 后端服务随后常驻运行（验收标准 3：进程跑起来）：
+
+![Hermes 后端常驻运行](屏幕截图 2026-08-28 124959.png)
+
+看到 `HERMES_BACKEND_READY port=9119` 且终端不退回命令行，说明 Hermes 进程已启动并持续运行。用 `Ctrl + C` 停止。
+
+直接验证后端服务常驻（跳过版本打印）：
+
+```bash
+docker run --rm -e HERMES_HOME=/opt/data --entrypoint hermes my-hermes:v2026.8.19 serve --skip-build
+```
+
+进容器交互排查：
+
+```bash
+docker run --rm -it --entrypoint bash my-hermes:v2026.8.19
+```
+## 代理地址
+
+本机 Clash 常用 `http://127.0.0.1:7890`。如果用的是 Docker Desktop（WSL2 后端）、宿主机 Clash 只监听回环地址，容器里访问不了 `127.0.0.1`，就改用 `http://host.docker.internal:7890`。
