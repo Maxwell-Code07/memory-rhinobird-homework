@@ -1,6 +1,13 @@
-# Build an image containing only a selected Hermes Agent version.
-# The assignment repository is never copied into the image; the upstream
-# Hermes source is downloaded at build time from its public Git repository.
+# 第二周作业：按传入的版本号构建干净 Hermes 镜像
+#
+# 使用说明（在本目录执行）：
+#   docker build --build-arg HERMES_VERSION=0.20.5 -t hermes:0.20.5 .
+#   docker run --rm hermes:0.20.5 hermes --version
+#   docker run --rm hermes:0.20.5 node --version
+#
+# HERMES_VERSION 必须通过 --build-arg 传入，不能写死在镜像中。
+# 本文件不 COPY 作业仓库；构建时只下载指定版本的上游 Hermes 源码。
+# 镜像不安装 TencentDB-Agent-Memory 或其他记忆插件。
 FROM node:22-bookworm-slim
 
 ARG HERMES_VERSION
@@ -15,6 +22,7 @@ WORKDIR /opt
 # Hermes is distributed from source.  Install only the runtime/build tools
 # needed for a clean source installation; no TencentDB memory plugin is added.
 RUN test -n "${HERMES_VERSION}" || (echo "HERMES_VERSION is required" >&2; exit 1) && \
+    node -e 'const [major,minor,patch]=process.versions.node.split(".").map(Number); if (major < 22 || (major === 22 && (minor < 16 || (minor === 16 && patch < 0)))) process.exit(1)' && \
     apt-get update && \
     apt-get install -y --no-install-recommends \
       ca-certificates git python3 python3-venv python3-pip build-essential && \
