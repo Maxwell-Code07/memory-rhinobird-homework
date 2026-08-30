@@ -12,8 +12,11 @@
 ```dockerfile
 # ============================================================
 # Week2 交付物 A：按版本号构建 Hermes 干净镜像
-# 构建命令：
+# 构建命令（默认使用官方 apt/PyPI 源，任何网络环境可直接构建）：
 #   docker build --build-arg HERMES_VERSION=v2026.8.27 -t hermes:v2026.8.27 .
+# 国内加速（可选）：
+#   docker build --build-arg HERMES_VERSION=v2026.8.27 \
+#     --build-arg APT_MIRROR=mirrors.tuna.tsinghua.edu.cn -t hermes:v2026.8.27 .
 # ============================================================
 
 # 1 基础镜像：Node 22 + Debian 12(bookworm) 精简版
@@ -32,22 +35,28 @@ RUN test -n "$HERMES_VERSION" || \
 # 4 把版本号转成运行期环境变量，容器跑起来后 echo $HERMES_VERSION 也能看到
 ENV HERMES_VERSION=${HERMES_VERSION}
 
-# 5 装系统工具 + 换国内源：
+# 5 装系统工具：
 #    slim 镜像没有 curl/git，而官方 install.sh 需要 git clone 和下载 uv，必须补上
-RUN sed -i 's|deb.debian.org|mirrors.tuna.tsinghua.edu.cn|g' /etc/apt/sources.list.d/debian.sources \
+#    apt 源默认官方；国内网络可传 --build-arg APT_MIRROR=mirrors.tuna.tsinghua.edu.cn 加速
+ARG APT_MIRROR=deb.debian.org
+RUN sed -i "s|deb.debian.org|${APT_MIRROR}|g" /etc/apt/sources.list.d/debian.sources \
  && apt-get update \
  && apt-get install -y --no-install-recommends ca-certificates curl git \
  && rm -rf /var/lib/apt/lists/*
 
-# 6 给 uv 装 Python 依赖时走 TUNA 的 PyPI 镜像（国内加速）
-ENV UV_DEFAULT_INDEX=https://pypi.tuna.tsinghua.edu.cn/simple
+# 6 uv 安装 Python 依赖的索引，默认官方 PyPI；国内可传 TUNA 镜像地址覆盖
+ARG UV_DEFAULT_INDEX=https://pypi.org/simple
+ENV UV_DEFAULT_INDEX=${UV_DEFAULT_INDEX}
 
 # 7 核心：安装指定版本的 Hermes
 #    官方 install.sh 内部就是 git clone --branch <tag> + uv 安装；
 #    --skip-setup --non-interactive 跳过交互式配置向导（构建环境无法交互）；
+#    下载与执行分离（不用 curl | bash 管道）：curl 失败时 && 链直接中断，
+#    不会出现"管道吞掉退出码、构建成功但实际没装"的假成功；
 #    容器内以 root 安装，装完后：命令在 /usr/local/bin/hermes，代码在 /usr/local/lib/hermes-agent
-RUN curl -fsSL https://hermes-agent.nousresearch.com/install.sh \
-      | bash -s -- --branch "${HERMES_VERSION}" --skip-setup --non-interactive
+RUN curl -fsSL https://hermes-agent.nousresearch.com/install.sh -o /tmp/install.sh \
+ && bash /tmp/install.sh --branch "${HERMES_VERSION}" --skip-setup --non-interactive \
+ && rm /tmp/install.sh
 
 # 8 启动命令：默认进入 hermes 交互界面（配 docker run -it 使用）
 CMD ["hermes"]
@@ -60,7 +69,14 @@ CMD ["hermes"]
 ### 1. 构建（验收标准 1）
 
 ```bash
+# 默认（官方源，任何网络环境）
 docker build --build-arg HERMES_VERSION=v2026.8.27 -t hermes:v2026.8.27 .
+
+# 国内网络加速（可选）：apt/PyPI 走清华 TUNA 镜像
+docker build --build-arg HERMES_VERSION=v2026.8.27 \
+  --build-arg APT_MIRROR=mirrors.tuna.tsinghua.edu.cn \
+  --build-arg UV_DEFAULT_INDEX=https://pypi.tuna.tsinghua.edu.cn/simple \
+  -t hermes:v2026.8.27 .
 ```
 
 ![构建启动：--build-arg 传入 v2026.8.27](./assets/image-20260830083500946-17880575657191.png)
@@ -147,6 +163,8 @@ docker run --rm hermes:v2026.8.19 git -C /usr/local/lib/hermes-agent describe --
 3. **`0.x.x` 不能直接当版本传**：会议示例写的 `HERMES_VERSION=0.x.x` 形式在 git 仓库中没有对应 tag，直接传会 clone 失败；实际能传的是日期式 tag（见「版本号约定」）。
 4. **装完后 `hermes --version` 提示 "Update available: N commits behind" 是正常现象**：这恰好证明版本被钉住而不是最新版；此时**不要**执行 `hermes update`，否则版本一致性验收会被破坏。
 5. **安装层耗时长是正常的**：install.sh 要从 GitHub 拉源码并用 uv 安装 Python 依赖，首次构建该层约 15-20 分钟；`ARG`/`ENV` 行不产生构建步骤，日志里只有 FROM + 3 条 RUN 属正常。
+6. **不要用 `curl | bash` 管道执行安装脚本**（来自 PR review 的有效意见）：管道表达式的退出码取自最后一个命令，`bash -s` 读到空输入会以 0 退出——若 curl 下载失败，这一层仍会"构建成功"但什么都没装。正确做法是先 `curl -o` 下载成文件，再用 `&&` 链执行，任何一步失败整个 RUN 立即失败。
+7. **换源不要硬编码进 Dockerfile**（来自 PR review 的有效意见）：硬编码 TUNA 镜像会让海外/公司网络环境无法直接构建。正确做法是把镜像地址做成 `ARG`（`APT_MIRROR`、`UV_DEFAULT_INDEX`），默认官方源，国内构建时用 `--build-arg` 按需覆盖。
 
 ---
 
@@ -156,4 +174,4 @@ docker run --rm hermes:v2026.8.19 git -C /usr/local/lib/hermes-agent describe --
 - 已验证版本：
   - [x] `v2026.8.27`（构建、版本一致性、容器启动三项验收均通过；容器内 `hermes --version` = v0.20.6）
   - [x] `v2026.8.19`（同三项验收均通过；容器内 `hermes --version` = v0.20.5——两个版本连语义化版本号都不同，进一步证明镜像内容随输入版本真实变化）
-- 镜像内 apt/PyPI 使用清华 TUNA 国内源加速，海外环境使用时可将第 5、6 步的换源行删除。
+- apt/PyPI 源已参数化（`APT_MIRROR`、`UV_DEFAULT_INDEX`），默认官方源保证可移植性，国内网络可用 `--build-arg` 切换清华 TUNA 镜像加速（见「构建与验收命令」第 1 步）。
