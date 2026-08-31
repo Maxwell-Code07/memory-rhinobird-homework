@@ -1,81 +1,83 @@
-# Hermes Docker Image Design
+# Hermes Docker 镜像设计说明
 
-## Goal
+## 一、作业目标
 
-Build a clean Docker image that contains a caller-selected, PyPI-published
-version of Hermes Agent. The image must not contain the TencentDB memory
-plugin or any files copied from this homework repository.
+构建一个干净的 Docker 镜像，镜像中安装用户指定的 Hermes Agent 版本。
+该版本必须是已经发布到 PyPI 的版本。镜像不得包含 TencentDB 记忆插件，
+也不得复制本作业仓库中的任何文件。
 
-## Assignment Requirements
+## 二、需求拆解
 
-1. Accept the Hermes version through `ARG HERMES_VERSION`.
-2. Install exactly that version and fail the build if it is missing or invalid.
-3. Use `node:22-bookworm-slim`, which provides Debian 12 and Node.js 22.
-4. Do not use `COPY` or `ADD`.
-5. Do not install the TencentDB memory plugin.
-6. Deliver both `Dockerfile` and `README.md`.
+1. 通过 `ARG HERMES_VERSION` 接收 Hermes 版本号。
+2. 安装的版本必须与输入版本完全一致；版本缺失或无效时应立即构建失败。
+3. 使用 `node:22-bookworm-slim` 作为基础镜像，同时获得 Debian 12 和 Node.js 22。
+4. Dockerfile 不使用 `COPY` 或 `ADD`。
+5. 不安装 TencentDB 记忆插件。
+6. 最终交付 `Dockerfile` 和 `README.md`。
 
-## Version Source and Support Boundary
+## 三、版本来源和支持范围
 
-Hermes is installed from the Python Package Index with an exact requirement:
-`hermes-agent==${HERMES_VERSION}`. This gives a deterministic mapping from the
-input version to the installed artifact.
+Dockerfile 通过下面的精确版本要求，从 Python Package Index（PyPI）
+安装 Hermes：
 
-Only versions published on PyPI are supported. At design time, the published
-versions are `0.13.0` through `0.19.0`; `0.19.0` is the README example.
-Source-only version `0.20.4` is deliberately out of scope because it has no
-matching PyPI release or Git tag.
+```text
+hermes-agent==${HERMES_VERSION}
+```
 
-## Image Design
+这种方式保证输入版本号能唯一对应到已发布的安装包，不会默认安装最新版。
 
-- Base: `node:22-bookworm-slim`.
-- System packages: `python3`, `python3-venv`, and `ca-certificates`. The venv
-  bootstraps pip, so a separate global Python environment is unnecessary.
-- Python isolation: create `/opt/hermes-venv` and put its `bin` directory first
-  in `PATH`.
-- Installation: install the exact `hermes-agent` version with pip and disable
-  pip's download cache.
-- Build-time check: compare Python package metadata with `HERMES_VERSION`; the
-  build fails on a mismatch.
-- Runtime: use `hermes` as the image entrypoint so arguments such as
-  `--version` are passed directly to Hermes.
-- User: run Hermes as an unprivileged `hermes` user with a writable home
-  directory.
+本方案只支持已发布到 PyPI 的 Hermes 版本。设计时可用版本为 `0.13.0`
+至 `0.19.0`，README 使用 `0.19.0` 作为示例。由于源码版 `0.20.4`
+尚无对应的 PyPI 发布包或 Git tag，因此不在本次作业实现范围内。
 
-## Data Flow
+## 四、镜像设计
+
+- **基础镜像**：`node:22-bookworm-slim`。
+- **系统依赖**：安装 `python3`、`python3-venv` 和 `ca-certificates`。
+  Python 虚拟环境会初始化 pip，不需要污染系统 Python 环境。
+- **Python 隔离**：在 `/opt/hermes-venv` 创建虚拟环境，并将它的
+  `bin` 目录放到 `PATH` 最前面。
+- **Hermes 安装**：使用 pip 安装与 `HERMES_VERSION` 完全一致的
+  `hermes-agent` 包，并禁用 pip 下载缓存以减小镜像。
+- **构建期验证**：读取已安装的 Python 包元数据，与 `HERMES_VERSION`
+  比较；两者不一致时使构建失败。
+- **容器入口**：使用 `hermes` 作为镜像入口，使 `--version` 等容器参数
+  可以直接传给 Hermes。
+- **运行用户**：使用无特权的 `hermes` 用户运行程序，并为其提供
+  可写的用户主目录。
+
+## 五、构建数据流
 
 ```text
 docker build --build-arg HERMES_VERSION=0.19.0
-  -> Docker ARG
-  -> pip installs hermes-agent==0.19.0
-  -> build verifies installed metadata is 0.19.0
-  -> image tagged hermes:0.19.0
-  -> docker run hermes:0.19.0 --version
-  -> Hermes reports 0.19.0
+  → Docker 接收 ARG
+  → pip 安装 hermes-agent==0.19.0
+  → 构建阶段确认安装版本是 0.19.0
+  → 生成标签为 hermes:0.19.0 的镜像
+  → docker run hermes:0.19.0 --version
+  → Hermes 输出 0.19.0
 ```
 
-## Failure Behavior
+## 六、失败处理
 
-- Missing `HERMES_VERSION`: fail early with a clear message.
-- Unknown or unpublished version: pip fails instead of silently installing the
-  latest release.
-- Installed version mismatch: an explicit build-time assertion fails.
-- Runtime credentials are never baked into the image; users provide provider
-  configuration only when running a container.
+- 未传入 `HERMES_VERSION`：构建应尽早失败，并显示明确提示。
+- 传入未发布的版本：pip 安装失败，而不是偷偷改为最新版。
+- 实际安装版本与输入不同：构建期断言失败。
+- API Key 和模型配置不写入镜像，而是在容器运行时由用户提供。
 
-## Verification
+## 七、验收设计
 
-The README will document commands that verify:
+README 将给出命令，分别验证：
 
-1. A build with `HERMES_VERSION=0.19.0` succeeds.
-2. `hermes --version` reports the requested version.
-3. Node.js is at least 22.16.0.
-4. The image starts the Hermes executable.
-5. No TencentDB memory plugin is installed.
-6. The Dockerfile contains no `COPY` or `ADD` instruction.
+1. 传入 `HERMES_VERSION=0.19.0` 时能够成功构建。
+2. 镜像内 `hermes --version` 输出与输入版本一致。
+3. 镜像内 Node.js 版本不低于 `22.16.0`。
+4. 容器能启动 Hermes 可执行程序。
+5. 镜像内没有 TencentDB 记忆插件。
+6. Dockerfile 中没有 `COPY` 或 `ADD` 指令。
 
-## Deliverables
+## 八、交付物
 
-- `Dockerfile`: reproducible image definition.
-- `README.md`: beginner-oriented build, verification, and troubleshooting
-  instructions, including the PyPI version support boundary.
+- `Dockerfile`：定义可重复构建的 Hermes 镜像。
+- `README.md`：面向初学者说明构建、运行、验收和常见问题，
+  并明确说明 PyPI 版本支持范围。
