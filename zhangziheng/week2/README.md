@@ -2,7 +2,7 @@
 
 本次作业，提供了一个能够按 Hermes 语义化版本号动态构建的干净镜像。构建时只需传入类似 `0.20.6` 的版本号，Dockerfile 会自动在官方 Git tags 中定位对应的日期式 tag、安装该版本，并在构建阶段完成版本和环境校验。
 
-镜像基于 `node:22-bookworm-slim`，只安装 Hermes 本体，不安装记忆插件，也不会将本仓库源码复制到镜像中。
+镜像基于 `node:22-bookworm-slim`，只安装 Hermes 本体，不安装记忆插件，也不会将当前作业仓库源码复制到镜像中。构建时会从 Hermes 官方仓库按需获取指定版本源码用于安装，安装完成后删除 Git 元数据。
 
 ## 本版 Dockerfile 实现的功能
 
@@ -162,7 +162,7 @@ HTTP Error 403: rate limit exceeded
 
 这会让 Docker 构建依赖外部 API 配额，不适合作为稳定的构建方案。
 
-最终移除 GitHub REST API，改用 `git clone --filter=blob:none --no-checkout` 获取官方仓库和 tags。版本解析在本地完成，不再消耗 GitHub REST API 配额；blobless clone 也避免在定位版本前下载全部源码内容。
+最终移除 GitHub REST API，改用 `git clone --filter=blob:none --no-checkout` 获取官方仓库和 tags。版本解析在本地完成，不再消耗 GitHub REST API 配额；blobless clone 在定位版本阶段不会下载完整源码，checkout 官方 tag 后仍会按需获取并安装所需源码。
 
 ### 4. `--version` 查询到了 Node.js
 
@@ -209,7 +209,7 @@ docker run --rm hermes:0.20.6 node --version
 
 1. **版本号参数化**：使用 `ARG HERMES_VERSION`，构建时通过 `--build-arg` 传入，并动态解析官方 release tag。
 2. **干净镜像**：只安装 Hermes，不安装记忆插件。
-3. **不复制本仓库源码**：Dockerfile 不使用 `COPY` 或 `ADD`。
+3. **不复制本仓库源码**：Dockerfile 不使用 `COPY` 或 `ADD`；Hermes 源码从官方仓库按需获取，安装后不保留 Git 元数据。
 4. **预装 Node.js**：基础镜像为 `node:22-bookworm-slim`，满足 Node.js ≥ `22.16.0` 的要求。
 5. **配套说明文档**：本 README 说明了构建、版本验证、启动和截图验收方式。
 
