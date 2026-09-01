@@ -1,6 +1,6 @@
 # 第二周作业：参数化 Hermes Dockerfile
 
-本目录提供一个能够按 Hermes 语义化版本号动态构建的干净镜像。构建时只需传入类似 `0.20.6` 的版本号，Dockerfile 会自动在官方 Git tags 中定位对应的日期式 tag、安装该版本，并在构建阶段完成版本和环境校验。
+本次作业，提供了一个能够按 Hermes 语义化版本号动态构建的干净镜像。构建时只需传入类似 `0.20.6` 的版本号，Dockerfile 会自动在官方 Git tags 中定位对应的日期式 tag、安装该版本，并在构建阶段完成版本和环境校验。
 
 镜像基于 `node:22-bookworm-slim`，只安装 Hermes 本体，不安装记忆插件，也不会将本仓库源码复制到镜像中。
 
@@ -16,7 +16,7 @@
 
 ## 构建镜像
 
-在本目录执行：
+在项目目录下执行：
 
 ```bash
 docker build --progress=plain \
@@ -193,7 +193,7 @@ docker run --rm hermes:0.20.6 node --version
 
 ![Docker 构建过程 3](<pictures/docker build 3.png>)
 
-### 2. Hermes 与 Node.js 版本验证
+### 2. Hermes  版本验证
 
 ![版本验证](<pictures/验证版本.png>)
 
@@ -245,4 +245,4 @@ FROM hermes:0.20.6
     └── 会话.png
 ```
 
-首次构建需要访问 Docker Hub、Hermes 官方 Git 仓库和 Python 包索引。请勿将 API Key 写入 Dockerfile、README 或镜像中。
+首次构建需要访问 Docker Hub、Hermes 官方 Git 仓库和 Python 包索引。
