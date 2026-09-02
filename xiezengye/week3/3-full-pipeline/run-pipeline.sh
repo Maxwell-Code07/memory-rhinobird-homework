@@ -86,8 +86,15 @@ NPM_ARGS=""
 docker exec "$CONTAINER" bash -c "
   set -e
   if [ ! -d /opt/tdai ]; then
-    git clone $GIT_PROXY_ARGS --depth 1 -b "$PLUGIN_BRANCH" "$PLUGIN_REPO" /opt/tdai
+    # GitHub 直连偶发 TLS 握手失败（gnutls_handshake failed），自动重试 3 次
+    for i in 1 2 3; do
+      git clone $GIT_PROXY_ARGS --depth 1 -b "$PLUGIN_BRANCH" "$PLUGIN_REPO" /opt/tdai && break
+      echo "[warn] git clone 第 $i 次失败（网络抖动），3 秒后重试..."
+      rm -rf /opt/tdai
+      sleep 3
+    done
   fi
+  [ -d /opt/tdai ] || { echo "[FAIL] git clone 重试 3 次仍失败：检查网络或用 GIT_PROXY_ARGS 走代理（见 README 注意事项 3）"; exit 1; }
   cd /opt/tdai
   # 插件的 peerDependencies（openclaw / node-llama-cpp，均 optional）会触发 npm 10.x
   # arborist 已知 bug：Cannot read properties of null (reading 'edgesOut')。
