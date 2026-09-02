@@ -1,0 +1,6 @@
+# 构建上下文排除项
+# 注意：hermes-agent-*.tar.gz 是构建必需的源码包，不能排除
+
+node_modules/
+.git/
+*.log
