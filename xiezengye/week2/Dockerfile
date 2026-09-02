@@ -1,7 +1,12 @@
 # ============================================================
 # Week2 交付物 A：按版本号构建 Hermes 干净镜像
-# 构建命令：
+# 构建命令（默认使用官方 apt/PyPI 源，需可访问外网）：
 #   docker build --build-arg HERMES_VERSION=v2026.8.27 -t hermes:v2026.8.27 .
+# 国内加速（可选，apt 与 PyPI 源同时切换）：
+#   docker build --build-arg HERMES_VERSION=v2026.8.27 \
+#     --build-arg APT_MIRROR=mirrors.tuna.tsinghua.edu.cn \
+#     --build-arg UV_DEFAULT_INDEX=https://pypi.tuna.tsinghua.edu.cn/simple \
+#     -t hermes:v2026.8.27 .
 # ============================================================
 
 # 1 基础镜像：Node 22 + Debian 12(bookworm) 精简版
@@ -20,22 +25,38 @@ RUN test -n "$HERMES_VERSION" || \
 # 4 把版本号转成运行期环境变量，容器跑起来后 echo $HERMES_VERSION 也能看到
 ENV HERMES_VERSION=${HERMES_VERSION}
 
-# 5 装系统工具 + 换国内源：
+# 5 装系统工具：
 #    slim 镜像没有 curl/git，而官方 install.sh 需要 git clone 和下载 uv，必须补上
-RUN sed -i 's|deb.debian.org|mirrors.tuna.tsinghua.edu.cn|g' /etc/apt/sources.list.d/debian.sources \
+#    apt 源默认官方；国内网络可传 --build-arg APT_MIRROR=mirrors.tuna.tsinghua.edu.cn 加速
+ARG APT_MIRROR=deb.debian.org
+RUN sed -i "s|deb.debian.org|${APT_MIRROR}|g" /etc/apt/sources.list.d/debian.sources \
  && apt-get update \
  && apt-get install -y --no-install-recommends ca-certificates curl git \
  && rm -rf /var/lib/apt/lists/*
 
-# 6 给 uv 装 Python 依赖时走 TUNA 的 PyPI 镜像（国内加速）
-ENV UV_DEFAULT_INDEX=https://pypi.tuna.tsinghua.edu.cn/simple
+# 6 uv 安装 Python 依赖的索引，默认官方 PyPI；国内可传 TUNA 镜像地址覆盖
+#    变量名 UV_DEFAULT_INDEX 是 uv >= 0.4.23 的官方推荐写法（对应 --default-index）；
+#    旧名 UV_INDEX_URL（对应 --index-url）在 uv 中已标记 Deprecated，故此处用新名。
+ARG UV_DEFAULT_INDEX=https://pypi.org/simple
+ENV UV_DEFAULT_INDEX=${UV_DEFAULT_INDEX}
 
 # 7 核心：安装指定版本的 Hermes
 #    官方 install.sh 内部就是 git clone --branch <tag> + uv 安装；
 #    --skip-setup --non-interactive 跳过交互式配置向导（构建环境无法交互）；
+#    下载与执行分离（不用 curl | bash 管道）：curl 失败时 && 链直接中断，
+#    不会出现"管道吞掉退出码、构建成功但实际没装"的假成功；
+#    --retry/--retry-connrefused 让网络抖动时自动重试，提升构建稳定性；
 #    容器内以 root 安装，装完后：命令在 /usr/local/bin/hermes，代码在 /usr/local/lib/hermes-agent
-RUN curl -fsSL https://hermes-agent.nousresearch.com/install.sh \
-      | bash -s -- --branch "${HERMES_VERSION}" --skip-setup --non-interactive
+#    可选完整性校验：传 --build-arg INSTALL_SH_SHA256=<sha256> 固定脚本内容、
+#    在 CI/验收环境校验后执行；不传则跳过校验（保持默认构建的灵活性）。
+ARG INSTALL_SH_SHA256=
+RUN curl -fsSL --retry 3 --retry-delay 2 --retry-connrefused \
+      https://hermes-agent.nousresearch.com/install.sh -o /tmp/install.sh \
+ && if [ -n "${INSTALL_SH_SHA256}" ]; then \
+        echo "${INSTALL_SH_SHA256}  /tmp/install.sh" | sha256sum -c - >/dev/null; \
+    fi \
+ && bash /tmp/install.sh --branch "${HERMES_VERSION}" --skip-setup --non-interactive \
+ && rm /tmp/install.sh
 
 # 8 启动命令：默认进入 hermes 交互界面（配 docker run -it 使用）
 CMD ["hermes"]
