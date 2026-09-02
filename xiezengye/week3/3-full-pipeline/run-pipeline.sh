@@ -87,20 +87,22 @@ docker exec "$CONTAINER" bash -c "
   set -e
   if [ ! -d /opt/tdai ]; then
     # GitHub 直连偶发 TLS 握手失败（gnutls_handshake failed），自动重试 3 次
+    # 注意：本块在外层双引号字符串内，内层引号用 \"、内层变量用 \$i 转义，
+    # 否则会被外层 shell（set -u）抢先展开/截断
     for i in 1 2 3; do
-      git clone $GIT_PROXY_ARGS --depth 1 -b "$PLUGIN_BRANCH" "$PLUGIN_REPO" /opt/tdai && break
-      echo "[warn] git clone 第 $i 次失败（网络抖动），3 秒后重试..."
+      git clone $GIT_PROXY_ARGS --depth 1 -b \"$PLUGIN_BRANCH\" \"$PLUGIN_REPO\" /opt/tdai && break
+      echo \"[warn] git clone 第 \$i 次失败（网络抖动），3 秒后重试...\"
       rm -rf /opt/tdai
       sleep 3
     done
   fi
-  [ -d /opt/tdai ] || { echo "[FAIL] git clone 重试 3 次仍失败：检查网络或用 GIT_PROXY_ARGS 走代理（见 README 注意事项 3）"; exit 1; }
+  [ -d /opt/tdai ] || { echo \"[FAIL] git clone 重试 3 次仍失败：检查网络或用 GIT_PROXY_ARGS 走代理（见 README 注意事项 3）\"; exit 1; }
   cd /opt/tdai
   # 插件的 peerDependencies（openclaw / node-llama-cpp，均 optional）会触发 npm 10.x
   # arborist 已知 bug：Cannot read properties of null (reading 'edgesOut')。
   # 这两个 peer 我们用不到（走 Hermes 而非 openclaw），失败时用 --legacy-peer-deps 跳过 peer 解析。
   if ! npm install $NPM_ARGS; then
-    echo "[warn] npm install 失败，加 --legacy-peer-deps 重试（跳过 optional peerDependencies 解析）"
+    echo \"[warn] npm install 失败，加 --legacy-peer-deps 重试（跳过 optional peerDependencies 解析）\"
     npm install $NPM_ARGS --legacy-peer-deps
   fi
   # 挂载 Provider：目录名必须是 memory_tencentdb（下划线），Hermes 从 ~/.hermes/plugins/ 扫描
