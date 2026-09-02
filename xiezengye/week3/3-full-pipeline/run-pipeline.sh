@@ -21,6 +21,9 @@
 #   SOAK_ROUNDS / SOAK_INTERVAL / SOAK_MAX_TOTAL_SECONDS   默认 12 / 5 / 1200
 #   TDAI_LLM_*              记忆抽取用 LLM（L1/L2/L3 沉淀），默认复用 MODEL_*
 #   PLUGIN_REPO             插件源码地址，默认 TencentCloud/TencentDB-Agent-Memory
+#   PLUGIN_BRANCH           插件分支，默认 main（必须显式指定！该仓库默认分支是
+#                           feat/server_team，目录结构完全不同、根目录没有 package.json，
+#                           不指定分支直接 clone 会导致 npm install 报 ENOENT）
 #   GIT_PROXY_ARGS          容器内 git clone 走代理，如：
 #                           GIT_PROXY_ARGS="-c http.proxy=http://192.168.1.x:7890 -c https.proxy=http://192.168.1.x:7890"
 #   NPM_REGISTRY            npm 镜像，如 https://registry.npmmirror.com
@@ -42,6 +45,7 @@ ROUNDS="${SOAK_ROUNDS:-12}"
 INTERVAL="${SOAK_INTERVAL:-5}"
 MAX_TOTAL="${SOAK_MAX_TOTAL_SECONDS:-1200}"
 PLUGIN_REPO="${PLUGIN_REPO:-https://github.com/TencentCloud/TencentDB-Agent-Memory}"
+PLUGIN_BRANCH="${PLUGIN_BRANCH:-main}"
 GIT_PROXY_ARGS="${GIT_PROXY_ARGS:-}"
 NPM_REGISTRY="${NPM_REGISTRY:-}"
 
@@ -82,7 +86,7 @@ NPM_ARGS=""
 docker exec "$CONTAINER" bash -c "
   set -e
   if [ ! -d /opt/tdai ]; then
-    git clone $GIT_PROXY_ARGS --depth 1 $PLUGIN_REPO /opt/tdai
+    git clone $GIT_PROXY_ARGS --depth 1 -b "$PLUGIN_BRANCH" "$PLUGIN_REPO" /opt/tdai
   fi
   cd /opt/tdai
   npm install $NPM_ARGS

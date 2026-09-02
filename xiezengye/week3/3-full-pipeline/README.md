@@ -52,6 +52,7 @@ bash run-pipeline.sh
 | `SOAK_ROUNDS` / `SOAK_INTERVAL` / `SOAK_MAX_TOTAL_SECONDS` | 12 / 5 / 1200 | soak 参数 |
 | `TDAI_LLM_API_KEY` / `TDAI_LLM_BASE_URL` / `TDAI_LLM_MODEL` | 复用 `MODEL_*` | 记忆抽取（L1/L2/L3）用的 LLM |
 | `PLUGIN_REPO` | TencentCloud/TencentDB-Agent-Memory | 插件源码仓库 |
+| `PLUGIN_BRANCH` | `main` | 插件分支。**必须 clone main**：该仓库默认分支是 `feat/server_team`（重构中的新结构，根目录无 `package.json`），不指定分支会在 npm install 报 ENOENT |
 | `GIT_PROXY_ARGS` | 空 | 容器内 git clone 走代理（见下面注意事项 3） |
 | `NPM_REGISTRY` | 空 | npm 镜像源（如 `https://registry.npmmirror.com`） |
 | `SKIP_BUILD` | 0 | 镜像已存在时置 1 跳过构建 |
