@@ -46,7 +46,7 @@ MODEL_API_KEY=sk-xxxx MODEL_BASE_URL=https://... MODEL_NAME=... bash run-pipelin
 2. `results-<时间戳>/result.json` 内容（passed: true + 统计）
 3. 三参数生效的对比（改 rounds/interval/max-total 各一次）
 4. 错误 API Key 的 `result.json`（passed: false, circuit_breaker, 401 明细）
-5. 进阶：`verify-l0l3.sh` 四合一输出（health / 数据目录 / persona / recall 四段）
+5. 进阶：`verify-l0l3.sh` 四合一输出（health / 数据目录 / persona / recall 四段）![image-20260902200615685](assets/image-20260902200615685.png)![image-20260902200636769](assets/image-20260902200636769.png)
 6. 流水线全流程终端记录（5 步日志）
 
 ## 注意事项（重要）
