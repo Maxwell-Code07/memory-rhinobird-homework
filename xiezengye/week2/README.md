@@ -12,7 +12,7 @@
 ```dockerfile
 # ============================================================
 # Week2 交付物 A：按版本号构建 Hermes 干净镜像
-# 构建命令（默认使用官方 apt/PyPI 源，任何网络环境可直接构建）：
+# 构建命令（默认使用官方 apt/PyPI 源，需可访问外网）：
 #   docker build --build-arg HERMES_VERSION=v2026.8.27 -t hermes:v2026.8.27 .
 # 国内加速（可选，apt 与 PyPI 源同时切换）：
 #   docker build --build-arg HERMES_VERSION=v2026.8.27 \
@@ -57,8 +57,14 @@ ENV UV_DEFAULT_INDEX=${UV_DEFAULT_INDEX}
 #    不会出现"管道吞掉退出码、构建成功但实际没装"的假成功；
 #    --retry/--retry-connrefused 让网络抖动时自动重试，提升构建稳定性；
 #    容器内以 root 安装，装完后：命令在 /usr/local/bin/hermes，代码在 /usr/local/lib/hermes-agent
+#    可选完整性校验：传 --build-arg INSTALL_SH_SHA256=<sha256> 固定脚本内容、
+#    在 CI/验收环境校验后执行；不传则跳过校验（保持默认构建的灵活性）。
+ARG INSTALL_SH_SHA256=
 RUN curl -fsSL --retry 3 --retry-delay 2 --retry-connrefused \
       https://hermes-agent.nousresearch.com/install.sh -o /tmp/install.sh \
+ && if [ -n "${INSTALL_SH_SHA256}" ]; then \
+        echo "${INSTALL_SH_SHA256}  /tmp/install.sh" | sha256sum -c - >/dev/null; \
+    fi \
  && bash /tmp/install.sh --branch "${HERMES_VERSION}" --skip-setup --non-interactive \
  && rm /tmp/install.sh
 
@@ -73,7 +79,7 @@ CMD ["hermes"]
 ### 1. 构建（验收标准 1）
 
 ```bash
-# 默认（官方源，任何网络环境）
+# 默认（官方源，需可访问外网）
 docker build --build-arg HERMES_VERSION=v2026.8.27 -t hermes:v2026.8.27 .
 
 # 国内网络加速（可选）：apt/PyPI 走清华 TUNA 镜像
@@ -170,6 +176,7 @@ docker run --rm hermes:v2026.8.19 git -C /usr/local/lib/hermes-agent describe --
 6. **不要用 `curl | bash` 管道执行安装脚本**（来自 PR review 的有效意见）：管道表达式的退出码取自最后一个命令，`bash -s` 读到空输入会以 0 退出——若 curl 下载失败，这一层仍会"构建成功"但什么都没装。正确做法是先 `curl -o` 下载成文件，再用 `&&` 链执行，任何一步失败整个 RUN 立即失败。
 7. **换源不要硬编码进 Dockerfile**（来自 PR review 的有效意见）：硬编码 TUNA 镜像会让海外/公司网络环境无法直接构建。正确做法是把镜像地址做成 `ARG`（`APT_MIRROR`、`UV_DEFAULT_INDEX`），默认官方源，国内构建时用 `--build-arg` 按需覆盖。
 8. **PyPI 换源参数名用 `UV_DEFAULT_INDEX` 而非 `UV_INDEX_URL`**：两者都用于指定默认索引，但 `UV_INDEX_URL`（对应 `--index-url`）在 uv 中已被标记 Deprecated，官方推荐用 `UV_DEFAULT_INDEX`（对应 `--default-index`，uv ≥ 0.4.23）。见 [uv 官方环境变量文档](https://docs.astral.sh/uv/reference/environment/)。
+9. **远端 install.sh 的供应链风险**（来自 Copilot review 的有效意见）：`install.sh` 从 hermes-agent.nousresearch.com 下载并以 root 执行，内容可能随时间变化导致构建不可复现。默认构建不校验以保证灵活性；若需固定脚本内容，可用 `--build-arg INSTALL_SH_SHA256=<sha256>` 传入校验值，Dockerfile 会在执行前用 `sha256sum -c` 校验，不符即中断构建。
 
 ---
 

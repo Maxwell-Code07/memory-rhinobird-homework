@@ -1,6 +1,6 @@
 # ============================================================
 # Week2 交付物 A：按版本号构建 Hermes 干净镜像
-# 构建命令（默认使用官方 apt/PyPI 源，任何网络环境可直接构建）：
+# 构建命令（默认使用官方 apt/PyPI 源，需可访问外网）：
 #   docker build --build-arg HERMES_VERSION=v2026.8.27 -t hermes:v2026.8.27 .
 # 国内加速（可选，apt 与 PyPI 源同时切换）：
 #   docker build --build-arg HERMES_VERSION=v2026.8.27 \
@@ -47,8 +47,14 @@ ENV UV_DEFAULT_INDEX=${UV_DEFAULT_INDEX}
 #    不会出现"管道吞掉退出码、构建成功但实际没装"的假成功；
 #    --retry/--retry-connrefused 让网络抖动时自动重试，提升构建稳定性；
 #    容器内以 root 安装，装完后：命令在 /usr/local/bin/hermes，代码在 /usr/local/lib/hermes-agent
+#    可选完整性校验：传 --build-arg INSTALL_SH_SHA256=<sha256> 固定脚本内容、
+#    在 CI/验收环境校验后执行；不传则跳过校验（保持默认构建的灵活性）。
+ARG INSTALL_SH_SHA256=
 RUN curl -fsSL --retry 3 --retry-delay 2 --retry-connrefused \
       https://hermes-agent.nousresearch.com/install.sh -o /tmp/install.sh \
+ && if [ -n "${INSTALL_SH_SHA256}" ]; then \
+        echo "${INSTALL_SH_SHA256}  /tmp/install.sh" | sha256sum -c - >/dev/null; \
+    fi \
  && bash /tmp/install.sh --branch "${HERMES_VERSION}" --skip-setup --non-interactive \
  && rm /tmp/install.sh
 
