@@ -25,13 +25,19 @@
 #                           GIT_PROXY_ARGS="-c http.proxy=http://192.168.1.x:7890 -c https.proxy=http://192.168.1.x:7890"
 #   NPM_REGISTRY            npm 镜像，如 https://registry.npmmirror.com
 #   SKIP_BUILD=1            镜像已存在时跳过构建
+#   CONTAINER_NAME          默认 hermes-week3-pipeline-<时间戳>（每次运行独立容器）
+#   RESULTS_DIR             默认 results-<时间戳>（每次运行结果独立保存，不覆盖历史）
 # =============================================================================
 set -euo pipefail
 cd "$(dirname "$0")"
 
 HERMES_VERSION="${HERMES_VERSION:-v2026.8.27}"
 IMAGE="hermes:${HERMES_VERSION}"
-CONTAINER="hermes-week3-pipeline"
+# 容器名与结果目录默认带时间戳后缀：并行/重复运行互不杀容器、互不覆盖结果。
+# 需要固定名字时可用环境变量覆盖（CONTAINER_NAME=xxx RESULTS_DIR=yyy）
+RUN_TS="$(date +%Y%m%d-%H%M%S)"
+CONTAINER="${CONTAINER_NAME:-hermes-week3-pipeline-${RUN_TS}}"
+RESULTS_DIR="${RESULTS_DIR:-results-${RUN_TS}}"
 ROUNDS="${SOAK_ROUNDS:-12}"
 INTERVAL="${SOAK_INTERVAL:-5}"
 MAX_TOTAL="${SOAK_MAX_TOTAL_SECONDS:-1200}"
@@ -48,7 +54,7 @@ TDAI_LLM_API_KEY="${TDAI_LLM_API_KEY:-$MODEL_API_KEY}"
 TDAI_LLM_BASE_URL="${TDAI_LLM_BASE_URL:-$MODEL_BASE_URL}"
 TDAI_LLM_MODEL="${TDAI_LLM_MODEL:-$MODEL_NAME}"
 
-WEEK2_DIR="../week2"           # 第二周交付物 A：Dockerfile
+WEEK2_DIR="../../week2"        # 第二周交付物 A：Dockerfile（本脚本位于 xiezengye/week3/3-full-pipeline/）
 SOAK_DIR="../1-basic-soak"     # 基础交付物：soak.mjs
 L0L3_DIR="../2-memory-l0l3"    # 进阶1交付物：事实剧本 + 验证脚本
 
@@ -140,9 +146,9 @@ set -e
 
 echo ""
 echo "----- 收集结果 -----"
-mkdir -p results
-docker cp "$CONTAINER":/opt/soak/out/. results/
-echo "soak 结果已复制到 $(pwd)/results/（result.json / report.txt / conversation.jsonl）"
+mkdir -p "$RESULTS_DIR"
+docker cp "$CONTAINER":/opt/soak/out/. "$RESULTS_DIR/"
+echo "soak 结果已复制到 $(pwd)/$RESULTS_DIR/（result.json / report.txt / conversation.jsonl）"
 
 echo ""
 echo "----- L0-L3 记忆验证（四张截图就位）-----"
@@ -155,7 +161,7 @@ echo ""
 bar() { echo "============================================================"; }
 bar
 echo " 流水线完成：soak 退出码 $SOAK_RC（0=通过，1=失败）"
-echo " 结果文件：$(pwd)/results/"
+echo " 结果文件：$(pwd)/$RESULTS_DIR/"
 echo " 容器 $CONTAINER 已保留，供手动截图 / 检查："
 echo "   docker exec -it $CONTAINER bash"
 echo "   docker exec $CONTAINER bash /opt/soak/verify-l0l3.sh    # 重跑四合一验证"

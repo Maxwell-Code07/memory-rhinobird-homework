@@ -12,7 +12,7 @@
 
 用到的其它交付物：
 
-- 第二周 `../week2/Dockerfile`（交付物 A：按版本号构建干净 Hermes 镜像）
+- 第二周 `../../week2/Dockerfile`（交付物 A：按版本号构建干净 Hermes 镜像）
 - 基础 `../1-basic-soak/soak.mjs`（交付物 B：自动对话驱动）
 - 进阶 1 `../2-memory-l0l3/conversation-facts.txt` + `verify-l0l3.sh`（事实剧本 + 四合一验证）
 
@@ -29,8 +29,8 @@ bash run-pipeline.sh
 
 跑完输出：
 
-- `results/result.json` —— soak 结构化判定（pass/fail + 轮次统计）
-- `results/report.txt`、`results/conversation.jsonl` —— 报告与逐轮记录
+- `results-<时间戳>/result.json` —— soak 结构化判定（pass/fail + 轮次统计）
+- `results-<时间戳>/report.txt`、`results-<时间戳>/conversation.jsonl` —— 报告与逐轮记录
 - 终端上的四合一 L0-L3 验证输出（**直接截图**）
 - 容器保留存活，供随时 `docker exec` 进去补充截图
 

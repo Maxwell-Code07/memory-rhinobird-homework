@@ -23,7 +23,7 @@ MODEL_NAME=deepseek-v3.2 \
 bash run-basic.sh
 ```
 
-结果落在 `results/`：`result.json`（结构化判定）、`report.txt`（人类可读报告）、`conversation.jsonl`（逐轮对话记录）。
+结果落在 `results-<时间戳>/`（每次运行独立目录，不覆盖历史）：`result.json`（结构化判定）、`report.txt`（人类可读报告）、`conversation.jsonl`（逐轮对话记录）。
 
 ### 方式二：手动分步（理解原理用）
 

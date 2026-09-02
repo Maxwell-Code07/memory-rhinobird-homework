@@ -16,7 +16,8 @@ cd memory-rhinobird-homework/xiezengye/week3
 
 # 基础：跑 10 轮闲聊 soak，出结构化 JSON（约 5-10 分钟）
 cd 1-basic-soak
-MODEL_API_KEY=sk-xxxx MODEL_BASE_URL=https://... MODEL_NAME=... bash run-basic.sh
+MODEL_API_KEY=你的key MODEL_BASE_URL=https://api.deepseek.com MODEL_NAME=deepseek-v4-flash bash run-basic.sh
+
 
 # 演示异常容错：故意给错 Key → 应报 fail 而不是假通过（截图用）
 MODEL_API_KEY=sk-invalid MODEL_BASE_URL=https://... MODEL_NAME=... bash run-basic.sh
@@ -32,7 +33,7 @@ MODEL_API_KEY=sk-xxxx MODEL_BASE_URL=https://... MODEL_NAME=... bash run-pipelin
 
 | 验收标准 | 满足方式 |
 |---|---|
-| 基础 1：自动完成 N 轮对话并输出结构化 JSON | `results/result.json` + 终端截图 |
+| 基础 1：自动完成 N 轮对话并输出结构化 JSON | `results-<时间戳>/result.json` + 终端截图 |
 | 基础 2：轮次/间隔/总时长三参数都生效 | `SOAK_ROUNDS` / `SOAK_INTERVAL` / `SOAK_MAX_TOTAL_SECONDS`，改小数值各跑一次截图对比 |
 | 基础 3：结果明确 pass/fail，含轮次、耗时统计 | `result.json` 的 `passed`、`rounds`、`stats`（avg/p50/p95） |
 | 基础 4：至少演示一种异常容错 | 错误 API Key → 401 报错回复识别 → 熔断 → fail（见 1-basic-soak/README.md「演示异常容错」） |
@@ -42,7 +43,7 @@ MODEL_API_KEY=sk-xxxx MODEL_BASE_URL=https://... MODEL_NAME=... bash run-pipelin
 ## 交付物截图清单（拍照顺序建议）
 
 1. 基础 soak 终端（逐轮 ✓/✗ 进度 + 最终 PASSED）
-2. `results/result.json` 内容（passed: true + 统计）
+2. `results-<时间戳>/result.json` 内容（passed: true + 统计）
 3. 三参数生效的对比（改 rounds/interval/max-total 各一次）
 4. 错误 API Key 的 `result.json`（passed: false, circuit_breaker, 401 明细）
 5. 进阶：`verify-l0l3.sh` 四合一输出（health / 数据目录 / persona / recall 四段）

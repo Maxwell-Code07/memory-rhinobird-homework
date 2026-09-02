@@ -18,13 +18,19 @@
 #   SOAK_INTERVAL            默认 5（秒）
 #   SOAK_MAX_TOTAL_SECONDS   默认 600（秒）
 #   SKIP_BUILD=1             镜像已存在时跳过构建
+#   CONTAINER_NAME           默认 hermes-week3-basic-<时间戳>（每次运行独立容器，互不干扰）
+#   RESULTS_DIR              默认 results-<时间戳>（每次运行结果独立保存，不覆盖历史）
 # =============================================================================
 set -euo pipefail
 cd "$(dirname "$0")"
 
 HERMES_VERSION="${HERMES_VERSION:-v2026.8.27}"
 IMAGE="hermes:${HERMES_VERSION}"
-CONTAINER="hermes-week3-basic"
+# 容器名与结果目录默认带时间戳后缀：多终端并行/多次运行互不杀容器、互不覆盖结果。
+# 需要固定名字时可用环境变量覆盖（CONTAINER_NAME=xxx RESULTS_DIR=yyy）
+RUN_TS="$(date +%Y%m%d-%H%M%S)"
+CONTAINER="${CONTAINER_NAME:-hermes-week3-basic-${RUN_TS}}"
+RESULTS_DIR="${RESULTS_DIR:-results-${RUN_TS}}"
 ROUNDS="${SOAK_ROUNDS:-10}"
 INTERVAL="${SOAK_INTERVAL:-5}"
 MAX_TOTAL="${SOAK_MAX_TOTAL_SECONDS:-600}"
@@ -34,7 +40,7 @@ MAX_TOTAL="${SOAK_MAX_TOTAL_SECONDS:-600}"
 : "${MODEL_NAME:?请设置 MODEL_NAME 环境变量}"
 MODEL_PROVIDER="${MODEL_PROVIDER:-custom}"
 
-WEEK2_DIR="../week2"   # 第二周交付物 A：Dockerfile 所在目录
+WEEK2_DIR="../../week2"   # 第二周交付物 A：Dockerfile 所在目录（本脚本位于 xiezengye/week3/1-basic-soak/）
 
 echo "===== [1/3] docker build（复用第二周 Dockerfile：${WEEK2_DIR}/Dockerfile）====="
 if [ "${SKIP_BUILD:-0}" = "1" ]; then
@@ -82,9 +88,9 @@ set -e
 
 echo ""
 echo "----- 收集结果 -----"
-mkdir -p results
-docker cp "$CONTAINER":/opt/soak/out/. results/
-echo "结果已复制到 $(pwd)/results/：result.json（结构化判定）/ report.txt（报告）/ conversation.jsonl（逐轮记录）"
+mkdir -p "$RESULTS_DIR"
+docker cp "$CONTAINER":/opt/soak/out/. "$RESULTS_DIR/"
+echo "结果已复制到 $(pwd)/$RESULTS_DIR/：result.json（结构化判定）/ report.txt（报告）/ conversation.jsonl（逐轮记录）"
 echo "soak 退出码：$SOAK_RC（0=通过，1=失败）"
 echo ""
 echo "容器 $CONTAINER 保留供检查：docker exec -it $CONTAINER bash"
