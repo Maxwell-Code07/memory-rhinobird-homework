@@ -71,6 +71,6 @@ bash run-pipeline.sh
 2. **凭证安全**：模型 Key 只经环境变量注入容器，不写入镜像层、不进 git；`config.yaml` 里会含 key，但只存在于容器内 `/root/.hermes/`；
 3. **国内网络**：容器内 `git clone` GitHub 不通时，把宿主机代理传给 git：
    `GIT_PROXY_ARGS="-c http.proxy=http://<宿主机IP>:7890 -c https.proxy=http://<宿主机IP>:7890" bash run-pipeline.sh`（注意用宿主机在 docker 网络里的 IP，不是 127.0.0.1）；npm 慢就加 `NPM_REGISTRY=https://registry.npmmirror.com`；
-4. **Gateway 起不来的排查**：`docker exec hermes-week3-pipeline tail -50 /tmp/gateway.log`，常见原因是 npm install 没装全或 TDAI_LLM_* 缺失；
+4. **npm install 报 `Cannot read properties of null (reading 'edgesOut')`**：npm 10.x 解析插件 optional peerDependencies（openclaw / node-llama-cpp，我们用不到）时的已知 bug，脚本已内置 `--legacy-peer-deps` 自动重试。**Gateway 起不来的排查**：`docker exec <容器名> tail -50 /tmp/gateway.log`，常见原因是 npm install 没装全或 TDAI_LLM_* 缺失；
 5. **重复跑**：脚本开头会 `docker rm -f` 同名容器再重建，直接重跑即可；插件源码目录 `/opt/tdai` 已存在时跳过 clone，改用缓存的源码；
 6. 跑完别急着删容器——四张 L0-L3 截图都在里面拍（`docker exec -it hermes-week3-pipeline bash` 进去随意翻）。

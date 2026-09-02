@@ -89,7 +89,13 @@ docker exec "$CONTAINER" bash -c "
     git clone $GIT_PROXY_ARGS --depth 1 -b "$PLUGIN_BRANCH" "$PLUGIN_REPO" /opt/tdai
   fi
   cd /opt/tdai
-  npm install $NPM_ARGS
+  # 插件的 peerDependencies（openclaw / node-llama-cpp，均 optional）会触发 npm 10.x
+  # arborist 已知 bug：Cannot read properties of null (reading 'edgesOut')。
+  # 这两个 peer 我们用不到（走 Hermes 而非 openclaw），失败时用 --legacy-peer-deps 跳过 peer 解析。
+  if ! npm install $NPM_ARGS; then
+    echo "[warn] npm install 失败，加 --legacy-peer-deps 重试（跳过 optional peerDependencies 解析）"
+    npm install $NPM_ARGS --legacy-peer-deps
+  fi
   # 挂载 Provider：目录名必须是 memory_tencentdb（下划线），Hermes 从 ~/.hermes/plugins/ 扫描
   mkdir -p /root/.hermes/plugins
   rm -rf /root/.hermes/plugins/memory_tencentdb
