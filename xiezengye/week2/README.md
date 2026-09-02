@@ -169,6 +169,7 @@ docker run --rm hermes:v2026.8.19 git -C /usr/local/lib/hermes-agent describe --
 5. **安装层耗时长是正常的**：install.sh 要从 GitHub 拉源码并用 uv 安装 Python 依赖，首次构建该层约 15-20 分钟；`ARG`/`ENV` 行不产生构建步骤，日志里只有 FROM + 3 条 RUN 属正常。
 6. **不要用 `curl | bash` 管道执行安装脚本**（来自 PR review 的有效意见）：管道表达式的退出码取自最后一个命令，`bash -s` 读到空输入会以 0 退出——若 curl 下载失败，这一层仍会"构建成功"但什么都没装。正确做法是先 `curl -o` 下载成文件，再用 `&&` 链执行，任何一步失败整个 RUN 立即失败。
 7. **换源不要硬编码进 Dockerfile**（来自 PR review 的有效意见）：硬编码 TUNA 镜像会让海外/公司网络环境无法直接构建。正确做法是把镜像地址做成 `ARG`（`APT_MIRROR`、`UV_DEFAULT_INDEX`），默认官方源，国内构建时用 `--build-arg` 按需覆盖。
+8. **PyPI 换源参数名用 `UV_DEFAULT_INDEX` 而非 `UV_INDEX_URL`**：两者都用于指定默认索引，但 `UV_INDEX_URL`（对应 `--index-url`）在 uv 中已被标记 Deprecated，官方推荐用 `UV_DEFAULT_INDEX`（对应 `--default-index`，uv ≥ 0.4.23）。见 [uv 官方环境变量文档](https://docs.astral.sh/uv/reference/environment/)。
 
 ---
 

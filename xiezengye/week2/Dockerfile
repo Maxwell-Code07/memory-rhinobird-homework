@@ -35,6 +35,8 @@ RUN sed -i "s|deb.debian.org|${APT_MIRROR}|g" /etc/apt/sources.list.d/debian.sou
  && rm -rf /var/lib/apt/lists/*
 
 # 6 uv 安装 Python 依赖的索引，默认官方 PyPI；国内可传 TUNA 镜像地址覆盖
+#    变量名 UV_DEFAULT_INDEX 是 uv >= 0.4.23 的官方推荐写法（对应 --default-index）；
+#    旧名 UV_INDEX_URL（对应 --index-url）在 uv 中已标记 Deprecated，故此处用新名。
 ARG UV_DEFAULT_INDEX=https://pypi.org/simple
 ENV UV_DEFAULT_INDEX=${UV_DEFAULT_INDEX}
 
