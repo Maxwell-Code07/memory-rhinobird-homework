@@ -41,8 +41,7 @@ hermes-agent==${HERMES_VERSION}
   `hermes-agent` 包，并禁用 pip 下载缓存以减小镜像。
 - **构建期验证**：读取已安装的 Python 包元数据，与 `HERMES_VERSION`
   比较；两者不一致时使构建失败。
-- **容器入口**：使用 `hermes` 作为镜像入口，使 `--version` 等容器参数
-  可以直接传给 Hermes。
+- 
 - **运行用户**：使用无特权的 `hermes` 用户运行程序，并为其提供
   可写的用户主目录。
 
