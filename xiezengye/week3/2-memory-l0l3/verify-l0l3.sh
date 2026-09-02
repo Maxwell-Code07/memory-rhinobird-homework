@@ -69,13 +69,21 @@ fi
 echo ""
 echo "== ④ /recall 召回测试 =="
 echo "查询：$QUERY"
+echo "session_key: $SESSION_KEY"
 RESP="$(curl -s --max-time 20 -X POST "$GATEWAY/recall" \
   -H 'Content-Type: application/json' \
-  -d "{\"query\": \"$QUERY\"}" 2>/dev/null)"
+  -d "{\"query\": \"$QUERY\", \"session_key\": \"$SESSION_KEY\"}" 2>/dev/null)"
 if [ -n "$RESP" ]; then
   echo "$RESP" | head -c 2000
   echo ""
-  echo "   [OK] /recall 有响应（上面内容含记忆上下文即代表召回正常）"
+  # 真正的 OK 判定：响应不含 error 字段、且 context 非空
+  if echo "$RESP" | grep -q '"error"'; then
+    echo "   [FAIL] /recall 返回了 error：$RESP"
+  elif echo "$RESP" | grep -qE '"context"\s*:\s*"[^"]+"'; then
+    echo "   [OK] /recall 召回成功（context 非空，含记忆上下文）"
+  else
+    echo "   [WARN] /recall 响应格式不符合预期（既无 error 也无 context 字段）"
+  fi
 else
   echo "   [FAIL] /recall 无响应"
 fi

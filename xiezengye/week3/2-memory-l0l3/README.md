@@ -80,4 +80,5 @@ docker exec hermes-week3-pipeline bash /opt/soak/verify-l0l3.sh
 2. **记忆抽取需要第二个 LLM**：Gateway 用 `TDAI_LLM_*` 环境变量做 L1/L2/L3 抽取，`run-pipeline.sh` 默认复用对话模型（`MODEL_*`），也可以单独指定更便宜的模型；
 3. **数据目录**：默认 `~/.memory-tencentdb/memory-tdai`，流水线里用 `TDAI_DATA_DIR=/root/memory-tdai` 显式固定，方便截图和 docker cp；
 4. **Provider 目录名必须是 `memory_tencentdb`**（下划线），且 `config.yaml` 里 `memory.provider: memory_tencentdb`——名字错了 Hermes 扫不到插件，对话正常但什么记忆都不会沉淀；
-5. 如果 soak 全部通过但数据目录是空的：先看 Gateway 日志（`docker exec hermes-week3-pipeline tail -50 /tmp/gateway.log`）里有没有 capture 记录，再确认 `config.yaml` 的 memory 段没写漏。
+5. 如果 soak 全部通过但数据目录是空的：先看 Gateway 日志（`docker exec hermes-week3-pipeline tail -50 /tmp/gateway.log`）里有没有 capture 记录，再确认 `config.yaml` 的 memory 段没写漏；
+6. **/recall 路由强制要求 `query` 和 `session_key` 两个字段**（缺一个返回 400 `Missing required fields: query, session_key`），本脚本已经默认带上 `RECALL_SESSION_KEY=hermes-week3-verify`。
