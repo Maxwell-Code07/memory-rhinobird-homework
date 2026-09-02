@@ -14,9 +14,11 @@
 # Week2 交付物 A：按版本号构建 Hermes 干净镜像
 # 构建命令（默认使用官方 apt/PyPI 源，任何网络环境可直接构建）：
 #   docker build --build-arg HERMES_VERSION=v2026.8.27 -t hermes:v2026.8.27 .
-# 国内加速（可选）：
+# 国内加速（可选，apt 与 PyPI 源同时切换）：
 #   docker build --build-arg HERMES_VERSION=v2026.8.27 \
-#     --build-arg APT_MIRROR=mirrors.tuna.tsinghua.edu.cn -t hermes:v2026.8.27 .
+#     --build-arg APT_MIRROR=mirrors.tuna.tsinghua.edu.cn \
+#     --build-arg UV_DEFAULT_INDEX=https://pypi.tuna.tsinghua.edu.cn/simple \
+#     -t hermes:v2026.8.27 .
 # ============================================================
 
 # 1 基础镜像：Node 22 + Debian 12(bookworm) 精简版
@@ -53,8 +55,10 @@ ENV UV_DEFAULT_INDEX=${UV_DEFAULT_INDEX}
 #    --skip-setup --non-interactive 跳过交互式配置向导（构建环境无法交互）；
 #    下载与执行分离（不用 curl | bash 管道）：curl 失败时 && 链直接中断，
 #    不会出现"管道吞掉退出码、构建成功但实际没装"的假成功；
+#    --retry/--retry-connrefused 让网络抖动时自动重试，提升构建稳定性；
 #    容器内以 root 安装，装完后：命令在 /usr/local/bin/hermes，代码在 /usr/local/lib/hermes-agent
-RUN curl -fsSL https://hermes-agent.nousresearch.com/install.sh -o /tmp/install.sh \
+RUN curl -fsSL --retry 3 --retry-delay 2 --retry-connrefused \
+      https://hermes-agent.nousresearch.com/install.sh -o /tmp/install.sh \
  && bash /tmp/install.sh --branch "${HERMES_VERSION}" --skip-setup --non-interactive \
  && rm /tmp/install.sh
 
