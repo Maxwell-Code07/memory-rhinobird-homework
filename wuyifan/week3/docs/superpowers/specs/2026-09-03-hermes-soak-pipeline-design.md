@@ -38,28 +38,54 @@ soak 支持两种命令前缀：
 ```text
 week3/
 ├── 1-basic-soak/
+│   ├── Dockerfile
 │   ├── hermes-soak.mjs
 │   ├── run-soak.sh
 │   ├── prompts.json
+│   ├── hermes-config.yaml.example
 │   ├── .env.example
 │   ├── .gitignore
 │   ├── README.md
 │   └── results/
 ├── 2-memory-l0l3/
+│   ├── Dockerfile
+│   ├── hermes-soak.mjs
+│   ├── run-soak.sh
 │   ├── memory-prompts.json
+│   ├── install-memory.sh
+│   ├── tdai-gateway.json
 │   ├── verify-memory.sh
+│   ├── hermes-config.yaml.example
+│   ├── .env.example
+│   ├── .gitignore
 │   ├── README.md
+│   ├── results/
 │   └── evidence/
 └── 3-full-pipeline/
+    ├── Dockerfile
+    ├── hermes-soak.mjs
+    ├── run-soak.sh
+    ├── memory-prompts.json
+    ├── install-memory.sh
+    ├── verify-memory.sh
     ├── pipeline.sh
     ├── tdai-gateway.json
+    ├── hermes-config.yaml.example
     ├── .env.example
     ├── .gitignore
     ├── README.md
+    ├── results/
     └── evidence/
 ```
 
-`1-basic-soak/hermes-soak.mjs` 是唯一的 soak 核心实现。进阶目录通过命令行参数引用它，不复制第二份核心脚本。
+三个阶段都是可独立运行的项目：
+
+- 不在运行时引用 `../week2`、`../1-basic-soak` 或其他阶段目录。
+- 不用符号链接共享 Dockerfile、脚本或配置。
+- 每个目录拥有自己的 Dockerfile、soak 核心、运行入口、剧本、配置模板和 README。
+- 任一阶段目录单独复制到新位置后，只需按它自己的 README 准备凭证就能运行。
+
+为满足这一交付要求，`hermes-soak.mjs`、Dockerfile 等通用文件会以真实文件复制到后续阶段。这是有意的交付物重复，不抽取跨目录共享模块。每次修改通用文件后，用 `cmp` 或校验和确认各份必要副本保持一致。
 
 ## 4. 基础 Soak 数据流
 
@@ -134,7 +160,7 @@ week3/
 
 ## 7. 完整 Docker 流水线
 
-1. 接收 `HERMES_VERSION`，调用第二周 Dockerfile 构建干净镜像。
+1. 接收 `HERMES_VERSION`，调用当前阶段目录自带的 Dockerfile 构建干净镜像。该 Dockerfile 的内容源自第二周交付物，但第三周运行时不依赖第二周目录。
 2. 以 `sleep infinity` 覆盖默认入口，启动后台容器。
 3. 通过 `docker exec -u root` 在运行中的容器内从 npm 安装指定版本的 `@tencentdb-agent-memory/memory-tencentdb`。
 4. 把 provider 安装到 `/home/hermes/.hermes/plugins/memory_tencentdb`。PyPI 版 Hermes 0.19.0 从 `$HERMES_HOME/plugins/<name>` 发现用户插件，不使用本机源码 checkout 的插件路径。
@@ -154,6 +180,12 @@ week3/
 - 容器内存储为作业测试数据，清理前先导出验收证据。
 
 ## 9. 验证策略
+
+### 独立性检查
+
+- 扫描三个阶段的脚本、配置和 README，不允许出现运行时跨目录引用。
+- 分别从三个阶段目录作为当前工作目录执行其 `--help` 与快速测试。
+- 最终验收时可把某一阶段复制到临时目录，验证它不依赖 `week2` 或其他阶段文件。
 
 ### 基础阶段
 
@@ -179,7 +211,7 @@ week3/
 
 ## 10. 非目标
 
-- 不修改第二周的干净 Dockerfile，不把记忆插件固化进该镜像。
+- 不修改第二周的干净 Dockerfile。各阶段在自己目录中保存其副本，但不把记忆插件固化进基础镜像。
 - 不运行或依赖 OpenClaw Gateway。
 - 不把 DeepSeek 文本生成端点宣称为 Embedding 服务。
 - 不为作业引入外部 Node.js 依赖、数据库服务或编排平台。
