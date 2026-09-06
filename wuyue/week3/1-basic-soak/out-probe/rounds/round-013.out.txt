@@ -1,0 +1,6 @@
+  ⚠ tirith security scanner enabled but not available — command scanning will use pattern matching only
+简单给一句总结，避免信息过载：
+
+核心就一句话——**OTel 是前端埋点/采集标准，Prometheus 是后端指标存储+告警**，真该比的是"遥测后端用谁"，而不是在这两者间二选一。你的跨分片 trace 硬约束只有 OTel 能做到，所以前端直接上 OTel 基本没悬念；Prometheus 是它指标那一路的收口后端，两者叠着用是标配。
+
+（已记下你在 9/9 灰度前需收敛选型这个约束。需要的话我把"跨分库 trace 验收清单"展开成照做步骤。）

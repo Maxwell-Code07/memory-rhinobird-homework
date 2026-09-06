@@ -1,0 +1,78 @@
+{
+  "generator": "soak.js — Hermes 版，结构对齐 openclaw-soak-tool/standalone-soak.mjs",
+  "started_at": "2026-09-06T11:13:16.944Z",
+  "ended_at": "2026-09-06T11:16:27.013Z",
+  "duration_ms": 190070,
+  "verdict": "pass",
+  "stop_reason": "rounds",
+  "params": {
+    "rounds": 10,
+    "interval_ms": 6000,
+    "duration_sec": 0,
+    "timeout_ms": 180000,
+    "pass_rate": 0.9,
+    "session_mode": "new",
+    "probe_every": 0,
+    "message_source": "topic-pool",
+    "hermes": "hermes",
+    "resource_interval_ms": 10000,
+    "log_files": [],
+    "flush_every": 100,
+    "max_consecutive_failures": 0
+  },
+  "totalRounds": 10,
+  "successCount": 10,
+  "failureCount": 0,
+  "failureRate": "0.0%",
+  "earlyExitReason": null,
+  "sessionMode": "new",
+  "sessionId": null,
+  "latency": {
+    "min": 9069,
+    "max": 18775,
+    "mean": 13596,
+    "p50": 15086,
+    "p90": 15956,
+    "p95": 18775,
+    "p99": 18775
+  },
+  "topErrors": [],
+  "results": {
+    "total": 10,
+    "passed": 10,
+    "failed": 0,
+    "success_rate": 1,
+    "failed_by_type": {}
+  },
+  "probes": null,
+  "resources": {
+    "target": "gateway(/opt/tdai-gateway/node_modules/@tencentdb-agent-memory/memor)",
+    "pid": 1,
+    "snapshotCount": 19,
+    "durationSec": 180,
+    "rss": {
+      "initialMb": "588.6",
+      "peakMb": "589.7",
+      "finalMb": "587.3",
+      "growthRatio": "1.00x"
+    },
+    "cpu": {
+      "avgPct": "1.6",
+      "peakPct": "9.9"
+    },
+    "fd": {
+      "initial": 31,
+      "peak": 34,
+      "final": 32
+    }
+  },
+  "logs": {
+    "files": [],
+    "totalErrors": 0,
+    "totalWarns": 0,
+    "topErrors": [],
+    "topWarns": [],
+    "memoryEvents": 0,
+    "totalEvents": 0
+  }
+}

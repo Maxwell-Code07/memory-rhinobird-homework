@@ -1,0 +1,21 @@
+╔════════════════════════════════════════════════════════════════╗
+║        HERMES SOAK TEST REPORT (Hermes CLI headless)
+╚════════════════════════════════════════════════════════════════╝
+  Duration:        16.5s  (stop=rounds)
+  Total rounds:    3
+  Successes:       0
+  Failures:        3 (100.0%)
+  Verdict:         FAIL  (threshold 90%)
+
+  LATENCY (successful rounds)
+
+  RESOURCES (gateway(/opt/tdai-gateway/node_modules/@tencentdb-agent-memory/memor))
+  RSS initial:     589.5 MB   peak: 589.5 MB   growth: 1.00x
+  CPU avg:         0.7%   peak: 0.7%
+  FDs initial:     32   peak: 32
+
+  round detail:
+  #  1 FAIL exit-1         3979ms session_id: 20260906_111757_64998a
+  #  2 FAIL exit-1         4485ms session_id: 20260906_111803_076c7b
+  #  3 FAIL exit-1         4002ms session_id: 20260906_111810_80405e
+

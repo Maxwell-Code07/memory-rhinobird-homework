@@ -1,0 +1,27 @@
+  ⚠ tirith security scanner enabled but not available — command scanning will use pattern matching only
+OpenTelemetry 和 Prometheus 不是二选一，是两层东西，关键在搞清各自边界。
+
+先用一句话区分：
+
+Prometheus 是 metrics 的存储 + 查询 + 告警后端。OTel 是标准化的埋点 + 采集 + 传输的体系（规范、SDK、Collector），它本身不解决"数据存哪、怎么查"。
+
+所以现实里最常见的终局是：**OTel 做统一埋点和采集入口，Prometheus（或其兼容栈）做 metrics 的落地**。这俩不是竞争关系，选型纠结往往是把"埋点标准"和"指标后端"混在了一起。
+
+对你这个 Go 场景，我拆成四段说：
+
+一、链路追踪（你的硬门槛之一）
+OTel 在 trace 这块没有对手。distributed tracing 的 W3C Trace-Context 就是 OTel 在推，Go SDK 生态成熟（otel-go 是官方一等公民），能接到 Jaeger / Tempo / 自家后端。而 Prometheus 只是个存储，trace 一般不走它，硬塞也撑不住高基数查询那套。
+
+二、指标侧
+Go 服务要算 QPS/延迟/P99 这类，你几乎躲不开 Prometheus 数据模型（Counter/Gauge/Histogram + 标签 + PromQL），因为它是事实标准，Grafana 背后基本就是它。OTel 这边要么通过 OTel SDK 直接吐 metrics，要么用 Prometheus 的 Go 客户端（promhttp）埋点，再由 OTel Collector 转一手。
+
+三、选型的真正分歧点：统一 vs 简单
+- 走"统一派"：全链路 OTel SDK 埋点 + OTel Collector 做管道，Collector 里再 export 到 Prometheus（metrics）、Jaeger/Tempo（trace）。优势是埋点层面只用一套 API，未来迁后端、进 K8s、加 platform 都很顺。代价是引入 Collector 一层，多一个运维心智负担。
+- 走"简单派"：先只接 Prometheus 客户端做 metrics，trace 单独用 Jaeger SDK 或干脆先不做。上手快、依赖少，但埋点 API 迟早要迁成 OTel——届时是重构成本。
+
+四、顺着你"先低风险、链路真跑通、留扩展"判据给建议
+你这三道门槛其实指向一个清晰的折中：**用 OTel Go SDK 做埋点（trace + metrics 都从一套 API 出），先不引 Collector，SDK 直接 export 到 Prometheus 做指标展示；trace 看是接 Jaeger 还是暂缓。** 这样埋点层一步到位（保住扩展性、链路能真跑通），又比一上来全家桶少扛一个 Collector，小范围灰度足够低风险。
+
+如果你愿意，我可以帮你在本地起一个最小可跑通的 demo——一个 Go 服务用 OTel SDK 埋 trace/metrics，export 到 Prometheus 和 Jaeger，用 docker compose 一把起来，让你亲眼看链路和数据真跑通，再决定是不是把 Collector 加进管道。要的话我就动手，代码写完会先给你看测试覆盖再谈实现（按你的评审顺序）。
+
+要往哪个方向深聊？是想先落这个 demo，还是先掰一掰 OTel 和 Prometheus 在你分库分表这个具体架构里、trace 要跨 query 那个环节怎么埋最合适？

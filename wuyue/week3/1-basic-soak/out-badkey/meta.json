@@ -1,0 +1,88 @@
+{
+  "generator": "soak.js — Hermes 版，结构对齐 openclaw-soak-tool/standalone-soak.mjs",
+  "started_at": "2026-09-06T11:17:57.228Z",
+  "ended_at": "2026-09-06T11:18:13.705Z",
+  "duration_ms": 16477,
+  "verdict": "fail",
+  "stop_reason": "rounds",
+  "params": {
+    "rounds": 3,
+    "interval_ms": 2000,
+    "duration_sec": 0,
+    "timeout_ms": 180000,
+    "pass_rate": 0.9,
+    "session_mode": "new",
+    "probe_every": 0,
+    "message_source": "topic-pool",
+    "hermes": "hermes",
+    "resource_interval_ms": 10000,
+    "log_files": [],
+    "flush_every": 100,
+    "max_consecutive_failures": 0
+  },
+  "totalRounds": 3,
+  "successCount": 0,
+  "failureCount": 3,
+  "failureRate": "100.0%",
+  "earlyExitReason": null,
+  "sessionMode": "new",
+  "sessionId": null,
+  "latency": null,
+  "topErrors": [
+    {
+      "error": "session_id: 20260906_111757_64998a",
+      "count": 1,
+      "lastRound": 1
+    },
+    {
+      "error": "session_id: 20260906_111803_076c7b",
+      "count": 1,
+      "lastRound": 2
+    },
+    {
+      "error": "session_id: 20260906_111810_80405e",
+      "count": 1,
+      "lastRound": 3
+    }
+  ],
+  "results": {
+    "total": 3,
+    "passed": 0,
+    "failed": 3,
+    "success_rate": 0,
+    "failed_by_type": {
+      "exit-1": 3
+    }
+  },
+  "probes": null,
+  "resources": {
+    "target": "gateway(/opt/tdai-gateway/node_modules/@tencentdb-agent-memory/memor)",
+    "pid": 1,
+    "snapshotCount": 2,
+    "durationSec": 10,
+    "rss": {
+      "initialMb": "589.5",
+      "peakMb": "589.5",
+      "finalMb": "589.4",
+      "growthRatio": "1.00x"
+    },
+    "cpu": {
+      "avgPct": "0.7",
+      "peakPct": "0.7"
+    },
+    "fd": {
+      "initial": 32,
+      "peak": 32,
+      "final": 32
+    }
+  },
+  "logs": {
+    "files": [],
+    "totalErrors": 0,
+    "totalWarns": 0,
+    "topErrors": [],
+    "topWarns": [],
+    "memoryEvents": 0,
+    "totalEvents": 0
+  }
+}

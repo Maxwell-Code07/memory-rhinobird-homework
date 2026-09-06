@@ -1,0 +1,9 @@
+  ⚠ tirith security scanner enabled but not available — command scanning will use pattern matching only
+可以。
+
+以后你的代码评审请求，我会固定按这个顺序执行：
+
+1. 先看单元测试覆盖——测了什么、覆盖了哪些路径、边界和异常兜没兜住，有没有关键分支裸奔；
+2. 再看实现细节——代码结构、逻辑、潜在问题。
+
+这条我已经记进长期偏好了，后续评审都会默认遵守。如果是临时想打破顺序的评审，你也随时说一声就行。

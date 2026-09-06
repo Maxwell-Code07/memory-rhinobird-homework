@@ -1,0 +1,31 @@
+╔════════════════════════════════════════════════════════════════╗
+║        HERMES SOAK TEST REPORT (Hermes CLI headless)
+╚════════════════════════════════════════════════════════════════╝
+  Duration:        153.6s  (stop=rounds)
+  Total rounds:    8
+  Successes:       8
+  Failures:        0 (0.0%)
+  Verdict:         PASS  (threshold 90%)
+
+  LATENCY (successful rounds)
+  P50 (median):    10.46s
+  P90:             13.07s
+  P95:             48.49s
+  P99:             48.49s
+  max:             48.49s
+
+  RESOURCES (gateway(/opt/tdai-gateway/node_modules/@tencentdb-agent-memory/memor))
+  RSS initial:     900.6 MB   peak: 900.6 MB   growth: 0.64x
+  CPU avg:         1.7%   peak: 5.6%
+  FDs initial:     22   peak: 33
+
+  round detail:
+  #  1 PASS ok            48487ms 有什么我能帮你的？无论是 Go 相关的开发问题、架构设计，还是别的任务，直接说就行。
+  #  2 PASS ok             9025ms 直接说需求就行。
+  #  3 PASS ok            10361ms 想从哪方面深入聊?
+  #  4 PASS ok            13071ms 需要我围绕这套栈做点什么吗？比如梳理分库分表的容量规划、中间件选型，还是别的具体问题。
+  #  5 PASS ok             7293ms 小巫，方便透露你们团队是怎么落实评审的？比如是 PR review 强制、看板卡门禁，还是多人交叉评审？如果你愿意，我可以帮你梳理一套适合支
+  #  6 PASS ok             7442ms 顺便问一句——你是想让 Hermes 帮你管点什么猫相关的事吗？比如定个定时提醒喂食/梳毛、备忘驱虫疫苗的时间，还是就是想聊两句猫?
+  #  7 PASS ok            12428ms 还有什么想补充的吗？比如工作周报、支付网关那边的事，或者别的？
+  #  8 PASS ok            10462ms 已存进你的偏好档案，下次帮你处理外卖或聚餐安排会直接带上这条。
+

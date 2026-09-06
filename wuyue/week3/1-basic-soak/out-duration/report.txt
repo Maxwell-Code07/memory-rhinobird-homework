@@ -1,0 +1,26 @@
+╔════════════════════════════════════════════════════════════════╗
+║        HERMES SOAK TEST REPORT (Hermes CLI headless)
+╚════════════════════════════════════════════════════════════════╝
+  Duration:        90.0s  (stop=duration(90s))
+  Total rounds:    3
+  Successes:       3
+  Failures:        0 (0.0%)
+  Verdict:         PASS  (threshold 90%)
+
+  LATENCY (successful rounds)
+  P50 (median):    14.19s
+  P90:             14.25s
+  P95:             14.25s
+  P99:             14.25s
+  max:             14.25s
+
+  RESOURCES (gateway(/opt/tdai-gateway/node_modules/@tencentdb-agent-memory/memor))
+  RSS initial:     587.5 MB   peak: 588.8 MB   growth: 1.00x
+  CPU avg:         0.7%   peak: 1.1%
+  FDs initial:     33   peak: 33
+
+  round detail:
+  #  1 PASS ok            14187ms 要往哪个方向深聊？是想先落这个 demo，还是先掰一掰 OTel 和 Prometheus 在你分库分表这个具体架构里、trace 要跨 q
+  #  2 PASS ok            13404ms 要不要我把它落成一份可迁移的清单？你既然在酝酿沉淀带队的流程规范，这玩意儿改成模板正好能用。
+  #  3 PASS ok            14254ms 陈奕迅哪首单曲循环着写代码最顺？这题我能和数据驱动聊得一样细。
+

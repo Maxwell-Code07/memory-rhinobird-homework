@@ -1,0 +1,4 @@
+Hermes 一键流水线结果 (20260906-192514)  version=v2026.8.31
+  soak    : verdict=pass  (8/8 pass)  详见 soak/meta.json
+  L0-L3   : verdict=pass  详见 evidence.json / evidence.txt
+  整体    : PASS
