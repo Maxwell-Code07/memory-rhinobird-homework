@@ -1,0 +1,15 @@
+# ---- 本机运行生成的临时产物（不提交）----
+# 记忆数据卷 / 运行结果 / 自动生成
+3-full-pipeline/memory-data/
+3-full-pipeline/results/
+3-full-pipeline/auto
+2-memory-l0l3/result.json
+1-basic-soak/result.json
+
+# Node 依赖 / 构建缓存
+node_modules/
+*.log
+
+# 系统 / 编辑器
+.DS_Store
+Thumbs.db

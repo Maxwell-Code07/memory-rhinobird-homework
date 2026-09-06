@@ -142,3 +142,7 @@ vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
 *.md
+# week3 运行时产物（不入库）
+rendelin/week3/3-full-pipeline/memory-data/
+rendelin/week3/3-full-pipeline/results/gateway.log
+rendelin/week3/3-full-pipeline/results/soak.log
