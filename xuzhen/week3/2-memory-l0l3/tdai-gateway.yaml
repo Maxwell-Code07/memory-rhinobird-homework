@@ -1,0 +1,33 @@
+deployMode: standalone
+stateBackend: local
+server:
+  host: 127.0.0.1
+  port: 8420
+data:
+  baseDir: /opt/hermes-home/memory-data
+llm:
+  baseUrl: "${TDAI_LLM_BASE_URL}"
+  apiKey: "${TDAI_LLM_API_KEY}"
+  model: "${TDAI_LLM_MODEL}"
+  timeoutMs: 120000
+memory:
+  capture:
+    enabled: true
+  extraction:
+    enabled: true
+    maxMemoriesPerSession: 20
+  persona:
+    triggerEveryN: 5
+  pipeline:
+    everyNConversations: 2
+    l2DelayAfterL1Seconds: 1
+    l2MinIntervalSeconds: 1
+  recall:
+    enabled: true
+    strategy: keyword
+  storeBackend: sqlite
+  embedding:
+    provider: none
+  bm25:
+    enabled: true
+    language: zh
