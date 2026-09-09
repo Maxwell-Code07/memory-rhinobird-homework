@@ -32,6 +32,7 @@ week3/
 │   ├── npx-offline-wrapper.sh
 │   └── README.md
 ├── 3-full-pipeline/
+│   ├── Dockerfile
 │   ├── run-pipeline.ps1
 │   ├── show-recall-evidence.ps1
 │   └── README.md
@@ -131,6 +132,8 @@ docker build --progress=plain `
 
 这里的 `0.20.6` 是本次真实验收使用的实例版本，不是脚本内部写死的唯一版本。
 
+下图展示了在docker中构建hermes的部分过程。
+
 ![基于第二周 Dockerfile 构建 Hermes](<pictures/进阶一/基于dockerfile构建Hermes.png>)
 
 ### 容器运行期安装插件
@@ -145,6 +148,8 @@ docker build --progress=plain `
 6. 调用 Hermes provider discovery 验证插件可以被发现。
 
 ![安装 memory_tencentdb provider](<pictures/进阶一/装上记忆插件（provider=memory_tencentdb).png>)
+
+上图中的“provider=memory_tencentdb”, 表明tencentdb这个记忆插件已经被正确安装。
 
 ### 富含事实的真实对话
 
@@ -188,7 +193,7 @@ docker build --progress=plain `
 
 ### 设计目标
 
-进阶二将前两个阶段串成一条可重复执行的流水线。入口为 `3-full-pipeline/run-pipeline.ps1`。
+进阶二将前两个阶段串成一条可重复执行的流水线。入口为 `3-full-pipeline/run-pipeline.ps1`。按照“Dockerfile + soak 一键流水线”的交付要求，`3-full-pipeline` 中同时附带第二周 Dockerfile 的原样副本；两个文件的 SHA256 均为 `DF51ECE4674EFA62D33EA527290DDD3F065E311AD0BF1B3F4130EFEA48990CCB`。这只是为了让进阶二目录可以独立审阅，并没有重新编写或分叉第二周实现。
 
 脚本不保存 Hermes 默认版本，也不维护版本号映射。`-HermesVersion` 是必填参数，并且只做标准 `x.y.z` 格式校验，然后原样传入第二周 Dockerfile：
 
@@ -227,7 +232,6 @@ docker build --progress=plain `
 ```powershell
 & .\3-full-pipeline\run-pipeline.ps1 `
   -HermesVersion "0.20.6" `
-  -Week2Dir "D:\path\to\week2" `
   -PluginDir "D:\path\to\TencentDB-Agent-Memory" `
   -ConfigVolume "hermes-config" `
   -Rounds 8 `
@@ -241,6 +245,14 @@ docker build --progress=plain `
 ```
 
 不需要修改第三周脚本或第二周 Dockerfile。
+
+默认情况下，流水线使用 `3-full-pipeline/Dockerfile`。如果希望直接从仓库的第二周目录构建，也可以额外传入：
+
+```powershell
+-Week2Dir "..\week2"
+```
+
+两处 Dockerfile 内容完全一致。
 
 ### 结构化 Soak 结果
 
@@ -322,6 +334,7 @@ Docker Desktop 重启期间，CLI 曾返回 Linux Engine named pipe 权限或连
 | 进阶一 | 富含事实的真实 soak | 8 轮第一人称真实对话及 PASS 摘要 |
 | 进阶一 | L0-L3 与 recall | 四层数据目录和 query 召回截图 |
 | 进阶二 | 完整自动化 | `run-pipeline.ps1` 串联全部阶段 |
+| 进阶二 | Dockerfile + soak | `3-full-pipeline/Dockerfile` 为第二周 Dockerfile 的原样副本，soak 剧本复用 `2-memory-l0l3/fact-prompts.json` |
 | 进阶二 | 版本前向适配 | `HermesVersion` 必填并透传第二周 Dockerfile |
 | 进阶二 | 新容器验收 | 每次创建独立容器和 volume，最终汇总记录 `fresh_container=true` |
 | 进阶二 | 结果可审计 | pipeline summary、soak meta、verification 和截图 |

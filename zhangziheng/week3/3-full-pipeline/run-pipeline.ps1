@@ -15,7 +15,11 @@ $pipelineRoot = $PSScriptRoot
 $thirdWeekRoot = Split-Path $pipelineRoot -Parent
 $openSourceRoot = Split-Path $thirdWeekRoot -Parent
 $planRoot = Split-Path $openSourceRoot -Parent
-if (-not $Week2Dir -or -not $PluginDir) { throw "Pass -Week2Dir and -PluginDir explicitly." }
+if (-not $Week2Dir) { $Week2Dir = $pipelineRoot }
+if (-not $PluginDir) { throw "Pass -PluginDir explicitly." }
+if (-not (Test-Path -LiteralPath (Join-Path $Week2Dir "Dockerfile"))) {
+    throw "Week 2 Dockerfile not found in: $Week2Dir"
+}
 $advancedSource = Join-Path $pipelineRoot "..\2-memory-l0l3"
 $basicSource = Join-Path $pipelineRoot "..\1-basic-soak"
 $runId = Get-Date -Format "yyyyMMdd_HHmmss"
