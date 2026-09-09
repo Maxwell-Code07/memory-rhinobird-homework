@@ -1,0 +1,21 @@
+[
+  {
+    "id": "database-preference",
+    "planted_at": "2026-09-08T18:34:15.436Z",
+    "plant_status": "pass",
+    "expected": [
+      "LinXiao",
+      "Python",
+      "PowerShell"
+    ],
+    "recalled_at": "2026-09-08T18:34:57.604Z",
+    "mode": "chat",
+    "found": [
+      "LinXiao",
+      "Python",
+      "PowerShell"
+    ],
+    "status": "pass",
+    "response": "你叫 LinXiao，偏好使用 Python 和 PowerShell 编写自动化脚本。"
+  }
+]

@@ -1,0 +1,20 @@
+﻿[2026-09-08T18:19:21.695Z] hermes-standalone-soak 2.1.0; output=E:\TencentDB\提交作业\memory-rhinobird-homework\heshiyu\week3\1-basic-soak\evidence\basic-20260909
+[2026-09-08T18:19:21.695Z] rounds=6; interval=1000ms; duration=600000ms; probeEvery=3; probeMode=chat
+[2026-09-08T18:19:26.877Z] preflight version command was unavailable; expected version was not set, continuing with actual conversations.
+[2026-09-08T18:19:26.877Z] round 1/6: health
+[2026-09-08T18:21:41.119Z] round 1/6: PASS 134.24s
+[2026-09-08T18:21:42.128Z] round 2/6: acknowledge
+[2026-09-08T18:23:20.337Z] round 2/6: PASS 98.21s
+[2026-09-08T18:23:27.222Z] probe database-preference: planted (pass)
+[2026-09-08T18:23:28.233Z] round 3/6: continuity
+[2026-09-08T18:24:07.157Z] round 3/6: PASS 38.92s
+[2026-09-08T18:24:45.169Z] probe database-preference: recall pass (3/3 keyword(s))
+[2026-09-08T18:24:46.179Z] round 4/6: health
+[2026-09-08T18:25:53.673Z] round 4/6: PASS 67.49s
+[2026-09-08T18:25:54.678Z] round 5/6: acknowledge
+[2026-09-08T18:25:59.735Z] round 5/6: PASS 5.06s
+[2026-09-08T18:28:59.960Z] probe deployment-constraint: planted (fail)
+[2026-09-08T18:29:00.974Z] round 6/6: continuity
+[2026-09-08T18:29:21.877Z] round 6/6: FAIL [duration_reached] Hermes action cancelled: duration_reached.
+[2026-09-08T18:29:21.956Z] RESULT: FAIL
+[2026-09-08T18:29:21.956Z] Artifacts: E:\TencentDB\提交作业\memory-rhinobird-homework\heshiyu\week3\1-basic-soak\evidence\basic-20260909

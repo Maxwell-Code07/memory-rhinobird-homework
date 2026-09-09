@@ -1,0 +1,8 @@
+[2026-09-08T18:22:26.007Z] hermes-standalone-soak 2.1.0; output=E:\TencentDB\提交作业\memory-rhinobird-homework\heshiyu\week3\1-basic-soak\evidence\validation-20260909\interrupted-after-success
+[2026-09-08T18:22:26.008Z] rounds=8; interval=5000ms; duration=10000ms; probeEvery=0; probeMode=chat
+[2026-09-08T18:22:26.062Z] Hermes version: 0.20.6
+[2026-09-08T18:22:26.062Z] round 1/8: health
+[2026-09-08T18:22:26.116Z] round 1/8: PASS 52ms
+[2026-09-08T18:22:26.117Z] interrupt received; cancelling active work and saving a failed result.
+[2026-09-08T18:22:26.159Z] RESULT: FAIL
+[2026-09-08T18:22:26.159Z] Artifacts: E:\TencentDB\提交作业\memory-rhinobird-homework\heshiyu\week3\1-basic-soak\evidence\validation-20260909\interrupted-after-success

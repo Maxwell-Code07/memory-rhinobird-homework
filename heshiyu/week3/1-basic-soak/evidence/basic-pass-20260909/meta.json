@@ -1,0 +1,104 @@
+{
+  "status": "pass",
+  "passed": true,
+  "started_at": "2026-09-08T18:31:46.902Z",
+  "completed_at": "2026-09-08T18:34:57.605Z",
+  "elapsed_ms": 190703,
+  "termination_reason": "completed",
+  "session": "soak-1788892306902",
+  "config": {
+    "rounds": 3,
+    "intervalMs": 1000,
+    "durationMs": 600000,
+    "roundTimeoutMs": 180000,
+    "hermes": "hermes",
+    "hermesArgs": [],
+    "transport": "chat",
+    "session": "",
+    "scenario": "E:\\TencentDB\\提交作业\\memory-rhinobird-homework\\heshiyu\\week3\\1-basic-soak\\scenarios\\basic-soak.json",
+    "output": "E:\\TencentDB\\提交作业\\memory-rhinobird-homework\\heshiyu\\week3\\1-basic-soak\\evidence\\basic-pass-20260909",
+    "expectedVersion": "",
+    "probeEvery": 3,
+    "probeMode": "chat",
+    "gatewayUrl": "",
+    "probeWaitMs": 0,
+    "probePollMs": 3000,
+    "resourceIntervalMs": 5000,
+    "logFile": "",
+    "maxConsecutiveFailures": 3,
+    "maxFailureRate": 0,
+    "roundRetries": 0
+  },
+  "scenario": {
+    "name": "basic-soak",
+    "path": "E:\\TencentDB\\提交作业\\memory-rhinobird-homework\\heshiyu\\week3\\1-basic-soak\\scenarios\\basic-soak.json",
+    "turns": 3
+  },
+  "rounds": {
+    "requested": 3,
+    "executed": 3,
+    "attempts": 3,
+    "passed": 3,
+    "failed": 0,
+    "failure_rate": 0
+  },
+  "latency_ms": {
+    "min": 4918,
+    "avg": 58180,
+    "p50": 36848,
+    "p95": 132773,
+    "max": 132773
+  },
+  "probes": {
+    "enabled": true,
+    "total": 1,
+    "passed": 1,
+    "failed": 0,
+    "pending": 0,
+    "results": [
+      {
+        "id": "database-preference",
+        "planted_at": "2026-09-08T18:34:15.436Z",
+        "plant_status": "pass",
+        "expected": [
+          "LinXiao",
+          "Python",
+          "PowerShell"
+        ],
+        "recalled_at": "2026-09-08T18:34:57.604Z",
+        "mode": "chat",
+        "found": [
+          "LinXiao",
+          "Python",
+          "PowerShell"
+        ],
+        "status": "pass",
+        "response": "你叫 LinXiao，偏好使用 Python 和 PowerShell 编写自动化脚本。"
+      }
+    ]
+  },
+  "resources": {
+    "samples": 40,
+    "driver_pid": 49536,
+    "rss_initial_bytes": 57335808,
+    "rss_peak_bytes": 58490880,
+    "rss_final_bytes": 58109952
+  },
+  "logs": {
+    "enabled": false,
+    "events": 0,
+    "errors": 0,
+    "warnings": 0
+  },
+  "artifacts": {
+    "conversations": "E:\\TencentDB\\提交作业\\memory-rhinobird-homework\\heshiyu\\week3\\1-basic-soak\\evidence\\basic-pass-20260909\\conversations.jsonl",
+    "resources": "E:\\TencentDB\\提交作业\\memory-rhinobird-homework\\heshiyu\\week3\\1-basic-soak\\evidence\\basic-pass-20260909\\resources.jsonl",
+    "logs": "E:\\TencentDB\\提交作业\\memory-rhinobird-homework\\heshiyu\\week3\\1-basic-soak\\evidence\\basic-pass-20260909\\log-events.jsonl",
+    "probes": "E:\\TencentDB\\提交作业\\memory-rhinobird-homework\\heshiyu\\week3\\1-basic-soak\\evidence\\basic-pass-20260909\\probes.json",
+    "meta": "E:\\TencentDB\\提交作业\\memory-rhinobird-homework\\heshiyu\\week3\\1-basic-soak\\evidence\\basic-pass-20260909\\meta.json",
+    "snapshot": "E:\\TencentDB\\提交作业\\memory-rhinobird-homework\\heshiyu\\week3\\1-basic-soak\\evidence\\basic-pass-20260909\\meta-snapshot.json",
+    "report": "E:\\TencentDB\\提交作业\\memory-rhinobird-homework\\heshiyu\\week3\\1-basic-soak\\evidence\\basic-pass-20260909\\report.txt"
+  },
+  "tool": "hermes-standalone-soak",
+  "tool_version": "2.1.0"
+}

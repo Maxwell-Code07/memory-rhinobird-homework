@@ -1,0 +1,31 @@
+[
+  {
+    "id": "database-preference",
+    "planted_at": "2026-09-08T18:23:27.222Z",
+    "plant_status": "pass",
+    "expected": [
+      "LinXiao",
+      "Python",
+      "PowerShell"
+    ],
+    "recalled_at": "2026-09-08T18:24:45.169Z",
+    "mode": "chat",
+    "found": [
+      "LinXiao",
+      "Python",
+      "PowerShell"
+    ],
+    "status": "pass",
+    "response": "你叫 LinXiao，偏好的脚本语言是 Python 和 PowerShell。"
+  },
+  {
+    "id": "deployment-constraint",
+    "planted_at": "2026-09-08T18:28:59.960Z",
+    "plant_status": "fail",
+    "expected": [
+      "备份",
+      "回滚",
+      "周五"
+    ]
+  }
+]

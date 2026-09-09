@@ -1,0 +1,88 @@
+﻿TAP version 13
+# Subtest: complete rounds, retry, probes and structured artifacts
+ok 1 - complete rounds, retry, probes and structured artifacts
+  ---
+  duration_ms: 647.0808
+  type: 'test'
+  ...
+# Subtest: round count and nonzero interval take effect
+ok 2 - round count and nonzero interval take effect
+  ---
+  duration_ms: 615.4575
+  type: 'test'
+  ...
+# Subtest: total duration cancels the active Hermes process
+ok 3 - total duration cancels the active Hermes process
+  ---
+  duration_ms: 1014.3013
+  type: 'test'
+  ...
+# Subtest: total duration also bounds preflight
+ok 4 - total duration also bounds preflight
+  ---
+  duration_ms: 991.1422
+  type: 'test'
+  ...
+# Subtest: partial successful run reaching duration is FAIL
+ok 5 - partial successful run reaching duration is FAIL
+  ---
+  duration_ms: 769.6933
+  type: 'test'
+  ...
+# Subtest: last requested round crossing deadline cannot pass
+ok 6 - last requested round crossing deadline cannot pass
+  ---
+  duration_ms: 950.4614
+  type: 'test'
+  ...
+# Subtest: retry loop stops at the global deadline
+ok 7 - retry loop stops at the global deadline
+  ---
+  duration_ms: 1014.5376
+  type: 'test'
+  ...
+# Subtest: gateway probe is bounded during miss
+ok 8 - gateway probe is bounded during miss
+  ---
+  duration_ms: 993.6152
+  type: 'test'
+  ...
+# Subtest: gateway probe is bounded during stalled-body
+ok 9 - gateway probe is bounded during stalled-body
+  ---
+  duration_ms: 976.3297
+  type: 'test'
+  ...
+# Subtest: SIGINT event after a successful round produces FAIL
+ok 10 - SIGINT event after a successful round produces FAIL
+  ---
+  duration_ms: 175.7954
+  type: 'test'
+  ...
+# Subtest: HTTP 401 text cannot pass even with exit code zero
+ok 11 - HTTP 401 text cannot pass even with exit code zero
+  ---
+  duration_ms: 172.9884
+  type: 'test'
+  ...
+# Subtest: empty response fails the round
+ok 12 - empty response fails the round
+  ---
+  duration_ms: 178.8742
+  type: 'test'
+  ...
+# Subtest: single-round probe frequency plants and recalls
+ok 13 - single-round probe frequency plants and recalls
+  ---
+  duration_ms: 278.8988
+  type: 'test'
+  ...
+1..13
+# tests 13
+# suites 0
+# pass 13
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 8874.7785

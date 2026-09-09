@@ -1,0 +1,84 @@
+{
+  "status": "fail",
+  "passed": false,
+  "started_at": "2026-09-08T18:22:23.523Z",
+  "completed_at": "2026-09-08T18:22:30.672Z",
+  "elapsed_ms": 7149,
+  "termination_reason": "consecutive_failures",
+  "session": "soak-1788891743523",
+  "config": {
+    "rounds": 1,
+    "intervalMs": 0,
+    "durationMs": 120000,
+    "roundTimeoutMs": 90000,
+    "hermes": "hermes",
+    "hermesArgs": [],
+    "transport": "oneshot",
+    "session": "",
+    "scenario": "",
+    "output": "E:\\TencentDB\\提交作业\\memory-rhinobird-homework\\heshiyu\\week3\\1-basic-soak\\evidence\\negative-20260909",
+    "expectedVersion": "",
+    "probeEvery": 0,
+    "probeMode": "chat",
+    "gatewayUrl": "",
+    "probeWaitMs": 0,
+    "probePollMs": 3000,
+    "resourceIntervalMs": 5000,
+    "logFile": "",
+    "maxConsecutiveFailures": 1,
+    "maxFailureRate": 0,
+    "roundRetries": 0
+  },
+  "scenario": {
+    "name": "basic-conversation",
+    "path": null,
+    "turns": 4
+  },
+  "rounds": {
+    "requested": 1,
+    "executed": 1,
+    "attempts": 1,
+    "passed": 0,
+    "failed": 1,
+    "failure_rate": 1
+  },
+  "latency_ms": {
+    "min": null,
+    "avg": null,
+    "p50": null,
+    "p95": null,
+    "max": null
+  },
+  "probes": {
+    "enabled": false,
+    "total": 0,
+    "passed": 0,
+    "failed": 0,
+    "pending": 0,
+    "results": []
+  },
+  "resources": {
+    "samples": 3,
+    "driver_pid": 15708,
+    "rss_initial_bytes": 57266176,
+    "rss_peak_bytes": 58490880,
+    "rss_final_bytes": 58490880
+  },
+  "logs": {
+    "enabled": false,
+    "events": 0,
+    "errors": 0,
+    "warnings": 0
+  },
+  "artifacts": {
+    "conversations": "E:\\TencentDB\\提交作业\\memory-rhinobird-homework\\heshiyu\\week3\\1-basic-soak\\evidence\\negative-20260909\\conversations.jsonl",
+    "resources": "E:\\TencentDB\\提交作业\\memory-rhinobird-homework\\heshiyu\\week3\\1-basic-soak\\evidence\\negative-20260909\\resources.jsonl",
+    "logs": "E:\\TencentDB\\提交作业\\memory-rhinobird-homework\\heshiyu\\week3\\1-basic-soak\\evidence\\negative-20260909\\log-events.jsonl",
+    "probes": "E:\\TencentDB\\提交作业\\memory-rhinobird-homework\\heshiyu\\week3\\1-basic-soak\\evidence\\negative-20260909\\probes.json",
+    "meta": "E:\\TencentDB\\提交作业\\memory-rhinobird-homework\\heshiyu\\week3\\1-basic-soak\\evidence\\negative-20260909\\meta.json",
+    "snapshot": "E:\\TencentDB\\提交作业\\memory-rhinobird-homework\\heshiyu\\week3\\1-basic-soak\\evidence\\negative-20260909\\meta-snapshot.json",
+    "report": "E:\\TencentDB\\提交作业\\memory-rhinobird-homework\\heshiyu\\week3\\1-basic-soak\\evidence\\negative-20260909\\report.txt"
+  },
+  "tool": "hermes-standalone-soak",
+  "tool_version": "2.1.0"
+}

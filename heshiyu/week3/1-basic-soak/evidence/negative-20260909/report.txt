@@ -1,0 +1,18 @@
+Hermes Standalone Soak Report
+============================
+Result: FAIL
+Started: 2026-09-08T18:22:23.523Z
+Elapsed: 7.15s
+Session: soak-1788891743523
+Scenario: basic-conversation
+Rounds: requested=1, executed=1, passed=0, failed=1
+Latency: p50=n/a, p95=n/a, avg=n/a
+Memory probes: enabled=false, passed=0/0, failed=0
+Driver RSS: initial=57266176, peak=58490880, final=58490880
+Log monitor: enabled=false, errors=0, warnings=0
+Termination: consecutive_failures
+
+JSONL: conversations.jsonl
+Resources: resources.jsonl
+Probes: probes.json
+Meta: meta.json

@@ -1,0 +1,70 @@
+﻿TAP version 13
+# Subtest: recall query: default-chinese
+ok 1 - recall query: default-chinese
+  ---
+  duration_ms: 118.9121
+  type: 'test'
+  ...
+# Subtest: recall query: utf8-bom-file
+ok 2 - recall query: utf8-bom-file
+  ---
+  duration_ms: 103.8438
+  type: 'test'
+  ...
+# Subtest: recall query: empty-file
+ok 3 - recall query: empty-file
+  ---
+  duration_ms: 62.9975
+  type: 'test'
+  ...
+# Subtest: recall query: invalid-utf8
+ok 4 - recall query: invalid-utf8
+  ---
+  duration_ms: 68.6678
+  type: 'test'
+  ...
+# Subtest: recall query: conflicting-options
+ok 5 - recall query: conflicting-options
+  ---
+  duration_ms: 70.5657
+  type: 'test'
+  ...
+# Subtest: recall query: default-chinese
+ok 6 - recall query: default-chinese
+  ---
+  duration_ms: 118.0443
+  type: 'test'
+  ...
+# Subtest: recall query: utf8-bom-file
+ok 7 - recall query: utf8-bom-file
+  ---
+  duration_ms: 96.3032
+  type: 'test'
+  ...
+# Subtest: recall query: empty-file
+ok 8 - recall query: empty-file
+  ---
+  duration_ms: 70.3412
+  type: 'test'
+  ...
+# Subtest: recall query: invalid-utf8
+ok 9 - recall query: invalid-utf8
+  ---
+  duration_ms: 68.8216
+  type: 'test'
+  ...
+# Subtest: recall query: conflicting-options
+ok 10 - recall query: conflicting-options
+  ---
+  duration_ms: 63.1258
+  type: 'test'
+  ...
+1..10
+# tests 10
+# suites 0
+# pass 10
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 500.1956

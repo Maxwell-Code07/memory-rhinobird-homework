@@ -1,0 +1,86 @@
+{
+  "status": "pass",
+  "passed": true,
+  "started_at": "2026-09-08T18:22:23.550Z",
+  "completed_at": "2026-09-08T18:22:24.195Z",
+  "elapsed_ms": 645,
+  "termination_reason": "completed",
+  "session": "soak-1788891743550",
+  "config": {
+    "rounds": 3,
+    "intervalMs": 200,
+    "durationMs": 10000,
+    "roundTimeoutMs": 10000,
+    "hermes": "C:\\Users\\HSY\\AppData\\Local\\hermes\\node\\node.exe",
+    "hermesArgs": [
+      "E:\\TencentDB\\提交作业\\memory-rhinobird-homework\\heshiyu\\week3\\1-basic-soak\\test\\mock-hermes-standalone.mjs"
+    ],
+    "transport": "chat",
+    "session": "",
+    "scenario": "",
+    "output": "E:\\TencentDB\\提交作业\\memory-rhinobird-homework\\heshiyu\\week3\\1-basic-soak\\evidence\\validation-20260909\\rounds-and-interval",
+    "expectedVersion": "",
+    "probeEvery": 0,
+    "probeMode": "chat",
+    "gatewayUrl": "",
+    "probeWaitMs": 0,
+    "probePollMs": 3000,
+    "resourceIntervalMs": 5000,
+    "logFile": "",
+    "maxConsecutiveFailures": 3,
+    "maxFailureRate": 0,
+    "roundRetries": 0
+  },
+  "scenario": {
+    "name": "basic-conversation",
+    "path": null,
+    "turns": 4
+  },
+  "rounds": {
+    "requested": 3,
+    "executed": 3,
+    "attempts": 3,
+    "passed": 3,
+    "failed": 0,
+    "failure_rate": 0
+  },
+  "latency_ms": {
+    "min": 52,
+    "avg": 56,
+    "p50": 57,
+    "p95": 59,
+    "max": 59
+  },
+  "probes": {
+    "enabled": false,
+    "total": 0,
+    "passed": 0,
+    "failed": 0,
+    "pending": 0,
+    "results": []
+  },
+  "resources": {
+    "samples": 2,
+    "driver_pid": 1328,
+    "rss_initial_bytes": 57335808,
+    "rss_peak_bytes": 59219968,
+    "rss_final_bytes": 59219968
+  },
+  "logs": {
+    "enabled": false,
+    "events": 0,
+    "errors": 0,
+    "warnings": 0
+  },
+  "artifacts": {
+    "conversations": "E:\\TencentDB\\提交作业\\memory-rhinobird-homework\\heshiyu\\week3\\1-basic-soak\\evidence\\validation-20260909\\rounds-and-interval\\conversations.jsonl",
+    "resources": "E:\\TencentDB\\提交作业\\memory-rhinobird-homework\\heshiyu\\week3\\1-basic-soak\\evidence\\validation-20260909\\rounds-and-interval\\resources.jsonl",
+    "logs": "E:\\TencentDB\\提交作业\\memory-rhinobird-homework\\heshiyu\\week3\\1-basic-soak\\evidence\\validation-20260909\\rounds-and-interval\\log-events.jsonl",
+    "probes": "E:\\TencentDB\\提交作业\\memory-rhinobird-homework\\heshiyu\\week3\\1-basic-soak\\evidence\\validation-20260909\\rounds-and-interval\\probes.json",
+    "meta": "E:\\TencentDB\\提交作业\\memory-rhinobird-homework\\heshiyu\\week3\\1-basic-soak\\evidence\\validation-20260909\\rounds-and-interval\\meta.json",
+    "snapshot": "E:\\TencentDB\\提交作业\\memory-rhinobird-homework\\heshiyu\\week3\\1-basic-soak\\evidence\\validation-20260909\\rounds-and-interval\\meta-snapshot.json",
+    "report": "E:\\TencentDB\\提交作业\\memory-rhinobird-homework\\heshiyu\\week3\\1-basic-soak\\evidence\\validation-20260909\\rounds-and-interval\\report.txt"
+  },
+  "tool": "hermes-standalone-soak",
+  "tool_version": "2.1.0"
+}

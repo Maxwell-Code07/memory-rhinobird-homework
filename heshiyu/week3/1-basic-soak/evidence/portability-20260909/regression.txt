@@ -1,0 +1,460 @@
+﻿TAP version 13
+# Subtest: evidence preview: truncated-first-record
+ok 1 - evidence preview: truncated-first-record
+  ---
+  duration_ms: 117.4634
+  type: 'test'
+  ...
+# Subtest: evidence preview: truncated-second-record
+ok 2 - evidence preview: truncated-second-record
+  ---
+  duration_ms: 152.9231
+  type: 'test'
+  ...
+# Subtest: evidence preview: malformed-untruncated-record
+ok 3 - evidence preview: malformed-untruncated-record
+  ---
+  duration_ms: 121.0052
+  type: 'test'
+  ...
+# Subtest: complete rounds, retry, probes and structured artifacts
+ok 4 - complete rounds, retry, probes and structured artifacts
+  ---
+  duration_ms: 879.6396
+  type: 'test'
+  ...
+# Subtest: round count and nonzero interval take effect
+ok 5 - round count and nonzero interval take effect
+  ---
+  duration_ms: 645.8246
+  type: 'test'
+  ...
+# Subtest: total duration cancels the active Hermes process
+ok 6 - total duration cancels the active Hermes process
+  ---
+  duration_ms: 1109.8823
+  type: 'test'
+  ...
+# Subtest: total duration also bounds preflight
+ok 7 - total duration also bounds preflight
+  ---
+  duration_ms: 1066.8381
+  type: 'test'
+  ...
+# Subtest: partial successful run reaching duration is FAIL
+ok 8 - partial successful run reaching duration is FAIL
+  ---
+  duration_ms: 775.208
+  type: 'test'
+  ...
+# Subtest: last requested round crossing deadline cannot pass
+ok 9 - last requested round crossing deadline cannot pass
+  ---
+  duration_ms: 1085.229
+  type: 'test'
+  ...
+# Subtest: retry loop stops at the global deadline
+ok 10 - retry loop stops at the global deadline
+  ---
+  duration_ms: 1079.7511
+  type: 'test'
+  ...
+# Subtest: gateway probe is bounded during miss
+ok 11 - gateway probe is bounded during miss
+  ---
+  duration_ms: 980.7294
+  type: 'test'
+  ...
+# Subtest: gateway probe is bounded during stalled-body
+ok 12 - gateway probe is bounded during stalled-body
+  ---
+  duration_ms: 966.939
+  type: 'test'
+  ...
+# Subtest: SIGINT event after a successful round produces FAIL
+ok 13 - SIGINT event after a successful round produces FAIL
+  ---
+  duration_ms: 192.502
+  type: 'test'
+  ...
+# Subtest: HTTP 401 text cannot pass even with exit code zero
+ok 14 - HTTP 401 text cannot pass even with exit code zero
+  ---
+  duration_ms: 197.2464
+  type: 'test'
+  ...
+# Subtest: empty response fails the round
+ok 15 - empty response fails the round
+  ---
+  duration_ms: 179.1055
+  type: 'test'
+  ...
+# Subtest: single-round probe frequency plants and recalls
+ok 16 - single-round probe frequency plants and recalls
+  ---
+  duration_ms: 302.126
+  type: 'test'
+  ...
+# Subtest: negative wrapper restores present environment after capture success
+ok 17 - negative wrapper restores present environment after capture success
+  ---
+  duration_ms: 472.3819
+  type: 'test'
+  ...
+# Subtest: negative wrapper restores present environment after capture fail
+ok 18 - negative wrapper restores present environment after capture fail
+  ---
+  duration_ms: 375.0431
+  type: 'test'
+  ...
+# Subtest: negative wrapper restores unset environment after capture success
+ok 19 - negative wrapper restores unset environment after capture success
+  ---
+  duration_ms: 328.059
+  type: 'test'
+  ...
+# Subtest: negative wrapper restores unset environment after capture fail
+ok 20 - negative wrapper restores unset environment after capture fail
+  ---
+  duration_ms: 300.063
+  type: 'test'
+  ...
+# Subtest: 1-basic-soak/run-basic-template.ps1: clean-machine environment
+ok 21 - 1-basic-soak/run-basic-template.ps1: clean-machine environment
+  ---
+  duration_ms: 446.6637
+  type: 'test'
+  ...
+# Subtest: 1-basic-soak/run-basic-template.ps1: clean-machine parameters
+ok 22 - 1-basic-soak/run-basic-template.ps1: clean-machine parameters
+  ---
+  duration_ms: 360.8581
+  type: 'test'
+  ...
+# Subtest: 1-basic-soak/run-basic-template.ps1: clean-machine missing
+ok 23 - 1-basic-soak/run-basic-template.ps1: clean-machine missing
+  ---
+  duration_ms: 272.2002
+  type: 'test'
+  ...
+# Subtest: 1-basic-soak/run-basic-template.ps1: clean-machine capture-fail
+ok 24 - 1-basic-soak/run-basic-template.ps1: clean-machine capture-fail
+  ---
+  duration_ms: 298.753
+  type: 'test'
+  ...
+# Subtest: 1-basic-soak/run-negative-template.ps1: clean-machine environment
+ok 25 - 1-basic-soak/run-negative-template.ps1: clean-machine environment
+  ---
+  duration_ms: 347.4561
+  type: 'test'
+  ...
+# Subtest: 1-basic-soak/run-negative-template.ps1: clean-machine parameters
+ok 26 - 1-basic-soak/run-negative-template.ps1: clean-machine parameters
+  ---
+  duration_ms: 283.2995
+  type: 'test'
+  ...
+# Subtest: 1-basic-soak/run-negative-template.ps1: clean-machine missing
+ok 27 - 1-basic-soak/run-negative-template.ps1: clean-machine missing
+  ---
+  duration_ms: 231.9996
+  type: 'test'
+  ...
+# Subtest: 2-memory-l0l3/run-pipeline-template.ps1: clean-machine environment
+ok 28 - 2-memory-l0l3/run-pipeline-template.ps1: clean-machine environment
+  ---
+  duration_ms: 264.217
+  type: 'test'
+  ...
+# Subtest: 2-memory-l0l3/run-pipeline-template.ps1: clean-machine parameters
+ok 29 - 2-memory-l0l3/run-pipeline-template.ps1: clean-machine parameters
+  ---
+  duration_ms: 258.4091
+  type: 'test'
+  ...
+# Subtest: 2-memory-l0l3/run-pipeline-template.ps1: clean-machine missing
+ok 30 - 2-memory-l0l3/run-pipeline-template.ps1: clean-machine missing
+  ---
+  duration_ms: 233.6388
+  type: 'test'
+  ...
+# Subtest: 3-full-pipeline/run-pipeline-template.ps1: clean-machine environment
+ok 31 - 3-full-pipeline/run-pipeline-template.ps1: clean-machine environment
+  ---
+  duration_ms: 246.3169
+  type: 'test'
+  ...
+# Subtest: 3-full-pipeline/run-pipeline-template.ps1: clean-machine parameters
+ok 32 - 3-full-pipeline/run-pipeline-template.ps1: clean-machine parameters
+  ---
+  duration_ms: 247.0256
+  type: 'test'
+  ...
+# Subtest: 3-full-pipeline/run-pipeline-template.ps1: clean-machine missing
+ok 33 - 3-full-pipeline/run-pipeline-template.ps1: clean-machine missing
+  ---
+  duration_ms: 262.2892
+  type: 'test'
+  ...
+# Subtest: evidence preview: truncated-first-record
+ok 34 - evidence preview: truncated-first-record
+  ---
+  duration_ms: 170.9678
+  type: 'test'
+  ...
+# Subtest: evidence preview: truncated-second-record
+ok 35 - evidence preview: truncated-second-record
+  ---
+  duration_ms: 123.8437
+  type: 'test'
+  ...
+# Subtest: evidence preview: malformed-untruncated-record
+ok 36 - evidence preview: malformed-untruncated-record
+  ---
+  duration_ms: 106.2233
+  type: 'test'
+  ...
+# Subtest: complete rounds, retry, probes and structured artifacts
+ok 37 - complete rounds, retry, probes and structured artifacts
+  ---
+  duration_ms: 906.7883
+  type: 'test'
+  ...
+# Subtest: round count and nonzero interval take effect
+ok 38 - round count and nonzero interval take effect
+  ---
+  duration_ms: 631.3685
+  type: 'test'
+  ...
+# Subtest: total duration cancels the active Hermes process
+ok 39 - total duration cancels the active Hermes process
+  ---
+  duration_ms: 1067.0963
+  type: 'test'
+  ...
+# Subtest: total duration also bounds preflight
+ok 40 - total duration also bounds preflight
+  ---
+  duration_ms: 1058.4257
+  type: 'test'
+  ...
+# Subtest: partial successful run reaching duration is FAIL
+ok 41 - partial successful run reaching duration is FAIL
+  ---
+  duration_ms: 783.2583
+  type: 'test'
+  ...
+# Subtest: last requested round crossing deadline cannot pass
+ok 42 - last requested round crossing deadline cannot pass
+  ---
+  duration_ms: 1075.0232
+  type: 'test'
+  ...
+# Subtest: retry loop stops at the global deadline
+ok 43 - retry loop stops at the global deadline
+  ---
+  duration_ms: 1074.8482
+  type: 'test'
+  ...
+# Subtest: gateway probe is bounded during miss
+ok 44 - gateway probe is bounded during miss
+  ---
+  duration_ms: 996.1945
+  type: 'test'
+  ...
+# Subtest: gateway probe is bounded during stalled-body
+ok 45 - gateway probe is bounded during stalled-body
+  ---
+  duration_ms: 979.5918
+  type: 'test'
+  ...
+# Subtest: SIGINT event after a successful round produces FAIL
+ok 46 - SIGINT event after a successful round produces FAIL
+  ---
+  duration_ms: 186.688
+  type: 'test'
+  ...
+# Subtest: HTTP 401 text cannot pass even with exit code zero
+ok 47 - HTTP 401 text cannot pass even with exit code zero
+  ---
+  duration_ms: 190.2502
+  type: 'test'
+  ...
+# Subtest: empty response fails the round
+ok 48 - empty response fails the round
+  ---
+  duration_ms: 179.072
+  type: 'test'
+  ...
+# Subtest: single-round probe frequency plants and recalls
+ok 49 - single-round probe frequency plants and recalls
+  ---
+  duration_ms: 302.2539
+  type: 'test'
+  ...
+# Subtest: recall query: default-chinese
+ok 50 - recall query: default-chinese
+  ---
+  duration_ms: 167.9583
+  type: 'test'
+  ...
+# Subtest: recall query: utf8-bom-file
+ok 51 - recall query: utf8-bom-file
+  ---
+  duration_ms: 147.901
+  type: 'test'
+  ...
+# Subtest: recall query: empty-file
+ok 52 - recall query: empty-file
+  ---
+  duration_ms: 94.3975
+  type: 'test'
+  ...
+# Subtest: recall query: invalid-utf8
+ok 53 - recall query: invalid-utf8
+  ---
+  duration_ms: 79.4488
+  type: 'test'
+  ...
+# Subtest: recall query: conflicting-options
+ok 54 - recall query: conflicting-options
+  ---
+  duration_ms: 90.565
+  type: 'test'
+  ...
+# Subtest: evidence preview: truncated-first-record
+ok 55 - evidence preview: truncated-first-record
+  ---
+  duration_ms: 145.8877
+  type: 'test'
+  ...
+# Subtest: evidence preview: truncated-second-record
+ok 56 - evidence preview: truncated-second-record
+  ---
+  duration_ms: 136.7767
+  type: 'test'
+  ...
+# Subtest: evidence preview: malformed-untruncated-record
+ok 57 - evidence preview: malformed-untruncated-record
+  ---
+  duration_ms: 108.597
+  type: 'test'
+  ...
+# Subtest: complete rounds, retry, probes and structured artifacts
+ok 58 - complete rounds, retry, probes and structured artifacts
+  ---
+  duration_ms: 855.3107
+  type: 'test'
+  ...
+# Subtest: round count and nonzero interval take effect
+ok 59 - round count and nonzero interval take effect
+  ---
+  duration_ms: 643.7172
+  type: 'test'
+  ...
+# Subtest: total duration cancels the active Hermes process
+ok 60 - total duration cancels the active Hermes process
+  ---
+  duration_ms: 1076.8856
+  type: 'test'
+  ...
+# Subtest: total duration also bounds preflight
+ok 61 - total duration also bounds preflight
+  ---
+  duration_ms: 1074.7024
+  type: 'test'
+  ...
+# Subtest: partial successful run reaching duration is FAIL
+ok 62 - partial successful run reaching duration is FAIL
+  ---
+  duration_ms: 766.9412
+  type: 'test'
+  ...
+# Subtest: last requested round crossing deadline cannot pass
+ok 63 - last requested round crossing deadline cannot pass
+  ---
+  duration_ms: 1062.362
+  type: 'test'
+  ...
+# Subtest: retry loop stops at the global deadline
+ok 64 - retry loop stops at the global deadline
+  ---
+  duration_ms: 1091.0982
+  type: 'test'
+  ...
+# Subtest: gateway probe is bounded during miss
+ok 65 - gateway probe is bounded during miss
+  ---
+  duration_ms: 1005.4381
+  type: 'test'
+  ...
+# Subtest: gateway probe is bounded during stalled-body
+ok 66 - gateway probe is bounded during stalled-body
+  ---
+  duration_ms: 980.2516
+  type: 'test'
+  ...
+# Subtest: SIGINT event after a successful round produces FAIL
+ok 67 - SIGINT event after a successful round produces FAIL
+  ---
+  duration_ms: 191.8411
+  type: 'test'
+  ...
+# Subtest: HTTP 401 text cannot pass even with exit code zero
+ok 68 - HTTP 401 text cannot pass even with exit code zero
+  ---
+  duration_ms: 184.515
+  type: 'test'
+  ...
+# Subtest: empty response fails the round
+ok 69 - empty response fails the round
+  ---
+  duration_ms: 219.1344
+  type: 'test'
+  ...
+# Subtest: single-round probe frequency plants and recalls
+ok 70 - single-round probe frequency plants and recalls
+  ---
+  duration_ms: 305.3045
+  type: 'test'
+  ...
+# Subtest: recall query: default-chinese
+ok 71 - recall query: default-chinese
+  ---
+  duration_ms: 221.759
+  type: 'test'
+  ...
+# Subtest: recall query: utf8-bom-file
+ok 72 - recall query: utf8-bom-file
+  ---
+  duration_ms: 148.3089
+  type: 'test'
+  ...
+# Subtest: recall query: empty-file
+ok 73 - recall query: empty-file
+  ---
+  duration_ms: 86.2014
+  type: 'test'
+  ...
+# Subtest: recall query: invalid-utf8
+ok 74 - recall query: invalid-utf8
+  ---
+  duration_ms: 97.2202
+  type: 'test'
+  ...
+# Subtest: recall query: conflicting-options
+ok 75 - recall query: conflicting-options
+  ---
+  duration_ms: 78.7217
+  type: 'test'
+  ...
+1..75
+# tests 75
+# suites 0
+# pass 75
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 9644.9805

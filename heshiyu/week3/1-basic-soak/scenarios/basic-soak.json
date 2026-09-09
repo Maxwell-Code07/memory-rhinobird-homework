@@ -1,0 +1,9 @@
+{
+  "name": "basic-soak",
+  "description": "短句连续对话：每轮只要求一个可检查的简短回复，降低模型推理和工具调用对稳定性测试的干扰。",
+  "turns": [
+    { "id": "health", "prompt": "这是连续对话第 {{round}} 轮。请只回复：正常", "expect_all": ["正常"] },
+    { "id": "acknowledge", "prompt": "承接上一轮。请只回复：收到", "expect_all": ["收到"] },
+    { "id": "continuity", "prompt": "继续同一会话。请只回复：连续", "expect_all": ["连续"] }
+  ]
+}
