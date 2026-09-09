@@ -34,6 +34,7 @@ week3/
 ├── 3-full-pipeline/
 │   ├── Dockerfile
 │   ├── run-pipeline.ps1
+│   ├── show-pipeline-evidence.ps1
 │   ├── show-recall-evidence.ps1
 │   └── README.md
 ├── evidence/advanced2/
@@ -144,7 +145,7 @@ docker build --progress=plain `
 2. 安装生产依赖或使用预先准备的 Linux x64 离线依赖；
 3. 创建 `memory_tencentdb` provider 软链接；
 4. 更新 Hermes 的 memory provider 配置；
-5. 写入 Gateway host、port、数据目录和模型环境变量；
+5. 写入 Gateway host、port 和数据目录，并保留流水线生成的模型配置；
 6. 调用 Hermes provider discovery 验证插件可以被发现。
 
 ![安装 memory_tencentdb provider](<pictures/进阶一/装上记忆插件（provider=memory_tencentdb).png>)
