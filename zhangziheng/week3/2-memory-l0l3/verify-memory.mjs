@@ -12,6 +12,7 @@ function option(name, fallback) {
 const dataDir = path.resolve(option("--data", "/opt/tdai-data"))
 const outputDir = path.resolve(option("--output", "/workspace/advanced/evidence"))
 const keyword = option("--keyword", "青松灯塔-7429")
+const expectedMarker = option("--expect", "7429")
 const sessionKey = option("--session", "week3-memory-soak")
 const gateway = option("--gateway", "http://127.0.0.1:8420")
 const timeoutSeconds = Number(option("--timeout-seconds", "900"))
@@ -68,11 +69,12 @@ async function inspect() {
 
   const l0Records = await nonEmptyLineCount(l0Files)
   const l1Records = await nonEmptyLineCount(l1Files)
-  const recallMatched = recall.ok && JSON.stringify(recall.body).includes(keyword)
+  const recallMatched = recall.ok && JSON.stringify(recall.body).includes(expectedMarker)
   const result = {
     checkedAt: new Date().toISOString(),
     dataDir,
     keyword,
+    expectedMarker,
     status:
       l0Records > 0 && l1Records > 0 && l2Files.length > 0 && persona.trim().length > 0 && recallMatched
         ? "pass"

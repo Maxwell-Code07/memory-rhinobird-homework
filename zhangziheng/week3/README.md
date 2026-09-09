@@ -227,16 +227,16 @@ docker build --progress=plain `
 
 ### 运行命令
 
-先准备一个包含 Hermes `.env` 和 `config.yaml` 的 Docker volume，并将其通过 `-ConfigVolume` 传入。插件依赖可以在线安装；本机网络不稳定时，也可以提前准备 Linux x64 依赖并使用 `-OfflineDependencies`。
+正常运行不要求预先准备插件源码、`.env`、`config.yaml` 或 Docker volume。流水线会自动拉取官方 TencentDB-Agent-Memory、生成配置并创建新 volume。模型 API Key 从当前进程的 `MINIMAX_CN_API_KEY` 读取；没有设置时，脚本会安全提示输入且不在终端回显。
 
 ```powershell
 & .\3-full-pipeline\run-pipeline.ps1 `
   -HermesVersion "0.20.6" `
-  -PluginDir "D:\path\to\TencentDB-Agent-Memory" `
-  -ConfigVolume "hermes-config" `
   -Rounds 8 `
   -KeepContainer
 ```
+
+因此用户侧只需要 Docker、网络和模型凭证。插件源码、Hermes 配置以及运行 volume 都由脚本编排；模型密钥属于不可构建进镜像的运行凭证，不会写入 Git 或镜像层。
 
 若需验证其他官方版本，只修改调用参数，例如：
 
@@ -256,7 +256,7 @@ docker build --progress=plain `
 
 ### 结构化 Soak 结果
 
-本次真实运行共完成 8 轮对话，`status=pass`、`successfulRounds=8`、`failedRounds=0`，最终 session 为 `20260909_013326_00e1ed`。
+本次零预置真实运行共完成 8 轮对话，`status=pass`、`successfulRounds=8`、`failedRounds=0`，最终 session 为 `20260909_073815_9245e5`。
 
 ![进阶二 soak meta](<pictures/进阶二/soak-meta.json.png>)
 
@@ -274,10 +274,10 @@ docker build --progress=plain `
 L0 = 16 条原始消息
 L1 = 10 条结构化记录
 L2 = 2 个非空场景文件
-L3 = 3725 bytes persona
+L3 = 6504 bytes persona
 ```
 
-不同运行中 L1/L2 数量可能因模型对事实的归并方式发生变化，因此验收关注四层都生成非空数据、事实语义正确并且 recall 命中，而不是把某个固定条数写死。
+不同运行中 L1/L2 数量可能因模型对事实的归并方式发生变化，因此验收关注四层都生成非空数据、事实语义正确并且 recall 命中，而不是把某个固定条数写死。Recall 请求仍使用完整中文 query `青松灯塔-7429`，但自动断言检查稳定标识 `7429`；这是因为生成式记忆可能把项目名归纳为 `Qingsong Lighthouse-7429`，不应把正常翻译误判为记忆丢失。
 
 ![进阶二 L0-L3 verification](<pictures/进阶二/L0-L3 verification.png>)
 
@@ -307,7 +307,7 @@ L3 = 3725 bytes persona
 
 ### 5. 容器内 `npm ci` 受网络影响
 
-Docker 网络不稳定时，插件生产依赖安装会卡住。实现保留标准在线 `npm ci --omit=dev` 路径，同时支持 `-OfflineDependencies` 注入预先准备的 Linux x64 依赖。离线依赖不提交到仓库，避免把大体积 `node_modules` 放入 PR。
+Docker 网络不稳定时，插件生产依赖安装会卡住；此外，官方仓库部分分支可能不包含 lockfile，固定执行 `npm ci` 会直接失败。最终实现会在 lockfile 存在时执行 `npm ci --omit=dev`，不存在时回退到 `npm install --omit=dev --legacy-peer-deps`，规避 npm 10 解析可选 peer dependency 时的 `edgesOut` 异常；仍保留 `-OfflineDependencies` 作为断网调试入口。离线依赖不提交到仓库，避免把大体积 `node_modules` 放入 PR。
 
 ### 6. PowerShell 中文参数发生代码页转换
 
@@ -336,6 +336,7 @@ Docker Desktop 重启期间，CLI 曾返回 Linux Engine named pipe 权限或连
 | 进阶二 | 完整自动化 | `run-pipeline.ps1` 串联全部阶段 |
 | 进阶二 | Dockerfile + soak | `3-full-pipeline/Dockerfile` 为第二周 Dockerfile 的原样副本，soak 剧本复用 `2-memory-l0l3/fact-prompts.json` |
 | 进阶二 | 版本前向适配 | `HermesVersion` 必填并透传第二周 Dockerfile |
+| 进阶二 | 无预置目录/volume | 自动拉取插件、生成配置并创建隔离 volume |
 | 进阶二 | 新容器验收 | 每次创建独立容器和 volume，最终汇总记录 `fresh_container=true` |
 | 进阶二 | 结果可审计 | pipeline summary、soak meta、verification 和截图 |
 
@@ -352,7 +353,7 @@ real soak                    8/8 PASS
 L0                           16 records
 L1                           10 records
 L2                           2 scene files
-L3                           3725 bytes
+L3                           6504 bytes
 recall query                 青松灯塔-7429
 recall matched               true
 ```

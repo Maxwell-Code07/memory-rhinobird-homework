@@ -24,7 +24,12 @@ if [ "${TDAI_SKIP_NPM_INSTALL:-0}" = "1" ]; then
   test -d node_modules
   printf '%s\n' "Skipping npm ci (offline dependencies supplied)"
 else
-  npm ci --omit=dev
+  if [ -f package-lock.json ] || [ -f npm-shrinkwrap.json ]; then
+    npm ci --omit=dev
+  else
+    printf '%s\n' "No npm lockfile found; falling back to npm install --omit=dev --legacy-peer-deps"
+    npm install --omit=dev --legacy-peer-deps
+  fi
 fi
 cp "$ADVANCED_DIR/tdai-gateway.yaml" "$INSTALL_DIR/tdai-gateway.yaml"
 

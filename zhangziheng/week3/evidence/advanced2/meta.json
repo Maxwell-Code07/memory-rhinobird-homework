@@ -3,9 +3,9 @@
   "test": "hermes-basic-soak",
   "status": "pass",
   "completionReason": "max_rounds",
-  "startedAt": "2026-09-09T01:33:25.447Z",
-  "finishedAt": "2026-09-09T01:35:25.639Z",
-  "elapsedMs": 120192,
+  "startedAt": "2026-09-09T07:38:14.211Z",
+  "finishedAt": "2026-09-09T07:40:16.253Z",
+  "elapsedMs": 122042,
   "config": {
     "rounds": 8,
     "intervalMs": 1000,
@@ -24,13 +24,13 @@
     "failedRounds": 0,
     "successRate": 1,
     "latencyMs": {
-      "min": 11342,
-      "mean": 14147,
-      "p50": 13277,
-      "p95": 21104,
-      "max": 21104
+      "min": 11601,
+      "mean": 14378,
+      "p50": 13481,
+      "p95": 20357,
+      "max": 20357
     },
     "errors": {}
   },
-  "finalSessionId": "20260909_013326_00e1ed"
+  "finalSessionId": "20260909_073815_9245e5"
 }

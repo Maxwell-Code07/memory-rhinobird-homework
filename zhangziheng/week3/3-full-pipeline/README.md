@@ -7,17 +7,18 @@
 ```powershell
 & .\3-full-pipeline\run-pipeline.ps1 `
   -HermesVersion '0.20.6' `
-  -PluginDir 'D:\Users\zzh\Desktop\腾讯开源计划\TencentDB-Agent-Memory-main' `
-  -OfflineDependencies -KeepContainer
+  -KeepContainer
 ```
 
 `-HermesVersion` 是必填参数，不存在针对某个版本的默认分支。脚本只把它透传为第二周 Dockerfile 的 `--build-arg HERMES_VERSION`；因此可替换为任意被第二周 Dockerfile 成功解析的官方 Hermes `x.y.z` 版本。默认使用本目录附带的 Dockerfile；也可以通过 `-Week2Dir` 显式指向原始 `week2` 目录并得到相同构建结果。
 
-`-OfflineDependencies` 使用已准备好的 Linux x64 生产依赖，避免容器内重复联网安装；不指定时会执行插件目录的 `npm ci --omit=dev`。每次运行都会创建新的镜像标签、容器、home volume 和 evidence 目录。
+流水线默认从 `https://github.com/Tencent/TencentDB-Agent-Memory.git` 拉取插件，自动生成 Hermes `.env` 和 `config.yaml`，并创建全新的 home volume。模型凭证从当前进程的 `MINIMAX_CN_API_KEY` 读取；未设置时会安全提示输入且不回显。每次运行都会创建新的镜像标签、容器、home volume 和 evidence 目录。
+
+`-PluginDir` 和 `-ConfigVolume` 仅作为调试/离线兼容入口，不是正常运行的前置条件。`-OfflineDependencies` 仅在本机已准备 Linux x64 生产依赖时使用；默认路径在新容器中执行 `npm ci --omit=dev`。
 
 ## 最近一次真实验收
 
-运行目录：`runs/20260909_093223/`。构建、全新容器、插件发现、Gateway、soak、记忆验收均为 PASS；soak 为 8/8 真实 MiniMax 对话，最终会话 `20260909_013326_00e1ed`，L0=16、L1=10、L2=2、L3=3725B，recall=true。
+运行目录：`runs/20260909_153626/`。正常入口只传入 `-HermesVersion`（另加 `-Rounds 8 -KeepContainer` 作为本次验收参数），没有传入本地插件目录或预置配置 volume。脚本自动拉取官方插件、生成配置、创建隔离 volume；构建、全新容器、插件发现、Gateway、soak、记忆验收均为 PASS。soak 为 8/8 真实 MiniMax 对话，最终会话 `20260909_073815_9245e5`，L0=16、L1=10、L2=2、L3=6504B，recall=true。
 
 ## 关于验收事实“青松灯塔-7429”
 

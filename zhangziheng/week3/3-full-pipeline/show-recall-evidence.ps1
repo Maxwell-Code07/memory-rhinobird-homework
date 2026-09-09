@@ -3,7 +3,14 @@ param(
 )
 
 if ([string]::IsNullOrWhiteSpace($EvidenceDir)) {
-  $EvidenceDir = Join-Path $PSScriptRoot "runs\20260909_093223\evidence"
+  $latestRun = Get-ChildItem (Join-Path $PSScriptRoot "runs") -Directory |
+    Sort-Object Name -Descending |
+    Where-Object { Test-Path (Join-Path $_.FullName "evidence\recall-result.json") } |
+    Select-Object -First 1
+  if (-not $latestRun) {
+    throw "No recall evidence found under $PSScriptRoot\runs"
+  }
+  $EvidenceDir = Join-Path $latestRun.FullName "evidence"
 }
 
 $result = Get-Content -Encoding UTF8 (Join-Path $EvidenceDir "recall-result.json") -Raw | ConvertFrom-Json

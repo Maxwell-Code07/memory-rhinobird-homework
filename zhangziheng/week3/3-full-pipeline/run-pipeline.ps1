@@ -4,7 +4,13 @@ param(
     [string]$HermesVersion,
     [string]$Week2Dir = "",
     [string]$PluginDir = "",
-    [string]$ConfigVolume = "hermes-real-home",
+    [string]$PluginRepo = "https://github.com/Tencent/TencentDB-Agent-Memory.git",
+    [string]$PluginRef = "main",
+    [string]$ConfigVolume = "",
+    [string]$Model = "MiniMax-M2",
+    [string]$ModelProvider = "minimax-cn",
+    [string]$ModelBaseUrl = "https://api.minimaxi.com/anthropic",
+    [string]$LlmBaseUrl = "https://api.minimaxi.com/v1",
     [int]$Rounds = 8,
     [switch]$KeepContainer,
     [switch]$OfflineDependencies
@@ -16,7 +22,6 @@ $thirdWeekRoot = Split-Path $pipelineRoot -Parent
 $openSourceRoot = Split-Path $thirdWeekRoot -Parent
 $planRoot = Split-Path $openSourceRoot -Parent
 if (-not $Week2Dir) { $Week2Dir = $pipelineRoot }
-if (-not $PluginDir) { throw "Pass -PluginDir explicitly." }
 if (-not (Test-Path -LiteralPath (Join-Path $Week2Dir "Dockerfile"))) {
     throw "Week 2 Dockerfile not found in: $Week2Dir"
 }
@@ -26,6 +31,9 @@ $runId = Get-Date -Format "yyyyMMdd_HHmmss"
 $outputDir = Join-Path $pipelineRoot "runs\$runId"
 $evidenceDir = Join-Path $outputDir "evidence"
 $runtimeDir = Join-Path $evidenceDir "runtime-data"
+$workDir = Join-Path $outputDir "_work"
+$generatedConfigDir = Join-Path $workDir "config"
+$clonedPluginDir = Join-Path $workDir "plugin"
 $imageTag = "hermes:week3-pipeline-$HermesVersion"
 $containerName = "hermes-pipeline-$runId"
 $homeVolume = "hermes-pipeline-home-$runId"
@@ -34,6 +42,7 @@ $summaryPath = Join-Path $outputDir "pipeline-summary.json"
 $startedAt = Get-Date
 $phaseResults = [ordered]@{}
 $containerCreated = $false
+$generatedConfig = $false
 
 New-Item -ItemType Directory -Force -Path $evidenceDir, $runtimeDir | Out-Null
 
@@ -45,6 +54,23 @@ function Invoke-DockerChecked {
     }
 }
 
+function Invoke-DockerWithRetry {
+    param(
+        [string[]]$Arguments,
+        [int]$Attempts = 3,
+        [int]$DelaySeconds = 5
+    )
+    for ($attempt = 1; $attempt -le $Attempts; $attempt++) {
+        & docker @Arguments
+        if ($LASTEXITCODE -eq 0) { return }
+        if ($attempt -lt $Attempts) {
+            Write-Host "Docker command failed (attempt $attempt/$Attempts); retrying in ${DelaySeconds}s" -ForegroundColor Yellow
+            Start-Sleep -Seconds $DelaySeconds
+        }
+    }
+    throw "docker $($Arguments -join ' ') failed after $Attempts attempts"
+}
+
 function Set-Phase {
     param([string]$Name, [string]$Status, [string]$Detail = "")
     $phaseResults[$Name] = [ordered]@{ status = $Status; detail = $Detail }
@@ -52,12 +78,59 @@ function Set-Phase {
 }
 
 try {
+    Set-Phase "bootstrap" "running" "preparing plugin and Hermes config"
+    $dockerServer = & docker version --format '{{.Server.Version}}' 2>$null
+    if ($LASTEXITCODE -ne 0) { throw "Docker Desktop engine is not available" }
+
+    if (-not $PluginDir) {
+        New-Item -ItemType Directory -Force -Path $workDir | Out-Null
+        & git clone --depth 1 --branch $PluginRef $PluginRepo $clonedPluginDir
+        if ($LASTEXITCODE -ne 0) { throw "Unable to clone plugin: $PluginRepo ref=$PluginRef" }
+        $PluginDir = $clonedPluginDir
+    }
+
+    if (-not $ConfigVolume) {
+        $apiKey = $env:MINIMAX_CN_API_KEY
+        if (-not $apiKey) {
+            $secureKey = Read-Host "MINIMAX_CN_API_KEY is not set; enter it for this run" -AsSecureString
+            $keyPointer = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($secureKey)
+            try { $apiKey = [Runtime.InteropServices.Marshal]::PtrToStringBSTR($keyPointer) }
+            finally { [Runtime.InteropServices.Marshal]::ZeroFreeBSTR($keyPointer) }
+        }
+        if (-not $apiKey) { throw "MINIMAX_CN_API_KEY is required" }
+
+        New-Item -ItemType Directory -Force -Path $generatedConfigDir | Out-Null
+        $envText = @"
+MINIMAX_CN_API_KEY="$apiKey"
+TDAI_LLM_API_KEY="$apiKey"
+TDAI_LLM_BASE_URL="$LlmBaseUrl"
+TDAI_LLM_MODEL="$Model"
+TDAI_LLM_TIMEOUT_MS="180000"
+TDAI_LLM_DISABLE_THINKING="true"
+"@
+        $configText = @"
+model:
+  default: $Model
+  provider: $ModelProvider
+  base_url: $ModelBaseUrl
+_config_version: 39
+memory:
+  memory_enabled: false
+  user_profile_enabled: false
+"@
+        $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+        [IO.File]::WriteAllText((Join-Path $generatedConfigDir ".env"), $envText, $utf8NoBom)
+        [IO.File]::WriteAllText((Join-Path $generatedConfigDir "config.yaml"), $configText, $utf8NoBom)
+        $generatedConfig = $true
+    }
+    Set-Phase "bootstrap" "pass" "docker=$dockerServer plugin_ref=$PluginRef generated_config=$generatedConfig"
+
     if (-not (Test-Path -LiteralPath (Join-Path $Week2Dir "Dockerfile"))) { throw "第二周 Dockerfile 不存在：$Week2Dir" }
     if (-not (Test-Path -LiteralPath (Join-Path $PluginDir "package.json"))) { throw "插件源码不存在：$PluginDir" }
     if (-not (Test-Path -LiteralPath (Join-Path $advancedSource "fact-prompts.json"))) { throw "事实 prompts 不存在：$advancedSource" }
 
     Set-Phase "build" "running" "image=$imageTag"
-    Invoke-DockerChecked @("build", "--progress=plain", "--build-arg", "HERMES_VERSION=$HermesVersion", "-t", $imageTag, $Week2Dir)
+    Invoke-DockerWithRetry -Arguments @("build", "--progress=plain", "--build-arg", "HERMES_VERSION=$HermesVersion", "-t", $imageTag, $Week2Dir)
     $dockerfileHash = (Get-FileHash -Algorithm SHA256 -LiteralPath (Join-Path $Week2Dir "Dockerfile")).Hash
     Set-Phase "build" "pass" "dockerfile_sha256=$dockerfileHash"
 
@@ -65,7 +138,11 @@ try {
     New-Item -ItemType Directory -Force -Path $outputDir | Out-Null
     tar --exclude=node_modules --exclude=.git -czf $sourceArchive -C $PluginDir .
     Invoke-DockerChecked @("volume", "create", $homeVolume)
-    Invoke-DockerChecked @("run", "--rm", "-v", "${ConfigVolume}:/source:ro", "-v", "${homeVolume}:/target", $imageTag, "sh", "-c", "cp /source/.env /target/.env; cp /source/config.yaml /target/config.yaml")
+    if (Test-Path -LiteralPath (Join-Path $generatedConfigDir ".env")) {
+        Invoke-DockerChecked @("run", "--rm", "--mount", "type=bind,source=$generatedConfigDir,target=/source,readonly", "-v", "${homeVolume}:/target", $imageTag, "sh", "-c", "cp /source/.env /target/.env; cp /source/config.yaml /target/config.yaml")
+    } else {
+        Invoke-DockerChecked @("run", "--rm", "-v", "${ConfigVolume}:/source:ro", "-v", "${homeVolume}:/target", $imageTag, "sh", "-c", "cp /source/.env /target/.env; cp /source/config.yaml /target/config.yaml")
+    }
     Invoke-DockerChecked @("run", "--name", $containerName, "-dit", "-v", "${homeVolume}:/opt/hermes-home", "-v", "${runtimeDir}:/opt/tdai-data", "-w", "/workspace/advanced", $imageTag, "sh")
     $containerCreated = $true
     Invoke-DockerChecked @("cp", "${advancedSource}\\.", "${containerName}:/workspace/advanced")
@@ -157,5 +234,8 @@ finally {
     }
     if (Test-Path -LiteralPath $sourceArchive) {
         Remove-Item -LiteralPath $sourceArchive -Force
+    }
+    if (Test-Path -LiteralPath $workDir) {
+        Remove-Item -LiteralPath $workDir -Recurse -Force
     }
 }
