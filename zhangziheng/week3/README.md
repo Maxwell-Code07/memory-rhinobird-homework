@@ -227,9 +227,9 @@ docker build --progress=plain `
 
 ### 运行命令
 
-正常运行不要求预先准备插件源码、`.env`、`config.yaml` 或 Docker volume。流水线会自动拉取官方 TencentDB-Agent-Memory、生成配置并创建新 volume。模型 API Key 从当前进程的 `MINIMAX_CN_API_KEY` 读取；没有设置时，脚本会安全提示输入且不在终端回显。
+正常运行不要求预先准备插件源码、`.env`、`config.yaml` 或 Docker volume。流水线会自动拉取官方 TencentDB-Agent-Memory、生成配置并创建新 volume。模型服务不绑定 MiniMax：API Key、模型名、Provider 和 Base URL 均由使用者的参数、环境变量或交互输入决定；没有 Key 时会安全提示输入且不在终端回显。
 
-因此其他人复现时只需要三个基础条件：Docker Desktop 已启动、Git 可用、拥有有效的 MiniMax API Key。在 `week3` 目录执行上述命令，脚本提示时粘贴 Key 即可；不需要把 Key 写进脚本或命令。Key 不进入日志和 evidence，流水线结束时还会从宿主机临时目录及 Docker home volume 中清除临时 `.env`。生产环境应进一步改用 Docker Secrets 或企业密钥管理系统。
+因此其他人复现时只需要三个基础条件：Docker Desktop 已启动、Git 可用、拥有可用的 OpenAI-compatible 模型服务。在 `week3` 目录执行上述命令，按提示输入 API Key、模型名和 Base URL 即可；Provider 默认 `openai`，如 Hermes 与记忆插件需要不同接口地址，可分别传 `-ModelBaseUrl` 与 `-LlmBaseUrl`。Key 不进入日志和 evidence，流水线结束时还会从宿主机临时目录及 Docker home volume 中清除临时 `.env`。生产环境应进一步改用 Docker Secrets 或企业密钥管理系统。
 
 ![进阶二一键流水线总览](<pictures/进阶二/one command pipeline.png>)
 
@@ -371,6 +371,6 @@ recall matched               true
 - `3-full-pipeline` 负责把第二周构建结果与前两部分串联；
 - `evidence/advanced2` 只保存脱敏后的关键 JSON 摘要；
 - `pictures` 保存本次真实运行截图；
-- API Key 只通过私有 `.env` 或 Docker volume 提供，不写入代码、镜像层或 Git。
+- API Key 只通过安全提示或环境变量提供，不写入代码、命令行、镜像层、日志或 Git；运行期临时 `.env` 会自动清除。
 
 首次完整复现需要访问 Docker Hub、Hermes 官方 Git 仓库、Python/npm 包索引以及所配置的模型 API；如果依赖已离线准备，可以使用流水线的离线依赖模式减少容器内网络请求。

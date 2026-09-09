@@ -68,11 +68,6 @@ updates = {
     "TDAI_DATA_DIR": "/opt/tdai-data",
     "TDAI_GATEWAY_HOST": "127.0.0.1",
     "TDAI_GATEWAY_PORT": "8420",
-    "TDAI_LLM_API_KEY": "${MINIMAX_CN_API_KEY}",
-    "TDAI_LLM_BASE_URL": "https://api.minimaxi.com/v1",
-    "TDAI_LLM_MODEL": "MiniMax-M2",
-    "TDAI_LLM_TIMEOUT_MS": "180000",
-    "TDAI_LLM_DISABLE_THINKING": "true",
 }
 kept = [line for line in lines if line.partition("=")[0].strip() not in updates]
 for key, value in updates.items():

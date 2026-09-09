@@ -7,10 +7,12 @@ param(
     [string]$PluginRepo = "https://github.com/Tencent/TencentDB-Agent-Memory.git",
     [string]$PluginRef = "main",
     [string]$ConfigVolume = "",
-    [string]$Model = "MiniMax-M2",
-    [string]$ModelProvider = "minimax-cn",
-    [string]$ModelBaseUrl = "https://api.minimaxi.com/anthropic",
-    [string]$LlmBaseUrl = "https://api.minimaxi.com/v1",
+    [string]$Model = "",
+    [string]$ModelProvider = "",
+    [ValidatePattern('^[A-Z][A-Z0-9_]*$')]
+    [string]$ProviderApiKeyEnv = "",
+    [string]$ModelBaseUrl = "",
+    [string]$LlmBaseUrl = "",
     [int]$Rounds = 8,
     [switch]$KeepContainer,
     [switch]$OfflineDependencies
@@ -90,18 +92,45 @@ try {
     }
 
     if (-not $ConfigVolume) {
-        $apiKey = $env:MINIMAX_CN_API_KEY
+        $apiKey = $env:HERMES_API_KEY
+        if (-not $apiKey) { $apiKey = $env:OPENAI_API_KEY }
+        if (-not $apiKey) { $apiKey = $env:MINIMAX_CN_API_KEY } # legacy compatibility
         if (-not $apiKey) {
-            $secureKey = Read-Host "MINIMAX_CN_API_KEY is not set; enter it for this run" -AsSecureString
+            $secureKey = Read-Host "Model API key is not set; enter it for this run" -AsSecureString
             $keyPointer = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($secureKey)
             try { $apiKey = [Runtime.InteropServices.Marshal]::PtrToStringBSTR($keyPointer) }
             finally { [Runtime.InteropServices.Marshal]::ZeroFreeBSTR($keyPointer) }
         }
-        if (-not $apiKey) { throw "MINIMAX_CN_API_KEY is required" }
+        if (-not $apiKey) { throw "A model API key is required" }
+
+        if (-not $Model) { $Model = $env:HERMES_MODEL }
+        if (-not $Model) { $Model = $env:OPENAI_MODEL }
+        if (-not $Model) { $Model = Read-Host "Model name (for example gpt-4.1-mini)" }
+        if (-not $LlmBaseUrl) { $LlmBaseUrl = $env:HERMES_LLM_BASE_URL }
+        if (-not $LlmBaseUrl) { $LlmBaseUrl = $env:OPENAI_BASE_URL }
+        if (-not $LlmBaseUrl) { $LlmBaseUrl = Read-Host "OpenAI-compatible API base URL (for example https://api.openai.com/v1)" }
+        if (-not $ModelProvider) { $ModelProvider = $env:HERMES_MODEL_PROVIDER }
+        if (-not $ModelProvider) { $ModelProvider = "openai" }
+        if (-not $ProviderApiKeyEnv) { $ProviderApiKeyEnv = $env:HERMES_PROVIDER_API_KEY_ENV }
+        if (-not $ProviderApiKeyEnv) {
+            $ProviderApiKeyEnv = switch -Regex ($ModelProvider) {
+                '^minimax-cn$' { 'MINIMAX_CN_API_KEY'; break }
+                '^anthropic$'  { 'ANTHROPIC_API_KEY'; break }
+                '^openrouter$' { 'OPENROUTER_API_KEY'; break }
+                '^groq$'       { 'GROQ_API_KEY'; break }
+                '^google$'     { 'GOOGLE_API_KEY'; break }
+                default        { 'OPENAI_API_KEY' }
+            }
+        }
+        if (-not $ModelBaseUrl) { $ModelBaseUrl = $env:HERMES_MODEL_BASE_URL }
+        if (-not $ModelBaseUrl) { $ModelBaseUrl = $LlmBaseUrl }
+        if (-not $Model -or -not $LlmBaseUrl) { throw "Model and API base URL are required" }
 
         New-Item -ItemType Directory -Force -Path $generatedConfigDir | Out-Null
+        $providerKeyLine = "${ProviderApiKeyEnv}=`"$apiKey`""
         $envText = @"
-MINIMAX_CN_API_KEY="$apiKey"
+HERMES_API_KEY="$apiKey"
+$providerKeyLine
 TDAI_LLM_API_KEY="$apiKey"
 TDAI_LLM_BASE_URL="$LlmBaseUrl"
 TDAI_LLM_MODEL="$Model"
