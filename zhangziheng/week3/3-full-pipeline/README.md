@@ -14,6 +14,8 @@
 
 流水线默认从 `https://github.com/Tencent/TencentDB-Agent-Memory.git` 拉取插件，自动生成 Hermes `.env` 和 `config.yaml`，并创建全新的 home volume。模型凭证从当前进程的 `MINIMAX_CN_API_KEY` 读取；未设置时会安全提示输入且不回显。每次运行都会创建新的镜像标签、容器、home volume 和 evidence 目录。
 
+别人复现时只需安装并启动 Docker Desktop、安装 Git，并准备一个有效的 MiniMax API Key；不需要预先下载插件、编写配置文件或创建 Docker volume。在仓库 `week3` 目录执行上面的命令，未设置环境变量时按提示粘贴 Key 即可。Key 不写入脚本、命令行、日志或 evidence；运行中生成的临时 `.env` 会在 `finally` 中从宿主机临时目录和 Docker home volume 一并清除。若用于长期运行而非作业验收，应改接 Docker Secrets 或组织的密钥管理系统。
+
 `-PluginDir` 和 `-ConfigVolume` 仅作为调试/离线兼容入口，不是正常运行的前置条件。`-OfflineDependencies` 仅在本机已准备 Linux x64 生产依赖时使用；默认路径在新容器中执行 `npm ci --omit=dev`。
 
 ## 最近一次真实验收

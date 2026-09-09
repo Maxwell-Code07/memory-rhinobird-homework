@@ -229,6 +229,13 @@ catch {
     exit 1
 }
 finally {
+    # The generated credential is needed only while the pipeline is running.
+    # Scrub it from the named home volume even when -KeepContainer is used.
+    if ($containerCreated) {
+        & docker exec $containerName sh -c "rm -f /opt/hermes-home/.env" 2>$null | Out-Null
+    }
+    $apiKey = $null
+    $envText = $null
     if ($containerCreated -and -not $KeepContainer) {
         & docker rm -f $containerName 2>$null | Out-Null
     }

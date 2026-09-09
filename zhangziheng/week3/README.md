@@ -229,6 +229,10 @@ docker build --progress=plain `
 
 正常运行不要求预先准备插件源码、`.env`、`config.yaml` 或 Docker volume。流水线会自动拉取官方 TencentDB-Agent-Memory、生成配置并创建新 volume。模型 API Key 从当前进程的 `MINIMAX_CN_API_KEY` 读取；没有设置时，脚本会安全提示输入且不在终端回显。
 
+因此其他人复现时只需要三个基础条件：Docker Desktop 已启动、Git 可用、拥有有效的 MiniMax API Key。在 `week3` 目录执行上述命令，脚本提示时粘贴 Key 即可；不需要把 Key 写进脚本或命令。Key 不进入日志和 evidence，流水线结束时还会从宿主机临时目录及 Docker home volume 中清除临时 `.env`。生产环境应进一步改用 Docker Secrets 或企业密钥管理系统。
+
+![进阶二一键流水线总览](<pictures/进阶二/one command pipeline.png>)
+
 ```powershell
 & .\3-full-pipeline\run-pipeline.ps1 `
   -HermesVersion "0.20.6" `
@@ -258,7 +262,7 @@ docker build --progress=plain `
 
 本次零预置真实运行共完成 8 轮对话，`status=pass`、`successfulRounds=8`、`failedRounds=0`，最终 session 为 `20260909_073815_9245e5`。
 
-![进阶二 soak meta](<pictures/进阶二/soak-meta.json.png>)
+![进阶二 soak meta](<pictures/进阶二/soak result.png>)
 
 ### 事实输入
 
@@ -285,7 +289,7 @@ L3 = 6504 bytes persona
 
 `show-recall-evidence.ps1` 同时展示 query、HTTP 状态、是否命中、命中记忆数以及完整 recall context，避免只看到 `matched=true` 却不知道召回了什么。
 
-![进阶二 recall](<pictures/进阶二/recall.png>)
+![进阶二 recall](<pictures/进阶二/recall (2).png>)
 
 ## 踩坑与解决过程
 
