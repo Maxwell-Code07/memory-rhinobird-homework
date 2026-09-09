@@ -1,0 +1,8 @@
+{
+  "query": "青松灯塔-7429",
+  "source": "recall-result.json",
+  "httpStatus": 200,
+  "matched": true,
+  "memoryCount": 1,
+  "note": "query 命中 Gateway recall 返回的 persona/scene context"
+}

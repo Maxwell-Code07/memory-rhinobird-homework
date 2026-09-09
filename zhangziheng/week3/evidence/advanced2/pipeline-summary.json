@@ -1,0 +1,79 @@
+﻿{
+    "schemaVersion":  1,
+    "status":  "pass",
+    "runId":  "20260909_093223",
+    "image":  "hermes:week3-pipeline-0.20.6",
+    "hermesVersion":  "0.20.6",
+    "container":  "hermes-pipeline-20260909_093223",
+    "dockerfile":  "D:\\Users\\zzh\\Desktop\\腾讯开源计划\\开源实战\\第二周作业\\Dockerfile",
+    "dockerfileSha256":  "DF51ECE4674EFA62D33EA527290DDD3F065E311AD0BF1B3F4130EFEA48990CCB",
+    "startedAt":  "2026-09-09T01:32:23.4750127Z",
+    "finishedAt":  "2026-09-09T01:35:26.1950913Z",
+    "elapsedMs":  182720,
+    "phases":  {
+                   "build":  {
+                                 "status":  "pass",
+                                 "detail":  "dockerfile_sha256=DF51ECE4674EFA62D33EA527290DDD3F065E311AD0BF1B3F4130EFEA48990CCB"
+                             },
+                   "prepare":  {
+                                   "status":  "pass",
+                                   "detail":  "fresh_container=true"
+                               },
+                   "install_plugin":  {
+                                          "status":  "pass",
+                                          "detail":  "provider=memory_tencentdb"
+                                      },
+                   "gateway":  {
+                                   "status":  "pass",
+                                   "detail":  "{\"status\":\"ok\",\"version\":\"0.1.0\",\"uptime\":2,\"stores\":{\"vectorStore\":true,\"embeddingService\":false}}"
+                               },
+                   "soak":  {
+                                "status":  "pass",
+                                "detail":  "meta.json generated"
+                            },
+                   "verify_memory":  {
+                                         "status":  "pass",
+                                         "detail":  "L0-L3 and recall passed"
+                                     }
+               },
+    "soak":  {
+                 "schemaVersion":  1,
+                 "test":  "hermes-basic-soak",
+                 "status":  "pass",
+                 "completionReason":  "max_rounds",
+                 "startedAt":  "2026-09-09T01:33:25.447Z",
+                 "finishedAt":  "2026-09-09T01:35:25.639Z",
+                 "elapsedMs":  120192,
+                 "config":  {
+                                "rounds":  8,
+                                "intervalMs":  1000,
+                                "durationMinutes":  20,
+                                "requestTimeoutMs":  180000,
+                                "initialSessionId":  null,
+                                "model":  null,
+                                "provider":  null,
+                                "toolsets":  "context_engine,memory",
+                                "promptsFile":  "/workspace/advanced/fact-prompts.json",
+                                "command":  "hermes"
+                            },
+                 "statistics":  {
+                                    "attemptedRounds":  8,
+                                    "successfulRounds":  8,
+                                    "failedRounds":  0,
+                                    "successRate":  1,
+                                    "latencyMs":  {
+                                                      "min":  11342,
+                                                      "mean":  14147,
+                                                      "p50":  13277,
+                                                      "p95":  21104,
+                                                      "max":  21104
+                                                  },
+                                    "errors":  {
+
+                                               }
+                                },
+                 "finalSessionId":  "20260909_013326_00e1ed"
+             },
+    "evidenceDir":  "D:\\Users\\zzh\\Desktop\\腾讯开源计划\\开源实战\\第三周作业\\3-full-pipeline\\runs\\20260909_093223\\evidence",
+    "keptContainer":  true
+}
