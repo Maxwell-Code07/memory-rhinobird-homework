@@ -13,6 +13,7 @@ param(
     [string]$ProviderApiKeyEnv = "",
     [string]$ModelBaseUrl = "",
     [string]$LlmBaseUrl = "",
+    [string]$ModelsEndpoint = "",
     [int]$Rounds = 8,
     [switch]$KeepContainer,
     [switch]$OfflineDependencies
@@ -79,6 +80,45 @@ function Set-Phase {
     Write-Host "[$Status] $Name $Detail"
 }
 
+function Select-ModelFromApi {
+    param(
+        [Parameter(Mandatory = $true)][string]$ApiKey,
+        [Parameter(Mandatory = $true)][string]$BaseUrl,
+        [string]$Endpoint = ""
+    )
+
+    $modelsUrl = if ($Endpoint) { $Endpoint } else { "$($BaseUrl.TrimEnd('/'))/models" }
+    Write-Host "Fetching available models from $modelsUrl ..." -ForegroundColor Cyan
+    try {
+        $response = Invoke-RestMethod -Method Get -Uri $modelsUrl -Headers @{ Authorization = "Bearer $ApiKey" } -TimeoutSec 30
+        $modelIds = @()
+        if ($response.data) {
+            $modelIds = @($response.data | ForEach-Object { $_.id })
+        } elseif ($response.models) {
+            $modelIds = @($response.models | ForEach-Object { if ($_.id) { $_.id } elseif ($_.name) { $_.name } })
+        }
+        $modelIds = @($modelIds | Where-Object { $_ } | Sort-Object -Unique)
+        if ($modelIds.Count -eq 0) { throw "The models endpoint returned no model IDs" }
+
+        Write-Host "Available models:" -ForegroundColor Yellow
+        for ($i = 0; $i -lt $modelIds.Count; $i++) {
+            Write-Host ("  [{0}] {1}" -f ($i + 1), $modelIds[$i])
+        }
+        $choice = Read-Host "Select a model number, or type a model ID"
+        $selectedIndex = 0
+        if ([int]::TryParse($choice, [ref]$selectedIndex) -and $selectedIndex -ge 1 -and $selectedIndex -le $modelIds.Count) {
+            return $modelIds[$selectedIndex - 1]
+        }
+        if ($choice) { return $choice }
+        throw "No model was selected"
+    } catch {
+        Write-Warning "Unable to enumerate models: $($_.Exception.Message)"
+        $manualModel = Read-Host "Enter the model ID manually"
+        if (-not $manualModel) { throw "A model ID is required" }
+        return $manualModel
+    }
+}
+
 try {
     Set-Phase "bootstrap" "running" "preparing plugin and Hermes config"
     $dockerServer = & docker version --format '{{.Server.Version}}' 2>$null
@@ -103,12 +143,14 @@ try {
         }
         if (-not $apiKey) { throw "A model API key is required" }
 
-        if (-not $Model) { $Model = $env:HERMES_MODEL }
-        if (-not $Model) { $Model = $env:OPENAI_MODEL }
-        if (-not $Model) { $Model = Read-Host "Model name (for example gpt-4.1-mini)" }
         if (-not $LlmBaseUrl) { $LlmBaseUrl = $env:HERMES_LLM_BASE_URL }
         if (-not $LlmBaseUrl) { $LlmBaseUrl = $env:OPENAI_BASE_URL }
         if (-not $LlmBaseUrl) { $LlmBaseUrl = Read-Host "OpenAI-compatible API base URL (for example https://api.openai.com/v1)" }
+        if (-not $LlmBaseUrl) { throw "An API base URL is required" }
+        if (-not $ModelsEndpoint) { $ModelsEndpoint = $env:HERMES_MODELS_ENDPOINT }
+        if (-not $Model) { $Model = $env:HERMES_MODEL }
+        if (-not $Model) { $Model = $env:OPENAI_MODEL }
+        if (-not $Model) { $Model = Select-ModelFromApi -ApiKey $apiKey -BaseUrl $LlmBaseUrl -Endpoint $ModelsEndpoint }
         if (-not $ModelProvider) { $ModelProvider = $env:HERMES_MODEL_PROVIDER }
         if (-not $ModelProvider) { $ModelProvider = "openai" }
         if (-not $ProviderApiKeyEnv) { $ProviderApiKeyEnv = $env:HERMES_PROVIDER_API_KEY_ENV }
@@ -124,7 +166,7 @@ try {
         }
         if (-not $ModelBaseUrl) { $ModelBaseUrl = $env:HERMES_MODEL_BASE_URL }
         if (-not $ModelBaseUrl) { $ModelBaseUrl = $LlmBaseUrl }
-        if (-not $Model -or -not $LlmBaseUrl) { throw "Model and API base URL are required" }
+        if (-not $Model) { throw "A model is required" }
 
         New-Item -ItemType Directory -Force -Path $generatedConfigDir | Out-Null
         $providerKeyLine = "${ProviderApiKeyEnv}=`"$apiKey`""
