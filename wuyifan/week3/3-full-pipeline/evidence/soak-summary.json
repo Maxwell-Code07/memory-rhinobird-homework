@@ -1,0 +1,23 @@
+{
+  "status": "pass",
+  "stopReason": "round_limit",
+  "configuredRounds": 1,
+  "completedRounds": 1,
+  "successfulRounds": 1,
+  "failedRounds": 0,
+  "failureRate": 0,
+  "maxConsecutiveFailures": 3,
+  "startedAt": "2026-09-09T15:23:28.121Z",
+  "endedAt": "2026-09-09T15:23:45.878Z",
+  "elapsedMs": 17757,
+  "sessionId": "20260909_152328_ae1890",
+  "container": "hermes-week3-submission-pass",
+  "latencyMs": {
+    "min": 17754,
+    "mean": 17754,
+    "p50": 17754,
+    "p95": 17754,
+    "max": 17754
+  },
+  "outputDir": "/Users/may/Documents/Academic/腾讯犀牛鸟/agent memory作业/memory-rhinobird-homework/wuyifan/week3/3-full-pipeline/results/submission-pass/soak"
+}

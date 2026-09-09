@@ -1,0 +1,31 @@
+✔ --help 显示三个核心参数并正常退出 (46.894375ms)
+✔ 拒绝不是正整数的对话轮数 (32.182916ms)
+✔ 接受轮数、间隔和总时长三个核心参数 (43.272875ms)
+✔ 拒绝负数对话间隔 (43.252625ms)
+✔ 拒绝不大于零的总时长 (35.393334ms)
+✔ 剧本文件不存在时给出明确错误 (31.621625ms)
+✔ 自动完成两轮并恢复同一个 Hermes 会话 (109.851958ms)
+✔ --container 通过 docker exec 驱动容器内 Hermes (713.790833ms)
+✔ Hermes 无响应时记录 timeout 并结束 (80.569417ms)
+✔ 成功运行后生成 JSONL、summary.json 和 report.txt (74.233875ms)
+✔ 连续失败达到阈值后提前停止 (78.859625ms)
+✔ Gateway config uses short-cycle keyword recall without embeddings (1.26625ms)
+✔ the first memory prompt carries the unique recall marker (0.416125ms)
+✔ memory scripts expose help without Docker side effects (31.905542ms)
+✔ install script keeps stdin open when sending its heredoc into Docker (0.374375ms)
+✔ install script reuses the dependency tree resolved by the package install (0.309333ms)
+✔ provider copy source remains anchored at the installed plugin root (0.172625ms)
+✔ npm package download retries transient network failures (0.193541ms)
+✔ verification passes only when L0-L3 and recall all have evidence (184.845083ms)
+✔ verification fails and still writes a summary when L3 is missing (148.838167ms)
+✔ pipeline --help 不构建镜像且正常退出 (38.099834ms)
+✔ 缺少模型凭证时在 Docker 前失败并写出流水线汇总 (123.592667ms)
+✔ pipeline 在读取结果 JSON 前把输出目录规范化为绝对路径 (0.226333ms)
+ℹ tests 23
+ℹ suites 0
+ℹ pass 23
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1374.552083
