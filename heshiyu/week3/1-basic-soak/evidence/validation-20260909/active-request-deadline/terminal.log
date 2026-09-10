@@ -1,7 +1,0 @@
-[2026-09-08T18:22:24.256Z] hermes-standalone-soak 2.1.0; output=E:\TencentDB\提交作业\memory-rhinobird-homework\heshiyu\week3\1-basic-soak\evidence\validation-20260909\active-request-deadline
-[2026-09-08T18:22:24.256Z] rounds=8; interval=0ms; duration=700ms; probeEvery=0; probeMode=chat
-[2026-09-08T18:22:24.312Z] Hermes version: 0.20.6
-[2026-09-08T18:22:24.313Z] round 1/8: health
-[2026-09-08T18:22:25.170Z] round 1/8: FAIL [duration_reached] Hermes action cancelled: duration_reached.
-[2026-09-08T18:22:25.172Z] RESULT: FAIL
-[2026-09-08T18:22:25.172Z] Artifacts: E:\TencentDB\提交作业\memory-rhinobird-homework\heshiyu\week3\1-basic-soak\evidence\validation-20260909\active-request-deadline

@@ -1,7 +1,0 @@
-[2026-09-08T18:22:25.230Z] hermes-standalone-soak 2.1.0; output=E:\TencentDB\提交作业\memory-rhinobird-homework\heshiyu\week3\1-basic-soak\evidence\validation-20260909\partial-success-deadline
-[2026-09-08T18:22:25.230Z] rounds=8; interval=5000ms; duration=700ms; probeEvery=0; probeMode=chat
-[2026-09-08T18:22:25.286Z] Hermes version: 0.20.6
-[2026-09-08T18:22:25.286Z] round 1/8: health
-[2026-09-08T18:22:25.339Z] round 1/8: PASS 52ms
-[2026-09-08T18:22:25.948Z] RESULT: FAIL
-[2026-09-08T18:22:25.948Z] Artifacts: E:\TencentDB\提交作业\memory-rhinobird-homework\heshiyu\week3\1-basic-soak\evidence\validation-20260909\partial-success-deadline
