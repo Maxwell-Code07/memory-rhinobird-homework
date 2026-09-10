@@ -1,0 +1,45 @@
+{
+  "_note": "Intermediate snapshot — 若进程被 kill，以此恢复最近状态",
+  "snapshotAt": "2026-09-06T11:24:52.303Z",
+  "startedAt": "2026-09-06T11:20:26.697Z",
+  "elapsedSeconds": 266,
+  "sessionMode": "new",
+  "sessionId": null,
+  "round": 16,
+  "successCount": 16,
+  "failureCount": 0,
+  "avgLatencyMs": 10970,
+  "consecutiveFailures": 0,
+  "probeResults": [
+    {
+      "probeId": "probe-family-trip",
+      "recalled": true,
+      "foundKeywords": [
+        "大理",
+        "10月12",
+        "爸妈"
+      ],
+      "missingKeywords": [],
+      "durationMs": 7543,
+      "conversationOk": true,
+      "mode": "new",
+      "timestamp": "2026-09-06T11:22:36.859Z"
+    },
+    {
+      "probeId": "probe-family-trip",
+      "recalled": true,
+      "foundKeywords": [
+        "大理",
+        "爸妈"
+      ],
+      "missingKeywords": [
+        "10月12"
+      ],
+      "durationMs": 8486,
+      "conversationOk": true,
+      "mode": "new",
+      "timestamp": "2026-09-06T11:24:52.303Z"
+    }
+  ],
+  "earlyExitReason": null
+}

@@ -1,0 +1,2 @@
+  ⚠ tirith security scanner enabled but not available — command scanning will use pattern matching only
+HTTP 401: Authentication Fails, Your api key: ****-999 is invalid

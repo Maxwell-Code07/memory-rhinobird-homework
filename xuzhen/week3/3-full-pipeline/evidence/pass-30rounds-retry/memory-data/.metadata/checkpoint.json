@@ -1,0 +1,165 @@
+{
+  "last_captured_timestamp": 1788882064896,
+  "total_processed": 60,
+  "last_persona_at": 60,
+  "last_persona_time": "2026-09-08T15:41:19.622Z",
+  "request_persona_update": false,
+  "persona_update_reason": "",
+  "memories_since_last_persona": 0,
+  "scenes_processed": 24,
+  "runner_states": {
+    "20260908_153435_80b53b": {
+      "last_captured_timestamp": 1788881678575,
+      "last_l1_cursor": 1788881678580,
+      "last_scene_name": "我（AI）在和小陈进行自我介绍并登记其软件测试工程师职业信息"
+    },
+    "20260908_153447_55de7d": {
+      "last_captured_timestamp": 1788881691909,
+      "last_l1_cursor": 1788881691913,
+      "last_scene_name": "我（AI）在和用户（上海居民）记录其居住地及通勤习惯"
+    },
+    "20260908_153500_62338c": {
+      "last_captured_timestamp": 1788881706199,
+      "last_l1_cursor": 1788881706218,
+      "last_scene_name": "我（AI）在记录用户负责项目海风的自动化测试工作"
+    },
+    "20260908_153514_d0fbc1": {
+      "last_captured_timestamp": 1788881719684,
+      "last_l1_cursor": 1788881719687,
+      "last_scene_name": "我（AI）在记录用户的常用编程语言偏好"
+    },
+    "20260908_153527_5213d0": {
+      "last_captured_timestamp": 1788881732865,
+      "last_l1_cursor": 1788881732879,
+      "last_scene_name": "我（AI）在和用户记录其工作日作息安排"
+    },
+    "20260908_153541_7228b5": {
+      "last_captured_timestamp": 1788881746686,
+      "last_l1_cursor": 1788881746695,
+      "last_scene_name": "我（AI）在和用户（开发者）记录测试脚本目录与执行偏好"
+    },
+    "20260908_153555_04473d": {
+      "last_captured_timestamp": 1788881759869,
+      "last_l1_cursor": 1788881759872,
+      "last_scene_name": "我（AI）在记录用户的主要兴趣（跑步和阅读技术书籍）"
+    },
+    "20260908_153608_9e6dab": {
+      "last_captured_timestamp": 1788881774367,
+      "last_l1_cursor": 1788881774372,
+      "last_scene_name": "我（AI）在记录用户每周六上午世纪公园跑步的习惯"
+    },
+    "20260908_153622_f425e2": {
+      "last_captured_timestamp": 1788881787752,
+      "last_l1_cursor": 1788881787756,
+      "last_scene_name": "我（AI）在和用户了解其阅读偏好"
+    },
+    "20260908_153636_d23fbf": {
+      "last_captured_timestamp": 1788881802223,
+      "last_l1_cursor": 1788881802230,
+      "last_scene_name": "我（AI）在和用户记录咖啡偏好"
+    },
+    "20260908_153650_4c7b41": {
+      "last_captured_timestamp": 1788881815848,
+      "last_l1_cursor": 1788881815851,
+      "last_scene_name": "我（AI）在和用户确认其每日工作前整理待办的习惯"
+    },
+    "20260908_153703_65405c": {
+      "last_captured_timestamp": 1788881830653,
+      "last_l1_cursor": 1788881830656,
+      "last_scene_name": "我（AI）在和用户设定测试报告的统计要求"
+    },
+    "20260908_153718_a4a174": {
+      "last_captured_timestamp": 1788881843260,
+      "last_l1_cursor": 1788881843269,
+      "last_scene_name": "我（AI）在与用户确认机器可读测试结果以JSON格式保存的偏好"
+    },
+    "20260908_153731_57f219": {
+      "last_captured_timestamp": 1788881857317,
+      "last_l1_cursor": 1788881857320,
+      "last_scene_name": "我在和用户确认同时生成文本测试报告的需求"
+    },
+    "20260908_153744_142cc4": {
+      "last_captured_timestamp": 1788881869105,
+      "last_l1_cursor": 1788881869107,
+      "last_scene_name": "我（AI）在和用户记录项目海风使用的智能体框架 Hermes"
+    },
+    "20260908_153756_c99d0d": {
+      "last_captured_timestamp": 1788881883459,
+      "last_l1_cursor": 1788881883462,
+      "last_scene_name": "我（AI）在和用户记录项目海风的运行环境"
+    },
+    "20260908_153810_e7945c": {
+      "last_captured_timestamp": 1788881893415,
+      "last_l1_cursor": 1788881893426,
+      "last_scene_name": "我（AI）在和用户验证多轮对话的稳定回复能力"
+    },
+    "20260908_153820_fc8f0d": {
+      "last_captured_timestamp": 1788881906502,
+      "last_l1_cursor": 1788881906513,
+      "last_scene_name": "我（AI）在和用户确认日志与截图中不泄露 API Key 的安全约束"
+    },
+    "20260908_153834_4d375c": {
+      "last_captured_timestamp": 1788881920312,
+      "last_l1_cursor": 1788881920318,
+      "last_scene_name": "我（AI）在和用户记录 Docker 镜像版本固定为 0.20.6 以便复现测试"
+    },
+    "20260908_153844_a23423": {
+      "last_captured_timestamp": 1788881930350,
+      "last_l1_cursor": 1788881930353,
+      "last_scene_name": "我（AI）在和用户确认容器的记忆插件运行时安装要求"
+    },
+    "20260908_153857_ce1a5e": {
+      "last_captured_timestamp": 1788881943657,
+      "last_l1_cursor": 1788881943661,
+      "last_scene_name": "我在和用户确认记忆系统写入L0层的规则"
+    },
+    "20260908_153910_6fee44": {
+      "last_captured_timestamp": 1788881957773,
+      "last_l1_cursor": 1788881957777,
+      "last_scene_name": "我（AI）在处理用户关于记忆系统抽取事实并写入L1 records层的请求"
+    },
+    "20260908_153926_ae1ad2": {
+      "last_captured_timestamp": 1788881969200,
+      "last_l1_cursor": 1788881969204,
+      "last_scene_name": "我（AI）在和用户确认记忆系统将相关事实汇总为 L2 scene blocks 的规则"
+    },
+    "20260908_153936_2fa887": {
+      "last_captured_timestamp": 1788881980273,
+      "last_l1_cursor": 1788881980277,
+      "last_scene_name": "我（AI）在和用户执行记忆系统L3画像设置指令"
+    },
+    "20260908_153948_8a826d": {
+      "last_captured_timestamp": 1788881991114,
+      "last_l1_cursor": 1788881991118,
+      "last_scene_name": "我（AI）正在配合用户进行记忆召回功能的确认测试"
+    },
+    "20260908_153958_c6f5f0": {
+      "last_captured_timestamp": 1788882013842,
+      "last_l1_cursor": 1788882013847,
+      "last_scene_name": "我（AI）在应用户要求记住小陈、Python和上海等关键词"
+    },
+    "20260908_154022_49ef42": {
+      "last_captured_timestamp": 1788882028973,
+      "last_l1_cursor": 1788882028977,
+      "last_scene_name": "我（AI）在和用户确认对 soak 脚本超时处理的要求"
+    },
+    "20260908_154036_637c72": {
+      "last_captured_timestamp": 1788882041978,
+      "last_l1_cursor": 1788882041985,
+      "last_scene_name": "我在和用户确认soak脚本在API Key错误时输出FAIL结果的要求"
+    },
+    "20260908_154049_30e402": {
+      "last_captured_timestamp": 1788882055368,
+      "last_l1_cursor": 1788882055374,
+      "last_scene_name": "我（AI）在和用户确认设置每轮测试间隔一秒的规则"
+    },
+    "20260908_154102_e2fe25": {
+      "last_captured_timestamp": 1788882064896,
+      "last_l1_cursor": 1788882064899,
+      "last_scene_name": "我（AI）在和用户确认已记住关于小陈和项目海风的测试事实"
+    }
+  },
+  "pipeline_states": {},
+  "l0_conversations_count": 30,
+  "total_memories_extracted": 24
+}

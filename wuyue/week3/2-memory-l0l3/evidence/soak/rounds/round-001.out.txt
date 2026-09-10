@@ -1,0 +1,4 @@
+  ⚠ tirith security scanner enabled but not available — command scanning will use pattern matching only
+记下了。
+
+有什么想做的吗？比如写 Go 服务、调试问题、搭环境，或者查技术资料，都可以直接说。

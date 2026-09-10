@@ -1,0 +1,20 @@
+  ⚠ tirith security scanner enabled but not available — command scanning will use pattern matching only
+知道你在做 OTel vs Prometheus 的可观测选型。用你那三道门槛（低风险小范围验证、链路真跑通、为放量与分布式链路留扩展）来框，我把结论收敛下。
+
+直接说结论：这俩不是替代关系，是层次关系。Prometheus 是"指标后端 + 查询 + 告警"，OTel 是"采集、语义与传输的标准化层"。你真正该纠结的不是 OT vs Prom，而是**用哪种方式把指标送进 Prometheus**。
+
+**OTel → Prometheus 迁就路径（低成本、推荐你先走的）**
+- 用 OTel SDK 打点，但通过 OTel Prometheus exporter 转成 Prometheus 拉取格式。你立即获得 OTel 的**统一语义规范和后续 trace/日志打通的能力**，同时也保留了 Prometheus 现成的查询和告警，不需要现在就上 OTlp 接收端（collector/backend）。
+- 迁移成本最低，单服务 grep 替换打点库级别。符合你"低风险小范围验证"。
+
+**Prometheus client 直打点（现状多数人的做法）**
+- 最快、依赖最少，但指标格式各自为政，将来接 OTel trace 时要再套一层关联，等于预埋债务。放量后分布式 trace 的关联是它的短板。
+
+**为什么网络上一堆人"纠结"：他们误把维度当二选一**
+- 选型的真判据就一条：**你未来要不要 trace/日志和指标跨服务关联**？要 → 现在就让所有服务统一用 OTel SDK 打点（哪怕后端是 Prometheus）；不要、纯指标 → 留 Prometheus client 即可，别过度设计。
+
+结合你 09-09 灰度那个节点：风险最高的不是"选谁"，而是**那条链路（服务曝光指标 → 抓取 → 查询/告警）有没有在你这边真跑起来过**，而不是配置放上去就算数。这正好对上你第二道门槛。建议灰度前至少用一个业务服务，把 OTel exporter → Prometheus → Grafana 告警整条跑通留个验收样本。
+
+要不要我带你走一遍具体的 OTel SDK 用 Go 插桩 + Prometheus exporter 的最小可跑 demo？还是你想先聊某个具体环节（指标命名规范、优雅关闭时 flush、多实例抓取冲突这些坑）？
+
+我对你的具体存量代码还没了解，你要是看一眼现有服务是哪种打点方式，我能给更贴合的建议。
