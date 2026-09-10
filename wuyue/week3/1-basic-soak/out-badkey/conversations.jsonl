@@ -1,0 +1,3 @@
+{"round":1,"label":"tech-stack","category":"技术背景","success":false,"status":"exit-1","durationMs":3979,"responseLength":171,"reply_snippet":"","error":"session_id: 20260906_111757_64998a","timestamp":"2026-09-06T11:18:01.207Z"}
+{"round":2,"label":"daily-routine","category":"日常习惯","success":false,"status":"exit-1","durationMs":4485,"responseLength":171,"reply_snippet":"","error":"session_id: 20260906_111803_076c7b","timestamp":"2026-09-06T11:18:07.699Z"}
+{"round":3,"label":"preference-coffee","category":"个人偏好","success":false,"status":"exit-1","durationMs":4002,"responseLength":171,"reply_snippet":"","error":"session_id: 20260906_111810_80405e","timestamp":"2026-09-06T11:18:13.705Z"}

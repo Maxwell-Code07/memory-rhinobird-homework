@@ -1,0 +1,4 @@
+  ⚠ tirith security scanner enabled but not available — command scanning will use pattern matching only
+你好，小巫！记下了——Go 后端工程师，在深圳工作。
+
+有什么我能帮你的？无论是 Go 相关的开发问题、架构设计，还是别的任务，直接说就行。

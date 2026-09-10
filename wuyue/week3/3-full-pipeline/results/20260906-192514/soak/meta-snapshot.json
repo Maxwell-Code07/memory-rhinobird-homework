@@ -1,0 +1,15 @@
+{
+  "_note": "Intermediate snapshot — 若进程被 kill，以此恢复最近状态",
+  "snapshotAt": "2026-09-06T11:28:03.359Z",
+  "startedAt": "2026-09-06T11:25:29.749Z",
+  "elapsedSeconds": 154,
+  "sessionMode": "new",
+  "sessionId": null,
+  "round": 8,
+  "successCount": 8,
+  "failureCount": 0,
+  "avgLatencyMs": 14821,
+  "consecutiveFailures": 0,
+  "probeResults": [],
+  "earlyExitReason": null
+}

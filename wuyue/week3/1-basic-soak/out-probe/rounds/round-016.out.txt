@@ -1,0 +1,8 @@
+  ⚠ tirith security scanner enabled but not available — command scanning will use pattern matching only
+你 10 月的那次家庭旅行信息如下：
+
+- 哪天出发：2026 年 10 月 12 日
+- 去哪里：云南（深圳 飞 昆明，当晚入住大理古城民宿）
+- 和谁一起去：带爸妈（行程、机票和住宿已全额付清）
+
+需要我把这条整理进下次帮你复查或改期时的参考吗？
