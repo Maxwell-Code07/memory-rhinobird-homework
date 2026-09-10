@@ -34,6 +34,8 @@ week3/
 ├── 3-full-pipeline/
 │   ├── Dockerfile
 │   ├── run-pipeline.ps1
+│   ├── run-pipeline.py
+│   ├── run-pipeline.sh
 │   ├── show-pipeline-evidence.ps1
 │   ├── show-recall-evidence.ps1
 │   └── README.md
@@ -228,11 +230,11 @@ docker build --progress=plain `
 
 ### 运行命令
 
-正常运行不要求预先准备插件源码、`config.yaml` 或 Docker volume；请先复制 `3-full-pipeline/.env.example` 为当前目录 `.env`，填写模型 API 信息。流水线会自动拉取官方 TencentDB-Agent-Memory、生成配置并创建新 volume。模型服务不绑定 MiniMax，Hermes 模型和插件 LLM 默认使用同一组配置。
+正常运行不要求预先准备插件源码、`config.yaml` 或 Docker volume。请先复制 `3-full-pipeline/.env.example` 为 `.env`，填写 API Key、OpenAI-compatible Base URL 和模型 ID；流水线会自动拉取官方 TencentDB-Agent-Memory、生成配置并创建新 volume。脚本不依赖 `/models` 枚举，也不会把模型信息写死在实现中。
 
-因此其他人复现时只需要 Docker Desktop、Git、可用的模型服务和一份本地 `.env`。Key 不进入日志和 evidence，流水线结束时会清除 Docker home volume 中的临时凭证文件。生产环境应进一步改用 Docker Secrets 或企业密钥管理系统。
+因此其他人复现时只需要三个基础条件：Docker Desktop/Engine 已启动、Git 可用、拥有可用的 OpenAI-compatible 模型服务。在 `week3` 目录填写 `.env` 后执行 PowerShell、Python 或 POSIX Shell 入口即可。Key 不进入日志和 evidence，流水线结束时还会从宿主机临时目录及 Docker home volume 中清除临时 `.env`。生产环境应进一步改用 Docker Secrets 或企业密钥管理系统。
 
-![进阶二一键流水线总览](<pictures/进阶二/one command pipeline.png>)
+![进阶二一键流水线构建](<pictures/进阶二/pipeline-build.png>)
 
 ```powershell
 & .\3-full-pipeline\run-pipeline.ps1 `
@@ -263,7 +265,7 @@ docker build --progress=plain `
 
 本次零预置真实运行共完成 8 轮对话，`status=pass`、`successfulRounds=8`、`failedRounds=0`，最终 session 为 `20260909_073815_9245e5`。
 
-![进阶二 soak meta](<pictures/进阶二/soak result.png>)
+![进阶二 8 轮 Soak 结构化结果](<pictures/进阶二/soak-8-rounds-pass.png>)
 
 ### 事实输入
 
@@ -284,13 +286,11 @@ L3 = 6504 bytes persona
 
 不同运行中 L1/L2 数量可能因模型对事实的归并方式发生变化，因此验收关注四层都生成非空数据、事实语义正确并且 recall 命中，而不是把某个固定条数写死。Recall 请求仍使用完整中文 query `青松灯塔-7429`，但自动断言检查稳定标识 `7429`；这是因为生成式记忆可能把项目名归纳为 `Qingsong Lighthouse-7429`，不应把正常翻译误判为记忆丢失。
 
-![进阶二 L0-L3 verification](<pictures/进阶二/L0-L3 verification.png>)
+![进阶二 L0-L3 与 recall 验证](<pictures/进阶二/memory-l0-l3-recall-pass.png>)
 
 ### Query 与 Recall 内容
 
-`show-recall-evidence.ps1` 同时展示 query、HTTP 状态、是否命中、命中记忆数以及完整 recall context，避免只看到 `matched=true` 却不知道召回了什么。
-
-![进阶二 recall](<pictures/进阶二/recall (2).png>)
+最新的 L0-L3 验收截图已经同时展示 query、HTTP 状态、是否命中、命中记忆数以及完整 recall context，避免只看到 `matched=true` 却不知道召回了什么。
 
 ## 踩坑与解决过程
 

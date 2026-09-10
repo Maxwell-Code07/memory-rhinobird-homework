@@ -11,6 +11,7 @@ param(
     [string]$ModelBaseUrl = "",
     [string]$LlmBaseUrl = "",
     [string]$ModelsEndpoint = "",
+    [string]$DisableThinking = "",
     [int]$Rounds = 8,
     [switch]$KeepContainer,
     [switch]$OfflineDependencies
@@ -47,11 +48,12 @@ if (-not $HermesVersion -or $HermesVersion -notmatch '^[0-9]+\.[0-9]+\.[0-9]+$')
     throw "HermesVersion is required: pass -HermesVersion x.y.z or set HERMES_VERSION in .env"
 }
 $Model = Resolve-Setting $Model "HERMES_MODEL" @("OPENAI_MODEL")
-$ModelProvider = Resolve-Setting $ModelProvider "HERMES_MODEL_PROVIDER"
+$ModelProvider = Resolve-Setting $ModelProvider "HERMES_API_STYLE" @("HERMES_MODEL_PROVIDER")
 $ProviderApiKeyEnv = Resolve-Setting $ProviderApiKeyEnv "HERMES_PROVIDER_API_KEY_ENV"
-$ModelBaseUrl = Resolve-Setting $ModelBaseUrl "HERMES_MODEL_BASE_URL"
-$LlmBaseUrl = Resolve-Setting $LlmBaseUrl "HERMES_LLM_BASE_URL" @("OPENAI_BASE_URL")
+$ModelBaseUrl = Resolve-Setting $ModelBaseUrl "HERMES_BASE_URL" @("HERMES_MODEL_BASE_URL")
+$LlmBaseUrl = Resolve-Setting $LlmBaseUrl "TDAI_LLM_BASE_URL" @("HERMES_LLM_BASE_URL", "OPENAI_BASE_URL")
 $ModelsEndpoint = Resolve-Setting $ModelsEndpoint "HERMES_MODELS_ENDPOINT"
+$DisableThinking = Resolve-Setting $DisableThinking "TDAI_LLM_DISABLE_THINKING"
 $thirdWeekRoot = Split-Path $pipelineRoot -Parent
 $openSourceRoot = Split-Path $thirdWeekRoot -Parent
 $planRoot = Split-Path $openSourceRoot -Parent
@@ -111,18 +113,19 @@ function Set-Phase {
     Write-Host "[$Status] $Name $Detail"
 }
 
-function Infer-Provider {
-    param([Parameter(Mandatory = $true)][string]$BaseUrl)
-    try { $hostName = ([Uri]$BaseUrl).Host.ToLowerInvariant() } catch { throw "Invalid API base URL: $BaseUrl" }
+function Infer-Thinking {
+    # The plugin only recognises these strategies (no-think-fetch.ts). The field it injects
+    # differs per vendor, so pick by endpoint host; unknown hosts get "false" (inject nothing).
+    param([string]$BaseUrl)
+    try { $hostName = ([Uri]$BaseUrl).Host.ToLowerInvariant() } catch { return "false" }
     switch -Regex ($hostName) {
-        'minimax'  { return 'minimax-cn' }
-        'openai'   { return 'openai-api' }
-        'openrouter' { return 'openrouter' }
-        'deepseek' { return 'deepseek' }
-        'anthropic' { return 'anthropic' }
-        'generativelanguage|google' { return 'gemini' }
-        'x.ai|grok' { return 'xai' }
-        default { throw "Cannot infer Hermes provider from $hostName. Set HERMES_MODEL_PROVIDER in .env (examples: minimax-cn, openai-api, anthropic, deepseek, gemini)." }
+        'minimax'                    { return 'anthropic' }
+        'deepseek'                   { return 'deepseek' }
+        'dashscope|aliyun'           { return 'dashscope' }
+        'anthropic'                  { return 'anthropic' }
+        'google|generativelanguage'  { return 'gemini' }
+        'openai\.com|openrouter'    { return 'openai' }
+        default                      { return 'false' }
     }
 }
 
@@ -139,28 +142,23 @@ try {
     }
 
     if (-not $ConfigVolume) {
-        $apiKey = Resolve-Setting "" "HERMES_API_KEY" @("OPENAI_API_KEY", "MINIMAX_CN_API_KEY")
+        $apiKey = Resolve-Setting "" "HERMES_API_KEY" @("OPENAI_API_KEY", "ANTHROPIC_API_KEY", "MINIMAX_CN_API_KEY")
         if (-not $apiKey) { throw "A model API key is required; set HERMES_API_KEY in .env or the process environment" }
-        if (-not $LlmBaseUrl) { throw "An API base URL is required; set HERMES_LLM_BASE_URL in .env" }
+        if (-not $ModelBaseUrl) { throw "A Hermes API base URL is required; set HERMES_BASE_URL in .env" }
         if (-not $Model) { throw "A model is required; set HERMES_MODEL in .env" }
-        if (-not $ModelProvider) { $ModelProvider = Infer-Provider $LlmBaseUrl }
-        if ($ModelProvider -eq 'openai') { $ModelProvider = 'openai-api' }
-        if (-not $ProviderApiKeyEnv) {
-            $ProviderApiKeyEnv = switch -Regex ($ModelProvider) {
-                '^minimax-cn$' { 'MINIMAX_CN_API_KEY'; break }
-                '^anthropic$'  { 'ANTHROPIC_API_KEY'; break }
-                '^openrouter$' { 'OPENROUTER_API_KEY'; break }
-                '^groq$'       { 'GROQ_API_KEY'; break }
-                '^google$'     { 'GOOGLE_API_KEY'; break }
-                default        { 'OPENAI_API_KEY' }
+        # Single supported style: an OpenAI-compatible endpoint. Hermes' "openai-api" provider
+        # speaks it and honours model.base_url, and the memory plugin's L1-L3 runner requires it too,
+        # so one URL serves both legs.
+        if ($ModelProvider) {
+            $apiStyle = $ModelProvider.ToLowerInvariant()
+            if ($apiStyle -notin @('openai', 'openai-api')) {
+                throw "HERMES_API_STYLE must be 'openai' (an OpenAI-compatible endpoint). Got: $ModelProvider"
             }
         }
-        if (-not $ModelBaseUrl) {
-            if ($ModelProvider -eq 'minimax-cn' -and $LlmBaseUrl -match '/v1/?$') {
-                $ModelBaseUrl = $LlmBaseUrl -replace '/v1/?$', '/anthropic'
-            } else { $ModelBaseUrl = $LlmBaseUrl }
-        }
-
+        $ModelProvider = 'openai-api'
+        if (-not $LlmBaseUrl) { $LlmBaseUrl = $ModelBaseUrl }
+        if (-not $ProviderApiKeyEnv) { $ProviderApiKeyEnv = 'OPENAI_API_KEY' }
+        if (-not $DisableThinking) { $DisableThinking = Infer-Thinking $LlmBaseUrl }
         New-Item -ItemType Directory -Force -Path $generatedConfigDir | Out-Null
         $providerKeyLine = "${ProviderApiKeyEnv}=`"$apiKey`""
         $envText = @"
@@ -170,7 +168,7 @@ TDAI_LLM_API_KEY="$apiKey"
 TDAI_LLM_BASE_URL="$LlmBaseUrl"
 TDAI_LLM_MODEL="$Model"
 TDAI_LLM_TIMEOUT_MS="180000"
-TDAI_LLM_DISABLE_THINKING="true"
+TDAI_LLM_DISABLE_THINKING="$DisableThinking"
 "@
         $configText = @"
 model:
@@ -293,7 +291,8 @@ catch {
         phases = $phaseResults
     }
     $failedSummary | ConvertTo-Json -Depth 12 | Set-Content -Encoding UTF8 -LiteralPath $summaryPath
-    Write-Error $_
+    Write-Host "[fail] $($_.Exception.Message)" -ForegroundColor Red
+    Write-Host "Evidence: $summaryPath" -ForegroundColor Yellow
     exit 1
 }
 finally {
