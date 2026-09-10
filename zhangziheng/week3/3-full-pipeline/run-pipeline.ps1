@@ -1,0 +1,316 @@
+param(
+    [string]$HermesVersion = "",
+    [string]$Week2Dir = "",
+    [string]$PluginDir = "",
+    [string]$PluginRepo = "https://github.com/Tencent/TencentDB-Agent-Memory.git",
+    [string]$PluginRef = "main",
+    [string]$ConfigVolume = "",
+    [string]$Model = "",
+    [string]$ModelProvider = "",
+    [string]$ProviderApiKeyEnv = "",
+    [string]$ModelBaseUrl = "",
+    [string]$LlmBaseUrl = "",
+    [string]$ModelsEndpoint = "",
+    [int]$Rounds = 8,
+    [switch]$KeepContainer,
+    [switch]$OfflineDependencies
+)
+
+$ErrorActionPreference = "Stop"
+$pipelineRoot = $PSScriptRoot
+$dotenv = @{}
+$dotenvCandidates = @((Join-Path (Get-Location) ".env"), (Join-Path $pipelineRoot ".env")) | Select-Object -Unique
+foreach ($candidate in $dotenvCandidates) {
+    if (-not (Test-Path -LiteralPath $candidate)) { continue }
+    foreach ($line in Get-Content -LiteralPath $candidate -Encoding UTF8) {
+        if ($line -match '^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*?)\s*$' -and $line -notmatch '^\s*#') {
+            $value = $Matches[2].Trim()
+            if ($value.Length -ge 2 -and (($value.StartsWith('"') -and $value.EndsWith('"')) -or ($value.StartsWith("'") -and $value.EndsWith("'")))) {
+                $value = $value.Substring(1, $value.Length - 2)
+            }
+            $dotenv[$Matches[1]] = $value
+        }
+    }
+}
+function Resolve-Setting {
+    param([string]$Explicit, [string]$Name, [string[]]$Aliases = @())
+    if ($Explicit) { return $Explicit }
+    foreach ($key in @($Name) + $Aliases) {
+        if ($dotenv.ContainsKey($key) -and $dotenv[$key]) { return $dotenv[$key] }
+        $environmentValue = [Environment]::GetEnvironmentVariable($key)
+        if ($environmentValue) { return $environmentValue }
+    }
+    return ""
+}
+$HermesVersion = Resolve-Setting $HermesVersion "HERMES_VERSION"
+if (-not $HermesVersion -or $HermesVersion -notmatch '^[0-9]+\.[0-9]+\.[0-9]+$') {
+    throw "HermesVersion is required: pass -HermesVersion x.y.z or set HERMES_VERSION in .env"
+}
+$Model = Resolve-Setting $Model "HERMES_MODEL" @("OPENAI_MODEL")
+$ModelProvider = Resolve-Setting $ModelProvider "HERMES_MODEL_PROVIDER"
+$ProviderApiKeyEnv = Resolve-Setting $ProviderApiKeyEnv "HERMES_PROVIDER_API_KEY_ENV"
+$ModelBaseUrl = Resolve-Setting $ModelBaseUrl "HERMES_MODEL_BASE_URL"
+$LlmBaseUrl = Resolve-Setting $LlmBaseUrl "HERMES_LLM_BASE_URL" @("OPENAI_BASE_URL")
+$ModelsEndpoint = Resolve-Setting $ModelsEndpoint "HERMES_MODELS_ENDPOINT"
+$thirdWeekRoot = Split-Path $pipelineRoot -Parent
+$openSourceRoot = Split-Path $thirdWeekRoot -Parent
+$planRoot = Split-Path $openSourceRoot -Parent
+if (-not $Week2Dir) { $Week2Dir = $pipelineRoot }
+if (-not (Test-Path -LiteralPath (Join-Path $Week2Dir "Dockerfile"))) {
+    throw "Week 2 Dockerfile not found in: $Week2Dir"
+}
+$advancedSource = Join-Path $pipelineRoot "..\2-memory-l0l3"
+$basicSource = Join-Path $pipelineRoot "..\1-basic-soak"
+$runId = Get-Date -Format "yyyyMMdd_HHmmss"
+$outputDir = Join-Path $pipelineRoot "runs\$runId"
+$evidenceDir = Join-Path $outputDir "evidence"
+$runtimeDir = Join-Path $evidenceDir "runtime-data"
+$workDir = Join-Path $outputDir "_work"
+$generatedConfigDir = Join-Path $workDir "config"
+$clonedPluginDir = Join-Path $workDir "plugin"
+$imageTag = "hermes:week3-pipeline-$HermesVersion"
+$containerName = "hermes-pipeline-$runId"
+$homeVolume = "hermes-pipeline-home-$runId"
+$sourceArchive = Join-Path $outputDir "tdai-source.tgz"
+$summaryPath = Join-Path $outputDir "pipeline-summary.json"
+$startedAt = Get-Date
+$phaseResults = [ordered]@{}
+$containerCreated = $false
+$generatedConfig = $false
+
+New-Item -ItemType Directory -Force -Path $evidenceDir, $runtimeDir | Out-Null
+
+function Invoke-DockerChecked {
+    param([string[]]$Arguments)
+    & docker @Arguments
+    if ($LASTEXITCODE -ne 0) {
+        throw "docker $($Arguments -join ' ') failed with exit code $LASTEXITCODE"
+    }
+}
+
+function Invoke-DockerWithRetry {
+    param(
+        [string[]]$Arguments,
+        [int]$Attempts = 3,
+        [int]$DelaySeconds = 5
+    )
+    for ($attempt = 1; $attempt -le $Attempts; $attempt++) {
+        & docker @Arguments
+        if ($LASTEXITCODE -eq 0) { return }
+        if ($attempt -lt $Attempts) {
+            Write-Host "Docker command failed (attempt $attempt/$Attempts); retrying in ${DelaySeconds}s" -ForegroundColor Yellow
+            Start-Sleep -Seconds $DelaySeconds
+        }
+    }
+    throw "docker $($Arguments -join ' ') failed after $Attempts attempts"
+}
+
+function Set-Phase {
+    param([string]$Name, [string]$Status, [string]$Detail = "")
+    $phaseResults[$Name] = [ordered]@{ status = $Status; detail = $Detail }
+    Write-Host "[$Status] $Name $Detail"
+}
+
+function Infer-Provider {
+    param([Parameter(Mandatory = $true)][string]$BaseUrl)
+    try { $hostName = ([Uri]$BaseUrl).Host.ToLowerInvariant() } catch { throw "Invalid API base URL: $BaseUrl" }
+    switch -Regex ($hostName) {
+        'minimax'  { return 'minimax-cn' }
+        'openai'   { return 'openai-api' }
+        'openrouter' { return 'openrouter' }
+        'deepseek' { return 'deepseek' }
+        'anthropic' { return 'anthropic' }
+        'generativelanguage|google' { return 'gemini' }
+        'x.ai|grok' { return 'xai' }
+        default { throw "Cannot infer Hermes provider from $hostName. Set HERMES_MODEL_PROVIDER in .env (examples: minimax-cn, openai-api, anthropic, deepseek, gemini)." }
+    }
+}
+
+try {
+    Set-Phase "bootstrap" "running" "preparing plugin and Hermes config"
+    $dockerServer = & docker version --format '{{.Server.Version}}' 2>$null
+    if ($LASTEXITCODE -ne 0) { throw "Docker Desktop engine is not available" }
+
+    if (-not $PluginDir) {
+        New-Item -ItemType Directory -Force -Path $workDir | Out-Null
+        & git clone --depth 1 --branch $PluginRef $PluginRepo $clonedPluginDir
+        if ($LASTEXITCODE -ne 0) { throw "Unable to clone plugin: $PluginRepo ref=$PluginRef" }
+        $PluginDir = $clonedPluginDir
+    }
+
+    if (-not $ConfigVolume) {
+        $apiKey = Resolve-Setting "" "HERMES_API_KEY" @("OPENAI_API_KEY", "MINIMAX_CN_API_KEY")
+        if (-not $apiKey) { throw "A model API key is required; set HERMES_API_KEY in .env or the process environment" }
+        if (-not $LlmBaseUrl) { throw "An API base URL is required; set HERMES_LLM_BASE_URL in .env" }
+        if (-not $Model) { throw "A model is required; set HERMES_MODEL in .env" }
+        if (-not $ModelProvider) { $ModelProvider = Infer-Provider $LlmBaseUrl }
+        if ($ModelProvider -eq 'openai') { $ModelProvider = 'openai-api' }
+        if (-not $ProviderApiKeyEnv) {
+            $ProviderApiKeyEnv = switch -Regex ($ModelProvider) {
+                '^minimax-cn$' { 'MINIMAX_CN_API_KEY'; break }
+                '^anthropic$'  { 'ANTHROPIC_API_KEY'; break }
+                '^openrouter$' { 'OPENROUTER_API_KEY'; break }
+                '^groq$'       { 'GROQ_API_KEY'; break }
+                '^google$'     { 'GOOGLE_API_KEY'; break }
+                default        { 'OPENAI_API_KEY' }
+            }
+        }
+        if (-not $ModelBaseUrl) {
+            if ($ModelProvider -eq 'minimax-cn' -and $LlmBaseUrl -match '/v1/?$') {
+                $ModelBaseUrl = $LlmBaseUrl -replace '/v1/?$', '/anthropic'
+            } else { $ModelBaseUrl = $LlmBaseUrl }
+        }
+
+        New-Item -ItemType Directory -Force -Path $generatedConfigDir | Out-Null
+        $providerKeyLine = "${ProviderApiKeyEnv}=`"$apiKey`""
+        $envText = @"
+HERMES_API_KEY="$apiKey"
+$providerKeyLine
+TDAI_LLM_API_KEY="$apiKey"
+TDAI_LLM_BASE_URL="$LlmBaseUrl"
+TDAI_LLM_MODEL="$Model"
+TDAI_LLM_TIMEOUT_MS="180000"
+TDAI_LLM_DISABLE_THINKING="true"
+"@
+        $configText = @"
+model:
+  default: $Model
+  provider: $ModelProvider
+  base_url: $ModelBaseUrl
+_config_version: 39
+memory:
+  memory_enabled: false
+  user_profile_enabled: false
+"@
+        $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+        [IO.File]::WriteAllText((Join-Path $generatedConfigDir ".env"), $envText, $utf8NoBom)
+        [IO.File]::WriteAllText((Join-Path $generatedConfigDir "config.yaml"), $configText, $utf8NoBom)
+        $generatedConfig = $true
+    }
+    Set-Phase "bootstrap" "pass" "docker=$dockerServer plugin_ref=$PluginRef generated_config=$generatedConfig"
+
+    if (-not (Test-Path -LiteralPath (Join-Path $Week2Dir "Dockerfile"))) { throw "第二周 Dockerfile 不存在：$Week2Dir" }
+    if (-not (Test-Path -LiteralPath (Join-Path $PluginDir "package.json"))) { throw "插件源码不存在：$PluginDir" }
+    if (-not (Test-Path -LiteralPath (Join-Path $advancedSource "fact-prompts.json"))) { throw "事实 prompts 不存在：$advancedSource" }
+
+    Set-Phase "build" "running" "image=$imageTag"
+    Invoke-DockerWithRetry -Arguments @("build", "--progress=plain", "--build-arg", "HERMES_VERSION=$HermesVersion", "-t", $imageTag, $Week2Dir)
+    $dockerfileHash = (Get-FileHash -Algorithm SHA256 -LiteralPath (Join-Path $Week2Dir "Dockerfile")).Hash
+    Set-Phase "build" "pass" "dockerfile_sha256=$dockerfileHash"
+
+    Set-Phase "prepare" "running" "container=$containerName"
+    New-Item -ItemType Directory -Force -Path $outputDir | Out-Null
+    tar --exclude=node_modules --exclude=.git -czf $sourceArchive -C $PluginDir .
+    Invoke-DockerChecked @("volume", "create", $homeVolume)
+    if (Test-Path -LiteralPath (Join-Path $generatedConfigDir ".env")) {
+        Invoke-DockerChecked @("run", "--rm", "--mount", "type=bind,source=$generatedConfigDir,target=/source,readonly", "-v", "${homeVolume}:/target", $imageTag, "sh", "-c", "cp /source/.env /target/.env; cp /source/config.yaml /target/config.yaml")
+    } else {
+        Invoke-DockerChecked @("run", "--rm", "-v", "${ConfigVolume}:/source:ro", "-v", "${homeVolume}:/target", $imageTag, "sh", "-c", "cp /source/.env /target/.env; cp /source/config.yaml /target/config.yaml")
+    }
+    Invoke-DockerChecked @("run", "--name", $containerName, "-dit", "-v", "${homeVolume}:/opt/hermes-home", "-v", "${runtimeDir}:/opt/tdai-data", "-w", "/workspace/advanced", $imageTag, "sh")
+    $containerCreated = $true
+    Invoke-DockerChecked @("cp", "${advancedSource}\\.", "${containerName}:/workspace/advanced")
+    Invoke-DockerChecked @("cp", "${basicSource}\\.", "${containerName}:/workspace/soak")
+    Invoke-DockerChecked @("cp", $sourceArchive, "${containerName}:/tmp/tdai-source.tgz")
+    Invoke-DockerChecked @("exec", $containerName, "sh", "-c", "mkdir -p /source/tdai /workspace/advanced; tar -xzf /tmp/tdai-source.tgz -C /source/tdai")
+    Invoke-DockerChecked @("exec", $containerName, "sh", "-c", "cp /workspace/advanced/npx-offline-wrapper.sh /usr/local/bin/npx; chmod +x /usr/local/bin/npx")
+    Set-Phase "prepare" "pass" "fresh_container=true"
+
+    Set-Phase "install_plugin" "running"
+    $installEnv = @()
+    if ($OfflineDependencies) {
+        $offlineNodeModules = Join-Path $advancedSource "linux-install\package\node_modules"
+        if (-not (Test-Path -LiteralPath $offlineNodeModules)) { throw "-OfflineDependencies 指定了离线模式，但未找到 $offlineNodeModules" }
+        Invoke-DockerChecked @("exec", $containerName, "sh", "-c", "mkdir -p /opt/hermes-home/tdai-memory-plugin")
+        Invoke-DockerChecked @("cp", $offlineNodeModules, "${containerName}:/opt/hermes-home/tdai-memory-plugin/node_modules")
+        $installEnv = @("-e", "TDAI_SKIP_NPM_INSTALL=1")
+    }
+    Invoke-DockerChecked (@("exec") + $installEnv + @($containerName, "sh", "/workspace/advanced/install-plugin-in-container.sh"))
+    Set-Phase "install_plugin" "pass" "provider=memory_tencentdb"
+
+    Set-Phase "gateway" "running"
+    Invoke-DockerChecked @("exec", "-d", $containerName, "sh", "/workspace/advanced/start-gateway-in-container.sh")
+    $health = $null
+    $healthy = $false
+    for ($attempt = 1; $attempt -le 30; $attempt++) {
+        $health = & docker exec $containerName node /workspace/advanced/health-check.mjs 2>$null
+        if ($LASTEXITCODE -eq 0) { $healthy = $true; break }
+        Start-Sleep -Seconds 2
+    }
+    if (-not $healthy) { throw "Gateway health check failed after 60s: $($health -join ' ')" }
+    Set-Phase "gateway" "pass" $health
+
+    Set-Phase "soak" "running" "rounds=$Rounds"
+    Invoke-DockerChecked @("exec", $containerName, "node", "/workspace/advanced/../soak/hermes-soak.mjs", "--rounds", "$Rounds", "--interval-ms", "1000", "--duration-minutes", "20", "--request-timeout-ms", "180000", "--toolsets", "context_engine,memory", "--prompts", "/workspace/advanced/fact-prompts.json", "--output", "/workspace/advanced/evidence/soak")
+    Set-Phase "soak" "pass" "meta.json generated"
+
+    $metaRaw = & docker exec $containerName sh -c "cat /workspace/advanced/evidence/soak/meta.json"
+    if ($LASTEXITCODE -ne 0) { throw "无法读取 soak meta.json" }
+    $meta = ($metaRaw -join "`n") | ConvertFrom-Json
+    if ($meta.status -ne "pass") { throw "soak status=$($meta.status)" }
+    $sessionId = $meta.finalSessionId
+    Set-Phase "verify_memory" "running" "session=$sessionId"
+    Invoke-DockerChecked @("exec", $containerName, "node", "/workspace/advanced/verify-memory.mjs", "--session", $sessionId, "--timeout-seconds", "180")
+    Set-Phase "verify_memory" "pass" "L0-L3 and recall passed"
+
+    Invoke-DockerChecked @("cp", "${containerName}:/workspace/advanced/evidence/.", $evidenceDir)
+    $finishedAt = Get-Date
+    $summary = [ordered]@{
+        schemaVersion = 1
+        status = "pass"
+        runId = $runId
+        image = $imageTag
+        hermesVersion = $HermesVersion
+        container = $containerName
+        dockerfile = (Join-Path $Week2Dir "Dockerfile")
+        dockerfileSha256 = $dockerfileHash
+        startedAt = $startedAt.ToUniversalTime().ToString("o")
+        finishedAt = $finishedAt.ToUniversalTime().ToString("o")
+        elapsedMs = [int](($finishedAt - $startedAt).TotalMilliseconds)
+        phases = $phaseResults
+        soak = $meta
+        evidenceDir = $evidenceDir
+        keptContainer = [bool]$KeepContainer
+    }
+    $summary | ConvertTo-Json -Depth 12 | Set-Content -Encoding UTF8 -LiteralPath $summaryPath
+    Write-Host "PIPELINE PASS: $summaryPath" -ForegroundColor Green
+}
+catch {
+    # Preserve failed soak diagnostics before the container is removed in finally.
+    if ($containerCreated) {
+        & docker cp "${containerName}:/workspace/advanced/evidence/." $evidenceDir 2>$null | Out-Null
+    }
+    $phaseResults["error"] = [ordered]@{
+        status = "fail"
+        detail = $_.Exception.Message
+    }
+    $failedSummary = [ordered]@{
+        schemaVersion = 1
+        status = "fail"
+        runId = $runId
+        image = $imageTag
+        container = $containerName
+        phases = $phaseResults
+    }
+    $failedSummary | ConvertTo-Json -Depth 12 | Set-Content -Encoding UTF8 -LiteralPath $summaryPath
+    Write-Error $_
+    exit 1
+}
+finally {
+    # The generated credential is needed only while the pipeline is running.
+    # Scrub it from the named home volume even when -KeepContainer is used.
+    if ($containerCreated) {
+        & docker exec $containerName sh -c "rm -f /opt/hermes-home/.env" 2>$null | Out-Null
+    }
+    $apiKey = $null
+    $envText = $null
+    if ($containerCreated -and -not $KeepContainer) {
+        & docker rm -f $containerName 2>$null | Out-Null
+    }
+    if (Test-Path -LiteralPath $sourceArchive) {
+        Remove-Item -LiteralPath $sourceArchive -Force
+    }
+    if (Test-Path -LiteralPath $workDir) {
+        Remove-Item -LiteralPath $workDir -Recurse -Force
+    }
+}
