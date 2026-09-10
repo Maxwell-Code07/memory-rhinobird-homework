@@ -31,7 +31,8 @@ function Check($name, $cond, $detail) {
 
 function Run-Bat([string[]]$inputLines, [hashtable]$envs) {
     @('HERMES_VERSION','MODEL_API_KEY','MODEL_BASE_URL','MODEL_NAME','MODEL_PROVIDER',
-      'SOAK_ROUNDS','SOAK_INTERVAL','SOAK_MAX_TOTAL_SECONDS','HTTP_PROXY','HTTPS_PROXY','NO_PAUSE') | ForEach-Object { Remove-Item "env:$_" -ErrorAction SilentlyContinue }
+      'SOAK_ROUNDS','SOAK_INTERVAL','SOAK_MAX_TOTAL_SECONDS','HTTP_PROXY','HTTPS_PROXY','NO_PAUSE',
+      'PROXY_ADDR') | ForEach-Object { Remove-Item "env:$_" -ErrorAction SilentlyContinue }
     $env:PATH = "$fakeDir;" + (Get-Item env:Path).Value
     $env:NO_PAUSE = '1'
     foreach ($k in $envs.Keys) { Set-Item "env:$k" $envs[$k] }

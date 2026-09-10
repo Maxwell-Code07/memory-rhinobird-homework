@@ -66,7 +66,7 @@ rm -f /tmp/shout/out.log
 env -i PATH="/usr/bin:/bin" HOME=/root bash "$SCRIPT" <<< $'2026.8.18\nsk-x\n\n\n\n\n\n\n\n' > /tmp/shout/out.log 2>&1
 RC=$?
 [ "$RC" = 127 ] && ok 'RC=127 (docker: command not found)' || bad 'RC=127' "rc=$RC"
-grep -q 'docker' /tmp/shout/out.log && ok 'docker msg' || bad 'docker msg' 'missing'
+grep -q 'command not found' /tmp/shout/out.log && ok 'docker not found msg' || bad 'docker msg' 'missing'
 
 echo '== S8 v-prefix accepted =='
 RC=$(run $'v2026.8.18\nsk-secret\n\n\n\n\n\n\n\n')
