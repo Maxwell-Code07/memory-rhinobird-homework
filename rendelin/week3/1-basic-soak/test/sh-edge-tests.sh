@@ -63,7 +63,12 @@ grep -q 'MODEL_API_KEY' /tmp/shout/out.log && ok 'key error msg' || bad 'key msg
 
 echo '== S7 docker not found -> error =='
 rm -f /tmp/shout/out.log
-env -i PATH="/usr/bin:/bin" HOME=/root bash "$SCRIPT" <<< $'2026.8.18\nsk-x\n\n\n\n\n\n\n\n' > /tmp/shout/out.log 2>&1
+# 用专用空目录保证"找不到 docker"——不依赖宿主机 /usr/bin 恰好没装 docker（Linux 也成立）
+# PATH 仍包含 bash 目录（ ourselves 要用 bash 调脚本），但不包含 docker 的位置；
+# PATH 里其余 GNU 工具（grep 等）仅被日志分析用，不受 env -i 影响（发生在测试进程内）
+mkdir -p /tmp/emptybin
+rc_bash_dir="$(cd "$( dirname "$(command -v bash)")" && pwd)"
+env -i PATH="/tmp/emptybin:$rc_bash_dir" HOME=/root bash "$SCRIPT" <<< $'2026.8.18\nsk-x\n\n\n\n\n\n\n\n' > /tmp/shout/out.log 2>&1
 RC=$?
 [ "$RC" = 127 ] && ok 'RC=127 (docker: command not found)' || bad 'RC=127' "rc=$RC"
 grep -q 'command not found' /tmp/shout/out.log && ok 'docker not found msg' || bad 'docker msg' 'missing'
