@@ -1,0 +1,13 @@
+Hermes memory-tencentdb 可用性证据：Recall + Provider
+====================================================
+
+[Recall]
+status=pass
+marker=rhinobird-memory-lighthouse-0907
+reason=marker_found
+
+[Hermes Provider Discovery]
+provider=memory_tencentdb
+available=True
+
+结论：记忆不但已经落库，还能被检索；Hermes 已实际加载 provider。

@@ -1,0 +1,22 @@
+{
+  "status": "pass",
+  "stopReason": "round_limit",
+  "configuredRounds": 2,
+  "completedRounds": 2,
+  "successfulRounds": 2,
+  "failedRounds": 0,
+  "failureRate": 0,
+  "maxConsecutiveFailures": 3,
+  "startedAt": "2026-09-07T11:36:06.073Z",
+  "endedAt": "2026-09-07T11:36:44.077Z",
+  "elapsedMs": 38004,
+  "sessionId": "20260907_193606_bf6060",
+  "latencyMs": {
+    "min": 18381,
+    "mean": 18751,
+    "p50": 18381,
+    "p95": 19120,
+    "max": 19120
+  },
+  "outputDir": "/Users/may/Documents/Academic/腾讯犀牛鸟/agent memory作业/memory-rhinobird-homework/wuyifan/week3/1-basic-soak/results/real-smoke-1"
+}

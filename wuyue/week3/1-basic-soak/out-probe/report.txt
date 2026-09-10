@@ -1,0 +1,47 @@
+╔════════════════════════════════════════════════════════════════╗
+║        HERMES SOAK TEST REPORT (Hermes CLI headless)
+╚════════════════════════════════════════════════════════════════╝
+  Duration:        265.6s  (stop=rounds)
+  Total rounds:    16
+  Successes:       16
+  Failures:        0 (0.0%)
+  Verdict:         PASS  (threshold 90%)
+
+  LATENCY (successful rounds)
+  P50 (median):    10.73s
+  P90:             15.41s
+  P95:             15.41s
+  P99:             18.45s
+  max:             18.45s
+
+  RECALL PROBES (植入→回忆→关键词)
+  Total probes:    2
+  Recalled:        2
+  Recall rate:     100.0%
+
+  RESOURCES (gateway(/opt/tdai-gateway/node_modules/@tencentdb-agent-memory/memor))
+  RSS initial:     589.9 MB   peak: 595.8 MB   growth: 0.99x
+  CPU avg:         1.3%   peak: 11.2%
+  FDs initial:     31   peak: 34
+
+  LOG MONITOR (/opt/data/logs/agent.log, /opt/data/logs/errors.log)
+  errors: 16   warns: 544   memory-tdai events: 64
+
+  round detail:
+  #  1 PASS ok            12671ms 需要的话，我可以帮你把某个具体中间件/框架（比如 gin、gRPC、go-sql-driver/mysql）的 context 传播断点画清
+  #  2 PASS ok            10731ms 你问这个，是不是在琢磨要不要给我下一个任务，想先摸清我会怎么接？还是纯粹想对一下工作方法论？
+  #  3 PASS ok            12298ms 要不要我帮你搜几篇咖啡因与认知/编程表现的实证研究，给你一个有出处、能量化的结论（比如处理复杂任务的最佳剂量窗）？你的风格是证据驱动，这种问
+  #  4 PASS ok             7875ms 你想让我现在就建个提醒项，还是先专注手头的灰度上线和个人节奏，旅行的事到点再说？
+  #  5 PASS ok             6502ms 这个偏好我已经记住了。
+  #  6 PASS ok            15103ms 你偏好先给方案再谈落地——上面是方向。你要是想现在就动手，我可以帮你把「三门槛」评审规范草案的骨架先搭出来，用模块化结构（判据/路径/边界兜
+  #  7 PASS ok            15409ms 有这三个输入，我能给你一套按 9/9 灰度节奏拆的行动方案而非罗列。
+  #  8 PASS ok             7542ms 如果你要用于出行前确认，建议以预订平台的真实订单为准核一下这三个点（尤其返程那天）。要我帮你从过往对话里再翻一下有没有航班号、民宿名这些细节
+  #  9 PASS ok             8004ms 想我先去把这几首的时长/风格信息查出来做个对比，还是你直接凭记忆定？
+  # 10 PASS ok            13418ms 需要的话，我可以把周三的重点练法（双打轮转那个时间段具体怎么对点）展开讲讲。
+  # 11 PASS ok             7457ms 记住了。以后给方案建议：不超过五条，每条配一句理由。已存入我的长期偏好。
+  # 12 PASS ok             8656ms 另外想确认一下：日期是今年 2026 年 10 月 12 日对吧？返程定了吗？如果告诉我行程细节，我可以帮你整理成一份带时间线的出行清单。要
+  # 13 PASS ok            18449ms （已记下你在 9/9 灰度前需收敛选型这个约束。需要的话我把"跨分库 trace 验收清单"展开成照做步骤。）
+  # 14 PASS ok            12283ms 你问这个,是不是因为之前碰到过我在关键一步上没对齐就开跑的情况?还是有具体的任务类型想听我怎么走全流程?
+  # 15 PASS ok            10643ms 一句话结论：你的早晨黑咖啡仪式不是心理安慰，是真实且符合你作息的最优增强；真正的纪律挑战不在早上的这一杯，而在别让它溢出到下午。
+  # 16 PASS ok             8485ms 需要我把这条整理进下次帮你复查或改期时的参考吗？
+

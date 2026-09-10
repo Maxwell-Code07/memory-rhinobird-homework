@@ -1,0 +1,2 @@
+  ⚠ tirith security scanner enabled but not available — command scanning will use pattern matching only
+记住了。以后给方案建议：不超过五条，每条配一句理由。已存入我的长期偏好。

@@ -1,0 +1,33 @@
+{
+  "status": "pass",
+  "checkedAt": "2026-09-09T15:24:24.585Z",
+  "dataDir": "/home/hermes/.memory-tencentdb/memory-tdai",
+  "marker": "rhinobird-memory-lighthouse-0907",
+  "sessionKey": "20260909_152328_ae1890",
+  "checks": {
+    "l0": {
+      "status": "pass",
+      "nonEmptyFiles": 1,
+      "path": "/home/hermes/.memory-tencentdb/memory-tdai/conversations/*.jsonl"
+    },
+    "l1": {
+      "status": "pass",
+      "nonEmptyFiles": 1,
+      "path": "/home/hermes/.memory-tencentdb/memory-tdai/records/*.jsonl"
+    },
+    "l2": {
+      "status": "pass",
+      "nonEmptyFiles": 1,
+      "path": "/home/hermes/.memory-tencentdb/memory-tdai/scene_blocks/*.md"
+    },
+    "l3": {
+      "status": "pass",
+      "nonEmptyFiles": 1,
+      "path": "/home/hermes/.memory-tencentdb/memory-tdai/persona.md"
+    },
+    "recall": {
+      "status": "pass",
+      "reason": "marker_found"
+    }
+  }
+}

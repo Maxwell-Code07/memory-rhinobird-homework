@@ -1,0 +1,49 @@
+{
+  "server": {
+    "host": "127.0.0.1",
+    "port": 8420
+  },
+  "data": {
+    "baseDir": "/home/hermes/.memory-tencentdb/memory-tdai"
+  },
+  "llm": {
+    "maxTokens": 4096,
+    "timeoutMs": 120000
+  },
+  "memory": {
+    "capture": {
+      "enabled": true
+    },
+    "extraction": {
+      "enabled": true,
+      "enableDedup": true,
+      "maxMemoriesPerSession": 20
+    },
+    "persona": {
+      "triggerEveryN": 1,
+      "maxScenes": 10,
+      "backupCount": 3,
+      "sceneBackupCount": 3
+    },
+    "pipeline": {
+      "everyNConversations": 1,
+      "enableWarmup": false,
+      "l1IdleTimeoutSeconds": 5,
+      "l2DelayAfterL1Seconds": 2,
+      "l2MinIntervalSeconds": 0,
+      "l2MaxIntervalSeconds": 30,
+      "sessionActiveWindowHours": 24
+    },
+    "recall": {
+      "enabled": true,
+      "maxResults": 10,
+      "scoreThreshold": 0.1,
+      "strategy": "keyword",
+      "timeoutMs": 5000
+    },
+    "embedding": {
+      "enabled": false,
+      "provider": "none"
+    }
+  }
+}

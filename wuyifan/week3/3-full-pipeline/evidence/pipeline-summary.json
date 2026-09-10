@@ -1,0 +1,22 @@
+{
+  "status": "pass",
+  "error": null,
+  "startedAt": "2026-09-09T15:16:17Z",
+  "endedAt": "2026-09-09T15:24:24.720Z",
+  "hermesVersion": "0.19.0",
+  "image": "hermes-week3-full:0.19.0-submission",
+  "container": "hermes-week3-submission-pass",
+  "outputDir": "/Users/may/Documents/Academic/腾讯犀牛鸟/agent memory作业/memory-rhinobird-homework/wuyifan/week3/3-full-pipeline/results/submission-pass",
+  "stages": {
+    "build": "pass",
+    "container": "pass",
+    "plugin": "pass",
+    "gateway": "pass",
+    "soak": "pass",
+    "l0": "pass",
+    "l1": "pass",
+    "l2": "pass",
+    "l3": "pass",
+    "recall": "pass"
+  }
+}
