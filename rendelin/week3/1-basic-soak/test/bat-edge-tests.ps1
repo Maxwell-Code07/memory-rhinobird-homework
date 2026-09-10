@@ -1,8 +1,10 @@
 ﻿# build.bat edge-case test suite (fake docker.exe => instant flow)
 # Run with Windows PowerShell:  powershell -File bat-edge-tests.ps1
 $ErrorActionPreference = 'Stop'
-$repo = 'G:\claude codex_workspace\开源计划\腾讯犀牛鸟开源计划\TencentDB-Agent-Memory'
-$compat = Join-Path $repo 'docker\hermes-version-compat'
+# 被测脚本：仓库内 week3 目录下的 build.bat（相对本文件定位，clone 即可用）
+# 兼容两种仓库布局：rendelin/week3/{1-basic-soak,build.bat}（本仓库现有结构）
+$scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+$compat = (Get-Item (Join-Path $scriptDir '..')).FullName
 $fakeDir = Join-Path $env:TEMP 'fakebin-bat'
 New-Item -ItemType Directory -Force $fakeDir | Out-Null
 
@@ -38,7 +40,7 @@ function Run-Bat([string[]]$inputLines, [hashtable]$envs) {
     Set-Content -Path $inFile -Value ($inputLines -join "`r`n") -Encoding ASCII
     Remove-Item "$env:TEMP\fake-docker.log" -ErrorAction SilentlyContinue
     Push-Location $compat
-    cmd /c "build.bat < `"$inFile`" > `"$env:TEMP\bat-edge-out.log`" 2>&1"
+    cmd /c ".\build.bat < `"$inFile`" > `"$env:TEMP\bat-edge-out.log`" 2>&1"
     $rc = $LASTEXITCODE
     Pop-Location
     $log = if (Test-Path "$env:TEMP\bat-edge-out.log") { Get-Content "$env:TEMP\bat-edge-out.log" -Raw } else { '' }
