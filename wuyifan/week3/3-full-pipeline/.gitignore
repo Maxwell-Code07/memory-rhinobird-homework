@@ -1,0 +1,25 @@
+# 真实环境变量和 API 凭证
+.env
+
+# soak 运行结果
+results/*
+!results/.gitkeep
+
+# macOS 文件
+.DS_Store
+
+# Node.js 日志
+npm-debug.log*
+
+# 记忆数据库和日志（真实运行时保存在容器内）
+memory-tdai/
+*.db
+*.log
+
+# 验收证据允许提交，但必须先确认不含 Key 和真实隐私
+evidence/*
+!evidence/.gitkeep
+!evidence/*.json
+!evidence/*.txt
+!evidence/*.png
+!evidence/README.md
