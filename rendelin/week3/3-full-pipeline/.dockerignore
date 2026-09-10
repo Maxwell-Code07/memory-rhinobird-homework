@@ -1,0 +1,5 @@
+# 不要把本机验证产物 / 生成数据带进 Docker 构建上下文
+memory-data/
+results/
+.git/
+*.log
