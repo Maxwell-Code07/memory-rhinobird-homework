@@ -1,7 +1,5 @@
 param(
-    [Parameter(Mandatory = $true)]
-    [ValidatePattern('^[0-9]+\.[0-9]+\.[0-9]+$')]
-    [string]$HermesVersion,
+    [string]$HermesVersion = "",
     [string]$Week2Dir = "",
     [string]$PluginDir = "",
     [string]$PluginRepo = "https://github.com/Tencent/TencentDB-Agent-Memory.git",
@@ -9,7 +7,6 @@ param(
     [string]$ConfigVolume = "",
     [string]$Model = "",
     [string]$ModelProvider = "",
-    [ValidatePattern('^[A-Z][A-Z0-9_]*$')]
     [string]$ProviderApiKeyEnv = "",
     [string]$ModelBaseUrl = "",
     [string]$LlmBaseUrl = "",
@@ -21,6 +18,40 @@ param(
 
 $ErrorActionPreference = "Stop"
 $pipelineRoot = $PSScriptRoot
+$dotenv = @{}
+$dotenvCandidates = @((Join-Path (Get-Location) ".env"), (Join-Path $pipelineRoot ".env")) | Select-Object -Unique
+foreach ($candidate in $dotenvCandidates) {
+    if (-not (Test-Path -LiteralPath $candidate)) { continue }
+    foreach ($line in Get-Content -LiteralPath $candidate -Encoding UTF8) {
+        if ($line -match '^\s*([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*?)\s*$' -and $line -notmatch '^\s*#') {
+            $value = $Matches[2].Trim()
+            if ($value.Length -ge 2 -and (($value.StartsWith('"') -and $value.EndsWith('"')) -or ($value.StartsWith("'") -and $value.EndsWith("'")))) {
+                $value = $value.Substring(1, $value.Length - 2)
+            }
+            $dotenv[$Matches[1]] = $value
+        }
+    }
+}
+function Resolve-Setting {
+    param([string]$Explicit, [string]$Name, [string[]]$Aliases = @())
+    if ($Explicit) { return $Explicit }
+    foreach ($key in @($Name) + $Aliases) {
+        if ($dotenv.ContainsKey($key) -and $dotenv[$key]) { return $dotenv[$key] }
+        $environmentValue = [Environment]::GetEnvironmentVariable($key)
+        if ($environmentValue) { return $environmentValue }
+    }
+    return ""
+}
+$HermesVersion = Resolve-Setting $HermesVersion "HERMES_VERSION"
+if (-not $HermesVersion -or $HermesVersion -notmatch '^[0-9]+\.[0-9]+\.[0-9]+$') {
+    throw "HermesVersion is required: pass -HermesVersion x.y.z or set HERMES_VERSION in .env"
+}
+$Model = Resolve-Setting $Model "HERMES_MODEL" @("OPENAI_MODEL")
+$ModelProvider = Resolve-Setting $ModelProvider "HERMES_MODEL_PROVIDER"
+$ProviderApiKeyEnv = Resolve-Setting $ProviderApiKeyEnv "HERMES_PROVIDER_API_KEY_ENV"
+$ModelBaseUrl = Resolve-Setting $ModelBaseUrl "HERMES_MODEL_BASE_URL"
+$LlmBaseUrl = Resolve-Setting $LlmBaseUrl "HERMES_LLM_BASE_URL" @("OPENAI_BASE_URL")
+$ModelsEndpoint = Resolve-Setting $ModelsEndpoint "HERMES_MODELS_ENDPOINT"
 $thirdWeekRoot = Split-Path $pipelineRoot -Parent
 $openSourceRoot = Split-Path $thirdWeekRoot -Parent
 $planRoot = Split-Path $openSourceRoot -Parent
@@ -80,42 +111,18 @@ function Set-Phase {
     Write-Host "[$Status] $Name $Detail"
 }
 
-function Select-ModelFromApi {
-    param(
-        [Parameter(Mandatory = $true)][string]$ApiKey,
-        [Parameter(Mandatory = $true)][string]$BaseUrl,
-        [string]$Endpoint = ""
-    )
-
-    $modelsUrl = if ($Endpoint) { $Endpoint } else { "$($BaseUrl.TrimEnd('/'))/models" }
-    Write-Host "Fetching available models from $modelsUrl ..." -ForegroundColor Cyan
-    try {
-        $response = Invoke-RestMethod -Method Get -Uri $modelsUrl -Headers @{ Authorization = "Bearer $ApiKey" } -TimeoutSec 30
-        $modelIds = @()
-        if ($response.data) {
-            $modelIds = @($response.data | ForEach-Object { $_.id })
-        } elseif ($response.models) {
-            $modelIds = @($response.models | ForEach-Object { if ($_.id) { $_.id } elseif ($_.name) { $_.name } })
-        }
-        $modelIds = @($modelIds | Where-Object { $_ } | Sort-Object -Unique)
-        if ($modelIds.Count -eq 0) { throw "The models endpoint returned no model IDs" }
-
-        Write-Host "Available models:" -ForegroundColor Yellow
-        for ($i = 0; $i -lt $modelIds.Count; $i++) {
-            Write-Host ("  [{0}] {1}" -f ($i + 1), $modelIds[$i])
-        }
-        $choice = Read-Host "Select a model number, or type a model ID"
-        $selectedIndex = 0
-        if ([int]::TryParse($choice, [ref]$selectedIndex) -and $selectedIndex -ge 1 -and $selectedIndex -le $modelIds.Count) {
-            return $modelIds[$selectedIndex - 1]
-        }
-        if ($choice) { return $choice }
-        throw "No model was selected"
-    } catch {
-        Write-Warning "Unable to enumerate models: $($_.Exception.Message)"
-        $manualModel = Read-Host "Enter the model ID manually"
-        if (-not $manualModel) { throw "A model ID is required" }
-        return $manualModel
+function Infer-Provider {
+    param([Parameter(Mandatory = $true)][string]$BaseUrl)
+    try { $hostName = ([Uri]$BaseUrl).Host.ToLowerInvariant() } catch { throw "Invalid API base URL: $BaseUrl" }
+    switch -Regex ($hostName) {
+        'minimax'  { return 'minimax-cn' }
+        'openai'   { return 'openai-api' }
+        'openrouter' { return 'openrouter' }
+        'deepseek' { return 'deepseek' }
+        'anthropic' { return 'anthropic' }
+        'generativelanguage|google' { return 'gemini' }
+        'x.ai|grok' { return 'xai' }
+        default { throw "Cannot infer Hermes provider from $hostName. Set HERMES_MODEL_PROVIDER in .env (examples: minimax-cn, openai-api, anthropic, deepseek, gemini)." }
     }
 }
 
@@ -132,28 +139,12 @@ try {
     }
 
     if (-not $ConfigVolume) {
-        $apiKey = $env:HERMES_API_KEY
-        if (-not $apiKey) { $apiKey = $env:OPENAI_API_KEY }
-        if (-not $apiKey) { $apiKey = $env:MINIMAX_CN_API_KEY } # legacy compatibility
-        if (-not $apiKey) {
-            $secureKey = Read-Host "Model API key is not set; enter it for this run" -AsSecureString
-            $keyPointer = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($secureKey)
-            try { $apiKey = [Runtime.InteropServices.Marshal]::PtrToStringBSTR($keyPointer) }
-            finally { [Runtime.InteropServices.Marshal]::ZeroFreeBSTR($keyPointer) }
-        }
-        if (-not $apiKey) { throw "A model API key is required" }
-
-        if (-not $LlmBaseUrl) { $LlmBaseUrl = $env:HERMES_LLM_BASE_URL }
-        if (-not $LlmBaseUrl) { $LlmBaseUrl = $env:OPENAI_BASE_URL }
-        if (-not $LlmBaseUrl) { $LlmBaseUrl = Read-Host "OpenAI-compatible API base URL (for example https://api.openai.com/v1)" }
-        if (-not $LlmBaseUrl) { throw "An API base URL is required" }
-        if (-not $ModelsEndpoint) { $ModelsEndpoint = $env:HERMES_MODELS_ENDPOINT }
-        if (-not $Model) { $Model = $env:HERMES_MODEL }
-        if (-not $Model) { $Model = $env:OPENAI_MODEL }
-        if (-not $Model) { $Model = Select-ModelFromApi -ApiKey $apiKey -BaseUrl $LlmBaseUrl -Endpoint $ModelsEndpoint }
-        if (-not $ModelProvider) { $ModelProvider = $env:HERMES_MODEL_PROVIDER }
-        if (-not $ModelProvider) { $ModelProvider = "openai" }
-        if (-not $ProviderApiKeyEnv) { $ProviderApiKeyEnv = $env:HERMES_PROVIDER_API_KEY_ENV }
+        $apiKey = Resolve-Setting "" "HERMES_API_KEY" @("OPENAI_API_KEY", "MINIMAX_CN_API_KEY")
+        if (-not $apiKey) { throw "A model API key is required; set HERMES_API_KEY in .env or the process environment" }
+        if (-not $LlmBaseUrl) { throw "An API base URL is required; set HERMES_LLM_BASE_URL in .env" }
+        if (-not $Model) { throw "A model is required; set HERMES_MODEL in .env" }
+        if (-not $ModelProvider) { $ModelProvider = Infer-Provider $LlmBaseUrl }
+        if ($ModelProvider -eq 'openai') { $ModelProvider = 'openai-api' }
         if (-not $ProviderApiKeyEnv) {
             $ProviderApiKeyEnv = switch -Regex ($ModelProvider) {
                 '^minimax-cn$' { 'MINIMAX_CN_API_KEY'; break }
@@ -164,9 +155,11 @@ try {
                 default        { 'OPENAI_API_KEY' }
             }
         }
-        if (-not $ModelBaseUrl) { $ModelBaseUrl = $env:HERMES_MODEL_BASE_URL }
-        if (-not $ModelBaseUrl) { $ModelBaseUrl = $LlmBaseUrl }
-        if (-not $Model) { throw "A model is required" }
+        if (-not $ModelBaseUrl) {
+            if ($ModelProvider -eq 'minimax-cn' -and $LlmBaseUrl -match '/v1/?$') {
+                $ModelBaseUrl = $LlmBaseUrl -replace '/v1/?$', '/anthropic'
+            } else { $ModelBaseUrl = $LlmBaseUrl }
+        }
 
         New-Item -ItemType Directory -Force -Path $generatedConfigDir | Out-Null
         $providerKeyLine = "${ProviderApiKeyEnv}=`"$apiKey`""
@@ -283,6 +276,10 @@ memory:
     Write-Host "PIPELINE PASS: $summaryPath" -ForegroundColor Green
 }
 catch {
+    # Preserve failed soak diagnostics before the container is removed in finally.
+    if ($containerCreated) {
+        & docker cp "${containerName}:/workspace/advanced/evidence/." $evidenceDir 2>$null | Out-Null
+    }
     $phaseResults["error"] = [ordered]@{
         status = "fail"
         detail = $_.Exception.Message

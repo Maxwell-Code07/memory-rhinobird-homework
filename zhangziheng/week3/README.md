@@ -228,9 +228,9 @@ docker build --progress=plain `
 
 ### 运行命令
 
-正常运行不要求预先准备插件源码、`.env`、`config.yaml` 或 Docker volume。流水线会自动拉取官方 TencentDB-Agent-Memory、生成配置并创建新 volume。模型服务不绑定 MiniMax：先由使用者提供 API Key 和 Base URL，再调用标准 `/models` 接口展示可用模型供编号选择；如果服务不支持枚举，才提示手动输入模型 ID。
+正常运行不要求预先准备插件源码、`config.yaml` 或 Docker volume；请先复制 `3-full-pipeline/.env.example` 为当前目录 `.env`，填写模型 API 信息。流水线会自动拉取官方 TencentDB-Agent-Memory、生成配置并创建新 volume。模型服务不绑定 MiniMax，Hermes 模型和插件 LLM 默认使用同一组配置。
 
-因此其他人复现时只需要三个基础条件：Docker Desktop 已启动、Git 可用、拥有可用的 OpenAI-compatible 模型服务。在 `week3` 目录执行上述命令，按提示输入 API Key 和 Base URL，并选择模型即可；Provider 默认 `openai`，如 Hermes 与记忆插件需要不同接口地址，可分别传 `-ModelBaseUrl` 与 `-LlmBaseUrl`。非标准模型列表接口可通过 `-ModelsEndpoint` 指定。Key 不进入日志和 evidence，流水线结束时还会从宿主机临时目录及 Docker home volume 中清除临时 `.env`。生产环境应进一步改用 Docker Secrets 或企业密钥管理系统。
+因此其他人复现时只需要 Docker Desktop、Git、可用的模型服务和一份本地 `.env`。Key 不进入日志和 evidence，流水线结束时会清除 Docker home volume 中的临时凭证文件。生产环境应进一步改用 Docker Secrets 或企业密钥管理系统。
 
 ![进阶二一键流水线总览](<pictures/进阶二/one command pipeline.png>)
 

@@ -310,9 +310,14 @@ function summarize(results, config, startedAt, finishedAt, completionReason) {
   const failures = results.filter((result) => result.status === "fail")
   const latencies = successes.map((result) => result.durationMs).sort((a, b) => a - b)
   const errors = {}
+  const errorMessages = {}
   for (const result of failures) {
     const key = result.error?.type ?? "unknown"
     errors[key] = (errors[key] ?? 0) + 1
+    const message = String(result.error?.message ?? "").slice(0, 500)
+    if (message && !(errorMessages[key] ?? []).includes(message)) {
+      errorMessages[key] = [...(errorMessages[key] ?? []), message].slice(0, 3)
+    }
   }
   const passed = results.length > 0 && failures.length === 0 && completionReason !== "interrupted"
   return {
@@ -350,6 +355,7 @@ function summarize(results, config, startedAt, finishedAt, completionReason) {
         max: latencies.length ? latencies.at(-1) : null,
       },
       errors,
+      errorMessages,
     },
   }
 }
