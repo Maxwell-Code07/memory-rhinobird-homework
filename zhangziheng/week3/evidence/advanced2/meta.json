@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "test": "hermes-basic-soak",
+  "status": "pass",
+  "completionReason": "max_rounds",
+  "startedAt": "2026-09-09T07:38:14.211Z",
+  "finishedAt": "2026-09-09T07:40:16.253Z",
+  "elapsedMs": 122042,
+  "config": {
+    "rounds": 8,
+    "intervalMs": 1000,
+    "durationMinutes": 20,
+    "requestTimeoutMs": 180000,
+    "initialSessionId": null,
+    "model": null,
+    "provider": null,
+    "toolsets": "context_engine,memory",
+    "promptsFile": "/workspace/advanced/fact-prompts.json",
+    "command": "hermes"
+  },
+  "statistics": {
+    "attemptedRounds": 8,
+    "successfulRounds": 8,
+    "failedRounds": 0,
+    "successRate": 1,
+    "latencyMs": {
+      "min": 11601,
+      "mean": 14378,
+      "p50": 13481,
+      "p95": 20357,
+      "max": 20357
+    },
+    "errors": {}
+  },
+  "finalSessionId": "20260909_073815_9245e5"
+}

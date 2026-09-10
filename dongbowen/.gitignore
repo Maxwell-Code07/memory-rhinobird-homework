@@ -1,0 +1,6 @@
+# 排除本地跑测产物
+**/soak-out/
+**/pipeline-out/
+# 排除大型镜像/包
+*.tar.gz
+**/*.tar.gz

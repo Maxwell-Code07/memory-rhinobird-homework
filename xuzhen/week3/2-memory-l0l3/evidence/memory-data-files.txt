@@ -1,0 +1,6 @@
+/opt/hermes-home/memory-data/.metadata/checkpoint.json 513 bytes
+/opt/hermes-home/memory-data/.metadata/manifest.json 167 bytes
+/opt/hermes-home/memory-data/conversations/2026-09-04.jsonl 486 bytes
+/opt/hermes-home/memory-data/vectors.db 4096 bytes
+/opt/hermes-home/memory-data/vectors.db-shm 32768 bytes
+/opt/hermes-home/memory-data/vectors.db-wal 276072 bytes

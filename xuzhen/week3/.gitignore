@@ -1,0 +1,25 @@
+# Local credentials and generated Python bytecode.
+.env
+**/__pycache__/
+
+# Earlier dry runs, debugging outputs, and the failed 90-second pipeline run.
+1-basic-soak/results-memory-final/
+1-basic-soak/results-real/
+1-basic-soak/results-real-90/
+1-basic-soak/results-real-fixed/
+1-basic-soak/evidence/basic-pass/
+1-basic-soak/evidence/error-handling/
+1-basic-soak/evidence/invalid-api-key/
+1-basic-soak/evidence/invalid-api-key-final/
+1-basic-soak/evidence/invalid-api-key-isolated/
+1-basic-soak/evidence/invalid-api-key-isolated-2/
+1-basic-soak/evidence/invalid-api-key-real/
+3-full-pipeline/evidence/final-memory-data/
+3-full-pipeline/evidence/final-soak-results/
+3-full-pipeline/evidence/memory-data/
+3-full-pipeline/evidence/final-gateway.log
+3-full-pipeline/evidence/gateway.log
+3-full-pipeline/evidence/pass-memory-data/
+3-full-pipeline/evidence/pass-soak-results/
+3-full-pipeline/evidence/pass-gateway.log
+3-full-pipeline/evidence/pass-30rounds/

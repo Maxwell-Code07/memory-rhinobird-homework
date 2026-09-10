@@ -1,0 +1,40 @@
+{
+  "tool": "hermes-version-compat-soak",
+  "tool_version": "1.0.0",
+  "passed": true,
+  "hermes_version": {
+    "raw": "Hermes Agent v0.20.5 (2026.8.19)\nInstall directory: /usr/local/lib/hermes-agent\nInstall method: git\nPython: 3.11.16\nOpenAI SDK: 2.24.0\nUpdate available: 765 commits behind — run 'hermes update'",
+    "releaseDate": "2026.8.19",
+    "expected": "2026.8.19",
+    "verified": true,
+    "spawnError": null
+  },
+  "config": {
+    "hermes": "hermes",
+    "rounds": 10,
+    "interval_seconds": 5,
+    "max_total_seconds": 600,
+    "per_round_timeout_ms": 180000,
+    "max_consecutive_failures": 3,
+    "prompt": null,
+    "conversation_file": "/opt/hermes-version-compat/conversation.jsonl",
+    "conversation_turns": 16,
+    "expected_version": "v2026.8.19"
+  },
+  "rounds": {
+    "total": 10,
+    "executed": 10,
+    "passed": 10,
+    "failed": 0
+  },
+  "stats": {
+    "total_duration_seconds": 145.69,
+    "avg_round_ms": 9463,
+    "min_round_ms": 6197,
+    "max_round_ms": 13445,
+    "p95_round_ms": 13445
+  },
+  "failures": [],
+  "termination_reason": "completed",
+  "completed_at": "2026-08-25T05:31:31.678Z"
+}

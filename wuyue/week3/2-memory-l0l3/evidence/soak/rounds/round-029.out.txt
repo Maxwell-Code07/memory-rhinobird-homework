@@ -1,0 +1,9 @@
+你说得对，Go 的并发确实舒服——goroutine + channel 那套心智模型比 Java 的线程池/锁/CAS 直白太多。三个字总结：原生的。
+
+Java 三年转过来，最感慨的大概是这几点吧：
+
+- 语言层面直接给你 goroutine，不用自己折腾线程池调参，写起来就是"开个协程干活"，心智负担低一个量级。
+- channel 做通信，配合 select 处理超时、取消、多路调度，比 Java 到处 synchronized/lock/Condition 优雅。
+- 你本来就在做支付网关这种高并发场景，goroutine 撑千万级日交易量，调度器帮你扛，不用像 JVM 那样靠调优保命。
+
+小巫你当时是怎么转的——是先看《Effective Go》这类书上手，还是直接拿项目硬练？毕竟你们支付这块对并发的正确性要求极高，goroutine 虽然爽，但 channel 空转、goroutine 泄漏、数据竞争这些坑也够喝一壶。有没有踩过什么印象深的坑？

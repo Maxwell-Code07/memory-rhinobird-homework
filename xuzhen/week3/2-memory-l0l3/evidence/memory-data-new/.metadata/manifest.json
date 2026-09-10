@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "createdAt": "2026-09-04T02:18:44.913Z",
+  "store": {
+    "type": "sqlite",
+    "sqlite": {
+      "path": "vectors.db"
+    }
+  },
+  "seed": null
+}

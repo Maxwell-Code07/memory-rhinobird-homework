@@ -1,0 +1,90 @@
+{
+  "last_captured_timestamp": 1788861672010,
+  "total_processed": 22,
+  "last_persona_at": 22,
+  "last_persona_time": "2026-09-08T10:01:27.023Z",
+  "request_persona_update": false,
+  "persona_update_reason": "",
+  "memories_since_last_persona": 2,
+  "scenes_processed": 3,
+  "runner_states": {
+    "week3-install-proof": {
+      "last_captured_timestamp": 1788488455031,
+      "last_l1_cursor": 1788488455038,
+      "last_scene_name": ""
+    },
+    "20260908_095129_f0e9e9": {
+      "last_captured_timestamp": 1788861094803,
+      "last_l1_cursor": 1788861094808,
+      "last_scene_name": ""
+    },
+    "20260908_095136_80a195": {
+      "last_captured_timestamp": 1788861101537,
+      "last_l1_cursor": 1788861101538,
+      "last_scene_name": ""
+    },
+    "20260908_095137_6d8fc8": {
+      "last_captured_timestamp": 1788861102703,
+      "last_l1_cursor": 1788861102704,
+      "last_scene_name": ""
+    },
+    "20260908_095303_298d0e": {
+      "last_captured_timestamp": 0,
+      "last_l1_cursor": 0,
+      "last_scene_name": ""
+    },
+    "20260908_095344_f958b7": {
+      "last_captured_timestamp": 1788861227447,
+      "last_l1_cursor": 1788861227448,
+      "last_scene_name": ""
+    },
+    "20260908_095442_e82c20": {
+      "last_captured_timestamp": 0,
+      "last_l1_cursor": 0,
+      "last_scene_name": ""
+    },
+    "20260908_095451_7a0307": {
+      "last_captured_timestamp": 0,
+      "last_l1_cursor": 0,
+      "last_scene_name": ""
+    },
+    "20260908_095501_103875": {
+      "last_captured_timestamp": 1788861305901,
+      "last_l1_cursor": 1788861305902,
+      "last_scene_name": ""
+    },
+    "20260908_095616_03127d": {
+      "last_captured_timestamp": 1788861379959,
+      "last_l1_cursor": 1788861379960,
+      "last_scene_name": ""
+    },
+    "20260908_095624_3e3719": {
+      "last_captured_timestamp": 1788861388985,
+      "last_l1_cursor": 1788861388986,
+      "last_scene_name": ""
+    },
+    "20260908_095633_d2bbab": {
+      "last_captured_timestamp": 0,
+      "last_l1_cursor": 0,
+      "last_scene_name": ""
+    },
+    "20260908_100037_dbfe7c": {
+      "last_captured_timestamp": 1788861644298,
+      "last_l1_cursor": 1788861644303,
+      "last_scene_name": "我（AI）在和小陈（软件测试工程师）进行初次认识交流"
+    },
+    "20260908_100049_d80b04": {
+      "last_captured_timestamp": 1788861654199,
+      "last_l1_cursor": 1788861654200,
+      "last_scene_name": "我（AI）在和用户（小陈）记录工作偏好与节奏"
+    },
+    "20260908_100059_76bbef": {
+      "last_captured_timestamp": 1788861672010,
+      "last_l1_cursor": 1788861672011,
+      "last_scene_name": "我（AI）在陪初次对话的用户梳理个人基本档案（常住上海、周末跑步阅读）"
+    }
+  },
+  "pipeline_states": {},
+  "l0_conversations_count": 11,
+  "total_memories_extracted": 5
+}

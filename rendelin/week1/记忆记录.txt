@@ -1,0 +1,48 @@
+PS C:\Users\Lenovo> Get-ChildItem "$d\conversations"   # L0 原始对话
+
+
+    目录: C:\Users\Lenovo\.memory-tencentdb\memory-tdai\conversations
+
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a----          2026/7/3     17:40           5503 2026-07-03.jsonl
+-a----          2026/7/4     13:28           2571 2026-07-04.jsonl
+-a----          2026/7/5     22:34           3712 2026-07-05.jsonl
+-a----          2026/7/6     17:40           1128 2026-07-06.jsonl
+-a----         2026/7/10     23:37           2116 2026-07-10.jsonl
+-a----         2026/8/21     22:47            417 2026-08-21.jsonl
+-a----         2026/8/22     13:16           4997 2026-08-22.jsonl
+
+
+PS C:\Users\Lenovo> Get-ChildItem "$d\records"         # L1 原子记忆
+
+
+    目录: C:\Users\Lenovo\.memory-tencentdb\memory-tdai\records
+
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a----         2026/8/22     13:11            881 2026-08-22.jsonl
+
+
+PS C:\Users\Lenovo> Get-ChildItem "$d\scene_blocks"    # L2 场景块
+
+
+    目录: C:\Users\Lenovo\.memory-tencentdb\memory-tdai\scene_blocks
+
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a----         2026/8/22     13:12           2357 User-Preferences.md
+
+
+PS C:\Users\Lenovo> Get-Item "$d\persona.md"           # L3 用户画像
+
+
+    目录: C:\Users\Lenovo\.memory-tencentdb\memory-tdai
+
+
+Mode                 LastWriteTime         Length Name
+----                 -------------         ------ ----
+-a----         2026/8/22     13:12           2720 persona.md

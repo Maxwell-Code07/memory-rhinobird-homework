@@ -1,0 +1,25 @@
+  ⚠ tirith security scanner enabled but not available — command scanning will use pattern matching only
+直接说结论。先说判断：**这不是二选一，OTel 和 Prometheus 不构成对立面——它们是不同的层**，你大概率两者都要。
+
+**本质区别**
+- Prometheus 解决的是"指标采集 + 存储 + 告警"——它是**打点数据的时间序列库**。
+- OpenTelemetry 是三件事的统一标准：trace / metrics / logs 的**采集协议 + 上下文传播 + 语义约定**。它本身不画图、不告警、不存储，它是"管道"，不是"水库"。
+
+所以标准组合是：**OTel SDK 埋点 → (OTLP 或直接) → 后端**。后端可以选 Prometheus（配 Thanos/告警）、Jaeger/Tempo（trace 存储）、Grafana（界面）等。
+
+**放到你的具体语境里，那个硬约束就是分水岭**
+你的判据里有一条刚升格的硬约束：trace 要能跨"分库分表的多个 query"串联成完整链路。这一条几乎把简单方案的可行性排除了——
+
+- 如果只需要指标，Prometheus 裸方案就够：每个分片服务暴露 /metrics，抓取即可，跨分片无关联需求。
+- 但你要跨分片关联 request，指标系统天生做不到——这必须是 **trace 的事**，而 trace 就必须带 context 传播（W3C traceparent 头随 gRPC/HTTP 透传、MySQL driver 层注入 span），这正是 OTel 的强项和设计初衷。
+
+换句话说：**你的硬约束已经替你把胶水确定成 OTel 了**。Prometheus 不是被它替代，而是变成它下游的 metrics 后端之一。
+
+**给个收敛路径（对应你的三门槛）**
+1. 小范围验证（低风险）：选一个分库 query 链路的代表性 service 接入 OTel（Go SDK 官方支持很好，自动 instrumentation + 手动 span），拉通 trace 到本地 Jaeger/Tempo 看一眼完整链路。别停在配置层——真跑通一次跨分片 request。
+2. 链路真跑通：验证 traceparent 是否真的穿透了分片路由那层（这层最容易断——中间件/框架没转发 header 就断了）。这是你要重点踩的坑。
+3. 为放量留扩展：后端先不必上 Prometheus——先纯 OTel → trace 后端，metrics 后端后补（因为指标语义约定 OTel 也兼容，后面接 Prometheus 不重做埋点）。
+
+**一句话给你**：选型早就被你的跨分片 trace 需求锁定了——**OTel 为主、Prometheus 是下游可选项**，纠结点在"后端怎么组合"而非"要不要 OTel"。
+
+需要的话，我可以帮你把某个具体中间件/框架（比如 gin、gRPC、go-sql-driver/mysql）的 context 传播断点画清楚——你那个 09-09 灰度前踩一遍会有价值。
