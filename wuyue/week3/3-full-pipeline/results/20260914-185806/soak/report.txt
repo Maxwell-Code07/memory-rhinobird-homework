@@ -1,0 +1,29 @@
+╔════════════════════════════════════════════════════════════════╗
+║        HERMES SOAK TEST REPORT (Hermes CLI headless)
+╚════════════════════════════════════════════════════════════════╝
+  Duration:        212.4s  (stop=rounds)
+  Total rounds:    6
+  Successes:       6
+  Failures:        0 (0.0%)
+  Verdict:         PASS  (threshold 90%)
+
+  LATENCY (successful rounds)
+  P50 (median):    25.01s
+  P90:             68.19s
+  P95:             68.19s
+  P99:             68.19s
+  max:             68.19s
+
+  RESOURCES (gateway(/opt/tdai-gateway/node_modules/@tencentdb-agent-memory/memor))
+  RSS initial:     536.3 MB   peak: 537.1 MB   growth: 0.55x
+  CPU avg:         1.2%   peak: 3.6%
+  FDs initial:     22   peak: 31
+
+  round detail:
+  #  1 PASS ok            68189ms 你好，小巫。有什么可以帮你的?
+  #  2 PASS ok            40363ms 说具体点我就能直接动手。另外如果是设计方案类的问题，有几个背景能帮我给出更准的判断：峰值 QPS 是多少（比日均值重要得多）、支付网关是自研
+  #  3 PASS ok            19614ms 如果愿意，把优化前后的火焰图或者关键代码片段发我，我可以一起看看还剩多少空间——千万笔级日交易量的话，剩下的 200ms 里往往还能再榨出不
+  #  4 PASS ok            14348ms 技术栈信息我记一下。数据库分库分表这块，分片键怎么选的、分片后跨库事务和分布式 ID 是怎么处理的？这两个通常是分库分表后最先出问题的地方，
+  #  5 PASS ok            25006ms 要我帮你把这套标准整理成团队可执行的规范（比如覆盖率门禁怎么配到 CI、评审清单怎么定），说一声。
+  #  6 PASS ok            19870ms 有什么想具体聊的？比如换毛季的毛量、粘人到影响睡眠，还是想给它添个伴。
+

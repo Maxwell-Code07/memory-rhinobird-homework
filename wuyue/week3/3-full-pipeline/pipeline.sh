@@ -22,6 +22,8 @@
 #                 [--image hermes-memory:hw] [--name hermes-pipe] \
 #                 [--soak-dir ../1-basic-soak] \
 #                 [--skip-build]           # 已有镜像时跳过 docker build（节省时间）
+#                 [--plugin-version latest] # 记忆插件版本（默认 latest；可指定如 0.3.6）
+#                 [--log-dir DIR]           # Gateway 日志目录（默认容器内 /opt/data/logs/tdai）
 #
 # 输出：results/<时间戳>/ 下
 #   soak/                  soak 输出（rounds.jsonl / meta.json / report.txt）
@@ -37,6 +39,8 @@ CNAME="${NAME:-hermes-pipe}"
 ROUNDS="${ROUNDS:-47}"
 INTERVAL_MS="${INTERVAL_MS:-5000}"
 DURATION_SEC="${DURATION_SEC:-0}"
+PLUGIN_VERSION="${PLUGIN_VERSION:-latest}"   # 记忆插件版本（build-arg MEMORY_PLUGIN_VERSION）
+LOG_DIR="${LOG_DIR:-}"                       # Gateway 日志目录（空=用镜像默认 /opt/data/logs/tdai）
 SKIP_BUILD="${SKIP_BUILD:-0}"
 SOAK_DIR="${SOAK_DIR:-$(cd "$(dirname "$0")/.." && pwd)/1-basic-soak}"
 HEREDIR="$(cd "$(dirname "$0")" && pwd)"
@@ -51,6 +55,8 @@ while [ $# -gt 0 ]; do
     --duration-sec) DURATION_SEC="$2"; shift 2;;
     --soak-dir) SOAK_DIR="$2"; shift 2;;
     --skip-build) SKIP_BUILD=1; shift;;
+    --plugin-version) PLUGIN_VERSION="$2"; shift 2;;
+    --log-dir) LOG_DIR="$2"; shift 2;;
     -h|--help) sed -n '2,40p' "$0" | sed 's/^# \{0,1\}//'; exit 0;;
     *) echo "unknown option: $1" >&2; exit 2;;
   esac
@@ -75,8 +81,9 @@ echo "== pipeline start ts=$TS version=$VERSION image=$IMAGE container=$CNAME ==
 if [ "$SKIP_BUILD" = "1" ]; then
   echo "== [1/6] skip build（使用已有镜像 ${IMAGE}）=="
 else
-  echo "== [1/6] docker build HERMES_VERSION=$VERSION =="
-  docker build --build-arg HERMES_VERSION="$VERSION" -t "$IMAGE" -f "$HEREDIR/docker/Dockerfile" "$HEREDIR/docker"
+  echo "== [1/6] docker build HERMES_VERSION=$VERSION MEMORY_PLUGIN_VERSION=$PLUGIN_VERSION =="
+  docker build --build-arg HERMES_VERSION="$VERSION" --build-arg MEMORY_PLUGIN_VERSION="$PLUGIN_VERSION" \
+    -t "$IMAGE" -f "$HEREDIR/docker/Dockerfile" "$HEREDIR/docker"
 fi
 
 # ---------- 2. run ----------
@@ -84,6 +91,7 @@ echo "== [2/6] 拉起容器（后台常驻，Gateway :8420）=="
 docker rm -f "$CNAME" >/dev/null 2>&1 || true
 docker volume rm "$VOL" >/dev/null 2>&1 || true   # 每次干净数据，保证 L0 从零开始
 docker run -d --name "$CNAME" \
+  -e MEMORY_TENCENTDB_LOG_DIR="${LOG_DIR:-/opt/data/logs/tdai}" \
   -e MODEL_API_KEY="$MODEL_API_KEY" \
   -e MODEL_BASE_URL="$MODEL_BASE_URL" \
   -e MODEL_NAME="$MODEL_NAME" \

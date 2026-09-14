@@ -47,9 +47,42 @@ export MODEL_NAME="deepseek-chat"
 ./pipeline.sh --version v2026.8.27 --rounds 30 --interval-ms 6000 --duration-sec 900
 ./pipeline.sh --skip-build        # 镜像已存在时跳过 build
 ./pipeline.sh --name my-pipe      # 自定义容器名（默认 hermes-pipe）
+./pipeline.sh --plugin-version 0.3.6               # 指定记忆插件版本（默认 latest）
+./pipeline.sh --log-dir /opt/data/logs/tdai-custom # 自定义 Gateway 日志目录
 ```
 
-参数：`--version / --rounds / --interval-ms / --duration-sec / --image / --name / --skip-build / --soak-dir`。
+参数：`--version / --rounds / --interval-ms / --duration-sec / --image / --name / --skip-build / --soak-dir / --plugin-version / --log-dir`。
+
+## 记忆插件版本参数化（build 时可指定版本）
+
+- build 参数 `--plugin-version`（默认 `latest`，等价于旧行为的 `@latest`）→ 透传给 Dockerfile 的 `ARG MEMORY_PLUGIN_VERSION`；
+- 构建期版本校验：安装后读取网关包 `package.json` 的 `version`，**非 latest 请求必须精确匹配**，不一致直接构建失败；
+- 版本不存在（如 `9.9.9`）：识别 npm 的 `ETARGET / No matching version found` 后**立即失败**，不会静默装成别的版本，也不做无谓重试；
+- 运行时可查证：
+  ```bash
+  docker exec <容器> cat /opt/memory-tencentdb.version    # 实际安装版本
+  docker inspect -f '{{ index .Config.Labels "memory_plugin.version" }}' <镜像>   # 请求的版本
+  ```
+
+## Gateway 日志落盘（日常 / 错误分文件）
+
+Gateway（tdai-memory sidecar）的 stdout/stderr 重定向到两个文件，目录由
+`MEMORY_TENCENTDB_LOG_DIR` 控制（默认 `/opt/data/logs/tdai`，在持久化卷内）：
+
+| 文件 | 内容 |
+|---|---|
+| `gateway.stdout.log` | 日常日志（DEBUG/INFO，`[tdai-gateway] [memory-tdai]` 前缀） |
+| `gateway.stderr.log` | 错误日志（异常/崩溃信息） |
+
+```bash
+# 查看（容器名按实际替换）
+docker exec <容器> ls -la /opt/data/logs/tdai
+docker exec <容器> tail -f /opt/data/logs/tdai/gateway.stdout.log
+docker exec <容器> tail -f /opt/data/logs/tdai/gateway.stderr.log
+```
+
+> 注意：Gateway 输出改为落文件后，`docker logs` 不再包含 Gateway 运行日志（仅剩启动横幅几行）；
+> 日志属于容器运行时产物，随卷持久化，不落 `results/` 目录。
 
 ## 输出与判定
 
@@ -81,3 +114,23 @@ Hermes 一键流水线结果 (20260906-192514)  version=v2026.8.31
 soak 回复可看到记忆注入（"记住了，小巫。早上那杯黑咖啡是你的开工仪式…"）。
 完整 47 轮跑法：`./pipeline.sh --version v2026.8.31`（默认 rounds=47），
 任何正常网络下去掉 `--skip-build` 即为全自动 build→soak 闭环。
+
+## 需求增强验证记录（2026-09-14 实测）
+
+| 构建 | 参数 | 结果 |
+|---|---|---|
+| 默认 | 不传插件版本 | ✅ `installed: 1.0.2`;LABEL `memory_plugin.version=latest`;容器 health ok;`/opt/data/logs/tdai/` 两文件落盘（stdout 36 行 DEBUG/INFO,stderr 收录 WARN 类）;`-e MEMORY_TENCENTDB_LOG_DIR=/opt/data/logs/tdai-custom` 覆盖生效 |
+| 指定版本 | `--plugin-version 0.3.6` | ✅ `installed: 0.3.6`;LABEL=0.3.6;0.3.6 网关也能正常启动（health ok）且日志正常落盘 |
+| 不存在版本 | `--plugin-version 9.9.9` | ✅ **8 秒快速失败**：`ERROR: memory-tencentdb 版本 9.9.9 在 npm 上不存在`（exit 1,不重试） |
+| 回归 | 3 轮 soak（默认镜像） | ✅ 3/3 pass;L0 捕获正常（conversations jsonl）;gateway.stdout.log 持续增长（434 行） |
+
+复现命令：
+
+```bash
+docker build --build-arg HERMES_VERSION=v2026.8.31 --build-arg MEMORY_PLUGIN_VERSION=0.3.6 \
+  -t hermes-memory:test-036 -f docker/Dockerfile docker
+docker run -d --name t -e MODEL_API_KEY=dummy -e MEMORY_TENCENTDB_LOG_DIR=/opt/data/logs/tdai \
+  -v t_data:/opt/data hermes-memory:test-036
+docker exec t ls /opt/data/logs/tdai/           # gateway.stdout.log  gateway.stderr.log
+docker exec t cat /opt/memory-tencentdb.version # 0.3.6
+```
