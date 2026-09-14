@@ -1,0 +1,47 @@
+{
+  "data_dir": "/opt/data",
+  "generated_at": "2026-09-05T12:17:14.474Z",
+  "layers": {
+    "L0": {
+      "level": "L0",
+      "desc": "原始对话",
+      "path": "/opt/data/conversations",
+      "nonempty": true,
+      "file_count": 1,
+      "files": [
+        "2026-09-05.jsonl"
+      ]
+    },
+    "L1": {
+      "level": "L1",
+      "desc": "结构化事实",
+      "path": "/opt/data/records",
+      "nonempty": true,
+      "file_count": 1,
+      "files": [
+        "2026-09-05.jsonl"
+      ]
+    },
+    "L2": {
+      "level": "L2",
+      "desc": "场景块",
+      "path": "/opt/data/scene_blocks",
+      "nonempty": true,
+      "file_count": 2,
+      "files": [
+        "职业-腾讯云数据库工作.md",
+        "软件设计理念-极简与本地优先.md"
+      ]
+    },
+    "L3": {
+      "level": "L3",
+      "desc": "用户画像",
+      "path": "/opt/data/persona.md",
+      "nonempty": true,
+      "exists": true,
+      "size_chars": 1349
+    }
+  },
+  "all_nonempty": true,
+  "since": null
+}

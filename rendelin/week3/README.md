@@ -1,99 +1,51 @@
-# 第 3 周作业 —— 交付物 B：Hermes 自动对话脚本
+# 第三周作业 · 任德霖
 
-自动跟 Hermes 持续对话，验证它能正常回复、长时间稳定；最后输出结构化 JSON（明确 pass/fail、含轮次与耗时统计）。
+week3 下三个目录，对应三次任务（基础、进阶 1 为必交，进阶 2 为选交）：
 
-## 文件
-
-- `soak.mjs` —— soak 驱动脚本（Node.js，零依赖）
-- `conversation.jsonl` —— 多轮对话剧本（纯闲聊：爱好、电影、食物、猫、心情这些，不涉及项目/文件/任务，所以不触发工具、不创建文件），默认启用，用来验证 Hermes 长时间稳定对话
-- `entrypoint.sh` —— 容器入口（启动即生成模型配置并跑 soak）
-- `build.bat` / `build.sh` —— 一键脚本：构建镜像（用第 2 周 Dockerfile）并运行自动对话
-- `test/` —— 单元测试（用 mock Hermes，不需要 Docker / 真实模型）
-
-## 用法
-
-```bash
-# 基本：默认用内置多轮剧本（纯闲聊），10 轮、间隔 5s、总时长上限 600s
-node soak.mjs --hermes hermes
-
-# 指定参数
-node soak.mjs --hermes hermes --rounds 20 --interval 3 --max-total-seconds 300
-
-# 换任意剧本路径（每轮发下一条，轮数多于条数则循环）
-node soak.mjs --hermes hermes --conversation conversation.jsonl --rounds 14
-
-# 退化为"固定单条"（不再走剧本）
-node soak.mjs --hermes hermes --prompt "Hi there! Just saying hello."
-
-# 输出到文件
-node soak.mjs --hermes hermes --result-file result.json
+```
+week3/
+├── 1-basic-soak/        # 基础：soak 自动对话脚本
+├── 2-memory-l0l3/       # 进阶1：记忆插件下 L0-L3 生成 + 验证截图
+└── 3-full-pipeline/     # 进阶2：Dockerfile + soak 一键流水线
 ```
 
-默认的 `conversation.jsonl` 是纯日常闲聊，Hermes 只会自然回话，不会调用工具、也不会创建文件——这样能长时间稳定地测"能不能正常对话"。每轮按剧本发下一条，轮数比剧本条数多就循环。想换剧本用 `--conversation <path>`，想退化成单条用 `--prompt <文本>`。
-
-## 可配置参数
-
-| 参数 | 默认 | 说明 |
+| 目录 | 内容 | 验证方式 |
 |---|---|---|
-| `--rounds N` | 10 | 总共对话多少轮 |
-| `--interval N` | 5 | 每轮之间的等待时间（秒） |
-| `--max-total-seconds N` | 600 | 全程时长上限，到点即止 |
-| `--per-round-timeout-ms N` | 180000 | 单轮超时 kill 并记失败 |
-| `--max-consecutive-failures N` | 3 | 连续失败熔断，提前终止 |
-| `--prompt "..."` / `--conversation <path>` | 内置闲聊剧本 / — | 固定单条 / 多轮剧本（默认用内置闲聊剧本） |
-| `--expected-version vX` | — | 断言 `hermes --version` 版本匹配 |
-| `--result-file PATH` | — | 额外把 JSON 落盘 |
+| `1-basic-soak/` | soak 脚本 + 纯闲聊剧本 + 单元测试 | `node test/test-soak.mjs`（39 个用例，不依赖 Docker 与模型） |
+| `2-memory-l0l3/` | 事实剧本 + `check-l0l3.mjs` 记忆检测 | 跑完 soak 后执行 `node check-l0l3.mjs --data-dir <记忆数据目录> --json`，以 `all_nonempty` 字段为准 |
+| `3-full-pipeline/` | Dockerfile + `build.sh` / `run-pipeline.bat` 一键流水线 | `bash build.sh`（Git Bash / Linux）或直接运行 `run-pipeline.bat`（Windows） |
 
-这些参数在 build.bat / build.sh 里会逐个提示，回车用默认；也可以环境变量预置（`SOAK_ROUNDS` 等），或直接 `docker run -e SOAK_ROUNDS=14 ...`。
+进阶 1、2 的设计要点：soak 剧本必须包含可提取事实（身份、偏好、习惯、约束），否则 Hermes 能正常应答但 L1/L2/L3 不会沉淀任何内容。`check-l0l3.mjs` 逐层检查 L0（conversations）、L1（records）、L2（scene_blocks）、L3（persona.md）是否非空；进阶 2 流水线在验证后还会调用 Gateway `POST /recall`，确认生成的记忆可被召回（证据见 `3-full-pipeline/results/recall*.json`）。
 
-## 输出（JSON，走 stdout）
-
-```json
-{
-  "passed": true,
-  "hermes_version": { "releaseDate": "2026.8.19", "verified": true },
-  "config": { "rounds": 14, "interval_seconds": 5, "max_total_seconds": 600, "conversation_turns": 14 },
-  "rounds": { "total": 14, "executed": 14, "passed": 14, "failed": 0 },
-  "stats": { "total_duration_seconds": 412.3, "avg_round_ms": 29450, "p95_round_ms": 52000 },
-  "failures": [],
-  "termination_reason": "completed"
-}
-```
-
-判定 `passed: true` 的条件：所有已执行轮次成功 + 至少跑了 1 轮 + 版本校验通过 + 没被截断。
-
-容错：单轮超时 kill、非零退出码捕获、空响应、报错回复识别（如 `HTTP 401` → 判失败）、连续失败熔断、总时长截断、SIGINT/SIGTERM 中断时输出部分结果。
-
-退出码：`0` 通过；`1` 失败；`2` 参数错误；`130/143` 被中断。
-
-## 测试（不需要 Docker / 模型）
+跑进阶 2 时进入 `3-full-pipeline/` 目录（week3 根目录无流水线脚本）：
 
 ```bash
-node test/test-soak.mjs  
+cd 3-full-pipeline
+bash build.sh                # Git Bash / Linux，交互式输入
+# 或双击 run-pipeline.bat    # Windows
 ```
 
-## 关于记忆验证
+需要提供的参数：
 
-默认的 `conversation.jsonl` 是纯闲聊，不会沉淀记忆。如果要在**装了记忆插件的 Hermes** 上验证 L0-L3 记忆，就把剧本换成含丰富可提取事实的版本（比如身份、偏好、经历这些），或者直接用"装了插件的本地 Hermes"（不是这个镜像）对话后查数据目录 `~\.memory-tencentdb\memory-tdai\`。
+- Hermes 版本号（如 `2026.8.19`，`v` 前缀可省略）
+- `MODEL_API_KEY`（必填）；`MODEL_BASE_URL` 与 `MODEL_NAME` 默认使用 deepseek（`https://api.deepseek.com/v1` / `deepseek-v4-flash`）
+- 构建代理，默认 `http://host.docker.internal:7890`（容器内访问宿主机 Clash 的地址；输入 `NONE` 表示直连）
 
-## 跨周依赖
+完成后产出以下结果文件：
 
-第 2 周交付的是 **Dockerfile**（构建镜像用，交付物 A），它 `COPY` 了本文件夹的 `soak.mjs`、`entrypoint.sh`、`conversation.jsonl` 并在启动时运行（因为题目要求"镜像启动后自动执行自动对话"）。
+- `3-full-pipeline/results/result.json` —— soak 判定结果（`passed` 字段，true/false）
+- `3-full-pipeline/results/l0l3.json` —— L0-L3 四层检查结果（`all_nonempty` 字段）
+- `3-full-pipeline/results/recall.json` / `recall-record.json` —— /recall 召回验证证据
+- `3-full-pipeline/memory-data/` —— 记忆数据：L0 conversations / L1 records / L2 scene_blocks / L3 persona.md
 
-构建镜像时，把第 2 周的 `Dockerfile` 放到本文件夹（或把本文件夹的这三个文件复制到第 2 周目录），然后一键或手动构建：
+构建失败的常见原因：
 
-```bash
-# 一键（本目录自带 build.bat / build.sh，会提示版本/模型/soak 参数/代理）
-build.bat          # 或 bash build.sh
+| 现象 | 原因 | 处理 |
+|---|---|---|
+| `429` / `RPC failed` | GitHub 对出口 IP 限流 | 更换 Clash 节点，或使用 `host.docker.internal:7890` 代理 |
+| `Could not connect` / 超时 | 代理地址错误或 Clash 未启动 | 核对代理配置，或输入 `NONE` 直连 |
+| 基础镜像拉取超时 | docker.io 连接不通 | 预先执行 `docker pull node:26-bookworm-slim` |
 
-# 手动（把第 2 周 Dockerfile 放进来后）
-docker build --build-arg HERMES_VERSION=v2026.8.19 -t hermes-version-compat:v2026.8.19 .
-docker run --rm -e MODEL_API_KEY=.. -e MODEL_BASE_URL=.. -e MODEL_NAME=.. -e MODEL_PROVIDER=custom \
-  -e SOAK_ROUNDS=14 hermes-version-compat:v2026.8.19
-```
+各子目录的 README 附有实测结果与截图：进阶 1 见 `2-memory-l0l3/`（L0-L3 四层截图 + /recall 召回），进阶 2 见 `3-full-pipeline/`（soak 判定、四层检查、召回证据与运行截图）。
 
-网络：国内构建 GitHub 不通时，按脚本提示输入代理地址（本机 Clash 常用 `http://127.0.0.1:7890`；Docker Desktop 构建用 `http://host.docker.internal:7890`；Linux Docker 用宿主机 IP）。代理只作为 `--build-arg` 传给构建，避免 Docker Desktop 改写代理。
-
-注：`soak.mjs` 同时也是第 2 周镜像构建时 COPY 进镜像的依赖脚本，两者内容一致。
-
-感谢老师评阅，辛苦了！
+根目录原先平铺的第二周版 `Dockerfile`、`build.sh` 等旧文件已清理，对应内容归入子目录。
