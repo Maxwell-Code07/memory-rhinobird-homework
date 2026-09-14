@@ -9,7 +9,7 @@
 - Python 3.11 和 Hermes 核心运行依赖
 - 从 Hermes 官方 Git 仓库浅克隆与输入版本严格匹配的标签源码
 
-镜像只安装 Hermes 核心依赖，也安装TencentDB记忆插件。镜像设置了 `HERMES_DISABLE_LAZY_INSTALLS=1`，防止运行时自动安装可选插件。
+镜像只安装 Hermes 核心及必要运行依赖，不安装 TencentDB 记忆插件或其他可选记忆组件。镜像设置了 `HERMES_DISABLE_LAZY_INSTALLS=1`，防止运行时自动安装可选插件。
 
 ## 构建镜像
 

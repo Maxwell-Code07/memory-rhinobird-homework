@@ -1,0 +1,22 @@
+﻿{
+    "captured_at":  "2026-09-09T02:26:27.9494378+08:00",
+    "data_dir":  "E:\\TencentDB\\提交作业\\memory-rhinobird-homework\\heshiyu\\week3\\3-full-pipeline\\.runtime\\data-0.20.6-20260909-022540\\.memory-tencentdb\\memory-tdai",
+    "phase":  "before-soak",
+    "conversations":  {
+                          "exists":  true,
+                          "file_count":  0
+                      },
+    "records":  {
+                    "exists":  true,
+                    "file_count":  0
+                },
+    "scene_blocks":  {
+                         "exists":  true,
+                         "file_count":  0
+                     },
+    "persona":  {
+                    "exists":  false,
+                    "file_count":  0
+                },
+    "fresh":  true
+}
