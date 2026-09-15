@@ -1,0 +1,19 @@
+# 真实环境变量和 API 凭证
+.env
+
+# soak 运行结果
+results/*
+!results/.gitkeep
+
+# 只提交人工检查过、已脱敏的验收证据
+evidence/*
+!evidence/*.json
+!evidence/*.txt
+!evidence/*.png
+!evidence/README.md
+
+# macOS 文件
+.DS_Store
+
+# Node.js 日志
+npm-debug.log*

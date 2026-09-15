@@ -1,0 +1,60 @@
+{
+  "status": "PASS",
+  "started_at": "2026-09-08T15:33:56.915029+00:00",
+  "finished_at": "2026-09-08T15:41:05.053108+00:00",
+  "config": {
+    "rounds": 30,
+    "interval_seconds": 1.0,
+    "duration_seconds": 1800.0,
+    "timeout_seconds": 180.0,
+    "hermes_command": "/opt/hermes-venv/bin/hermes",
+    "dry_run": false
+  },
+  "statistics": {
+    "requested_rounds": 30,
+    "completed_rounds": 30,
+    "passed_rounds": 30,
+    "failed_rounds": 0,
+    "elapsed_ms": 428264,
+    "latency_ms": [
+      41981,
+      12398,
+      13180,
+      12439,
+      12442,
+      12671,
+      12172,
+      13424,
+      12431,
+      13543,
+      12525,
+      13839,
+      11776,
+      12823,
+      10860,
+      13366,
+      8954,
+      12204,
+      12686,
+      8986,
+      12337,
+      13182,
+      10332,
+      10066,
+      9872,
+      21790,
+      14089,
+      12041,
+      12331,
+      8496
+    ],
+    "latency_summary_ms": {
+      "min": 8496,
+      "max": 41981,
+      "avg": 13308,
+      "p50": 12431,
+      "p95": 21790
+    }
+  },
+  "rounds_file": "/opt/week3/soak-results/rounds.jsonl"
+}

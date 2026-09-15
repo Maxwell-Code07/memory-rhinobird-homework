@@ -1,0 +1,23 @@
+{
+  "status": "pass",
+  "stopReason": "round_limit",
+  "configuredRounds": 10,
+  "completedRounds": 10,
+  "successfulRounds": 10,
+  "failedRounds": 0,
+  "failureRate": 0,
+  "maxConsecutiveFailures": 3,
+  "startedAt": "2026-09-09T14:27:25.358Z",
+  "endedAt": "2026-09-09T14:45:30.361Z",
+  "elapsedMs": 1085003,
+  "sessionId": "20260909_142725_e66c63",
+  "container": "hermes-week3-final-acceptance",
+  "latencyMs": {
+    "min": 87406,
+    "mean": 108047,
+    "p50": 97853,
+    "p95": 143759,
+    "max": 143759
+  },
+  "outputDir": "/Users/may/Documents/Academic/腾讯犀牛鸟/agent memory作业/memory-rhinobird-homework/wuyifan/week3/3-full-pipeline/results/final-acceptance/soak"
+}

@@ -1,0 +1,28 @@
+{
+  "status": "PASS",
+  "checked_at": "2026-09-08T14:52:00.138044+00:00",
+  "root": "D:\\HuaweiMoveData\\Users\\33176\\Documents\\处理异常\\memory-rhinobird-homework\\xuzhen\\week3\\3-full-pipeline\\evidence\\pass-memory-data",
+  "layers": {
+    "L0": {
+      "present": true,
+      "path": "D:\\HuaweiMoveData\\Users\\33176\\Documents\\处理异常\\memory-rhinobird-homework\\xuzhen\\week3\\3-full-pipeline\\evidence\\pass-memory-data\\conversations"
+    },
+    "L1": {
+      "present": true,
+      "path": "D:\\HuaweiMoveData\\Users\\33176\\Documents\\处理异常\\memory-rhinobird-homework\\xuzhen\\week3\\3-full-pipeline\\evidence\\pass-memory-data\\records"
+    },
+    "L2": {
+      "present": true,
+      "path": "D:\\HuaweiMoveData\\Users\\33176\\Documents\\处理异常\\memory-rhinobird-homework\\xuzhen\\week3\\3-full-pipeline\\evidence\\pass-memory-data\\scene_blocks"
+    },
+    "L3": {
+      "present": true,
+      "path": "D:\\HuaweiMoveData\\Users\\33176\\Documents\\处理异常\\memory-rhinobird-homework\\xuzhen\\week3\\3-full-pipeline\\evidence\\pass-memory-data\\persona.md"
+    }
+  },
+  "recall": {
+    "file": null,
+    "keywords": [],
+    "missing_keywords": []
+  }
+}

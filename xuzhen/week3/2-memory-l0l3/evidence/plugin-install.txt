@@ -1,0 +1,3 @@
+memory-tencentdb@1.0.0 /opt/memory-tencentdb
+`-- @tencentdb-agent-memory/memory-tencentdb@1.0.1
+

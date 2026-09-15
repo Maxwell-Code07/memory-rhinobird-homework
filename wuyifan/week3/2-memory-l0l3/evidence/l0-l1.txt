@@ -1,0 +1,13 @@
+Hermes memory-tencentdb 落库证据：L0 + L1
+========================================
+
+容器：hermes-week3-submission-pass
+会话：20260909_152328_ae1890
+
+L0 conversations/*.jsonl
+status=pass  non_empty_files=1  total_bytes=679
+
+L1 records/*.jsonl
+status=pass  non_empty_files=1  total_bytes=559
+
+结论：原始对话层和结构化长期记忆层均已生成非空文件。

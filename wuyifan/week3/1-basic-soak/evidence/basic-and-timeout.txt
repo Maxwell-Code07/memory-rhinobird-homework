@@ -1,0 +1,24 @@
+Hermes Week3 基础 Soak 验收证据
+================================
+
+[真实模型自动连续对话]
+status: pass
+configuredRounds: 2
+completedRounds: 2
+successfulRounds: 2
+failedRounds: 0
+failureRate: 0
+sessionId: 20260907_193606_bf6060
+elapsedMs: 38004
+latencyP50Ms: 18381
+latencyP95Ms: 19120
+
+[异常容错：故意触发超时]
+status: fail
+completedRounds: 1
+failedRounds: 1
+stopReason: consecutive_failure_limit
+errorType: timeout
+程序正常结束并写出 summary.json，没有崩溃或假通过。
+
+原始结构化文件：real-soak-summary.json / timeout-summary.json

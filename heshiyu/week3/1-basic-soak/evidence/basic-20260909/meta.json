@@ -1,0 +1,114 @@
+{
+  "status": "fail",
+  "passed": false,
+  "started_at": "2026-09-08T18:19:21.694Z",
+  "completed_at": "2026-09-08T18:29:21.878Z",
+  "elapsed_ms": 600184,
+  "termination_reason": "duration_reached",
+  "session": "soak-1788891561694",
+  "config": {
+    "rounds": 6,
+    "intervalMs": 1000,
+    "durationMs": 600000,
+    "roundTimeoutMs": 180000,
+    "hermes": "hermes",
+    "hermesArgs": [],
+    "transport": "chat",
+    "session": "",
+    "scenario": "E:\\TencentDB\\提交作业\\memory-rhinobird-homework\\heshiyu\\week3\\1-basic-soak\\scenarios\\basic-soak.json",
+    "output": "E:\\TencentDB\\提交作业\\memory-rhinobird-homework\\heshiyu\\week3\\1-basic-soak\\evidence\\basic-20260909",
+    "expectedVersion": "",
+    "probeEvery": 3,
+    "probeMode": "chat",
+    "gatewayUrl": "",
+    "probeWaitMs": 0,
+    "probePollMs": 3000,
+    "resourceIntervalMs": 5000,
+    "logFile": "",
+    "maxConsecutiveFailures": 3,
+    "maxFailureRate": 0,
+    "roundRetries": 0
+  },
+  "scenario": {
+    "name": "basic-soak",
+    "path": "E:\\TencentDB\\提交作业\\memory-rhinobird-homework\\heshiyu\\week3\\1-basic-soak\\scenarios\\basic-soak.json",
+    "turns": 3
+  },
+  "rounds": {
+    "requested": 6,
+    "executed": 6,
+    "attempts": 6,
+    "passed": 5,
+    "failed": 1,
+    "failure_rate": 0.16666666666666666
+  },
+  "latency_ms": {
+    "min": 5056,
+    "avg": 68784,
+    "p50": 67494,
+    "p95": 134240,
+    "max": 134240
+  },
+  "probes": {
+    "enabled": true,
+    "total": 2,
+    "passed": 1,
+    "failed": 0,
+    "pending": 1,
+    "results": [
+      {
+        "id": "database-preference",
+        "planted_at": "2026-09-08T18:23:27.222Z",
+        "plant_status": "pass",
+        "expected": [
+          "LinXiao",
+          "Python",
+          "PowerShell"
+        ],
+        "recalled_at": "2026-09-08T18:24:45.169Z",
+        "mode": "chat",
+        "found": [
+          "LinXiao",
+          "Python",
+          "PowerShell"
+        ],
+        "status": "pass",
+        "response": "你叫 LinXiao，偏好的脚本语言是 Python 和 PowerShell。"
+      },
+      {
+        "id": "deployment-constraint",
+        "planted_at": "2026-09-08T18:28:59.960Z",
+        "plant_status": "fail",
+        "expected": [
+          "备份",
+          "回滚",
+          "周五"
+        ]
+      }
+    ]
+  },
+  "resources": {
+    "samples": 121,
+    "driver_pid": 31280,
+    "rss_initial_bytes": 57290752,
+    "rss_peak_bytes": 59445248,
+    "rss_final_bytes": 59445248
+  },
+  "logs": {
+    "enabled": false,
+    "events": 0,
+    "errors": 0,
+    "warnings": 0
+  },
+  "artifacts": {
+    "conversations": "E:\\TencentDB\\提交作业\\memory-rhinobird-homework\\heshiyu\\week3\\1-basic-soak\\evidence\\basic-20260909\\conversations.jsonl",
+    "resources": "E:\\TencentDB\\提交作业\\memory-rhinobird-homework\\heshiyu\\week3\\1-basic-soak\\evidence\\basic-20260909\\resources.jsonl",
+    "logs": "E:\\TencentDB\\提交作业\\memory-rhinobird-homework\\heshiyu\\week3\\1-basic-soak\\evidence\\basic-20260909\\log-events.jsonl",
+    "probes": "E:\\TencentDB\\提交作业\\memory-rhinobird-homework\\heshiyu\\week3\\1-basic-soak\\evidence\\basic-20260909\\probes.json",
+    "meta": "E:\\TencentDB\\提交作业\\memory-rhinobird-homework\\heshiyu\\week3\\1-basic-soak\\evidence\\basic-20260909\\meta.json",
+    "snapshot": "E:\\TencentDB\\提交作业\\memory-rhinobird-homework\\heshiyu\\week3\\1-basic-soak\\evidence\\basic-20260909\\meta-snapshot.json",
+    "report": "E:\\TencentDB\\提交作业\\memory-rhinobird-homework\\heshiyu\\week3\\1-basic-soak\\evidence\\basic-20260909\\report.txt"
+  },
+  "tool": "hermes-standalone-soak",
+  "tool_version": "2.1.0"
+}

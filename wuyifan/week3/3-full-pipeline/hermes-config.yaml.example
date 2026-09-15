@@ -1,0 +1,16 @@
+model:
+  default: "${HERMES_MODEL}"
+  provider: custom
+  base_url: "${HERMES_BASE_URL}"
+  api_key: "${HERMES_API_KEY}"
+
+memory:
+  provider: memory_tencentdb
+  memory_enabled: true
+  user_profile_enabled: true
+
+agent:
+  verbose: false
+
+display:
+  streaming: false

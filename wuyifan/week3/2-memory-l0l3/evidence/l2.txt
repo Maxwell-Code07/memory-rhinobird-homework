@@ -1,0 +1,10 @@
+Hermes memory-tencentdb 落库证据：L2
+==================================
+
+容器：hermes-week3-submission-pass
+会话：20260909_152328_ae1890
+
+L2 scene_blocks/*.md
+status=pass  non_empty_files=1  total_bytes=2351
+
+结论：场景记忆 Markdown 块已生成且非空。

@@ -1,0 +1,33 @@
+{
+  "status": "PASS",
+  "started_at": "2026-09-08T14:30:39.720226+00:00",
+  "finished_at": "2026-09-08T14:31:06.314400+00:00",
+  "config": {
+    "rounds": 3,
+    "interval_seconds": 2.0,
+    "duration_seconds": 180.0,
+    "timeout_seconds": 90.0,
+    "hermes_command": "docker exec -e DEEPSEEK_API_KEY -e HERMES_INFERENCE_PROVIDER -e HERMES_INFERENCE_MODEL -e DEEPSEEK_BASE_URL hermes-memory-week3 /opt/hermes-venv/bin/hermes",
+    "dry_run": false
+  },
+  "statistics": {
+    "requested_rounds": 3,
+    "completed_rounds": 3,
+    "passed_rounds": 3,
+    "failed_rounds": 0,
+    "elapsed_ms": 26594,
+    "latency_ms": [
+      6131,
+      7736,
+      8720
+    ],
+    "latency_summary_ms": {
+      "min": 6131,
+      "max": 8720,
+      "avg": 7529,
+      "p50": 7736,
+      "p95": 8720
+    }
+  },
+  "rounds_file": "xuzhen\\week3\\1-basic-soak\\evidence\\real-pass\\rounds.jsonl"
+}

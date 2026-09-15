@@ -1,0 +1,5 @@
+# 保证脚本在 git 里始终是 LF 行尾（bash 脚本遇 CRLF 会报错）
+*.sh text eol=lf
+*.mjs text eol=lf
+*.txt text eol=lf
+*.md text eol=lf

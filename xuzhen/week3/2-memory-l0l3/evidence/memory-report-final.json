@@ -1,0 +1,32 @@
+{
+  "status": "PASS",
+  "checked_at": "2026-09-08T10:12:39.855162+00:00",
+  "root": "xuzhen\\week3\\2-memory-l0l3\\evidence\\memory-data-new",
+  "layers": {
+    "L0": {
+      "present": true,
+      "path": "xuzhen\\week3\\2-memory-l0l3\\evidence\\memory-data-new\\conversations"
+    },
+    "L1": {
+      "present": true,
+      "path": "xuzhen\\week3\\2-memory-l0l3\\evidence\\memory-data-new\\records"
+    },
+    "L2": {
+      "present": true,
+      "path": "xuzhen\\week3\\2-memory-l0l3\\evidence\\memory-data-new\\scene_blocks"
+    },
+    "L3": {
+      "present": true,
+      "path": "xuzhen\\week3\\2-memory-l0l3\\evidence\\memory-data-new\\persona.md"
+    }
+  },
+  "recall": {
+    "file": "xuzhen\\week3\\2-memory-l0l3\\evidence\\recall-output.json",
+    "keywords": [
+      "小陈",
+      "Python",
+      "上海"
+    ],
+    "missing_keywords": []
+  }
+}

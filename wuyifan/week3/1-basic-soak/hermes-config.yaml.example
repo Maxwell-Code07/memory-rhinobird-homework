@@ -1,0 +1,5 @@
+model:
+  default: "${HERMES_MODEL}"
+  provider: custom
+  base_url: "${HERMES_BASE_URL}"
+  api_key: "${HERMES_API_KEY}"

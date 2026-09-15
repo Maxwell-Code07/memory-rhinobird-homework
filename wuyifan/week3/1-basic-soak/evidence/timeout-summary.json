@@ -1,0 +1,22 @@
+{
+  "status": "fail",
+  "stopReason": "consecutive_failure_limit",
+  "configuredRounds": 1,
+  "completedRounds": 1,
+  "successfulRounds": 0,
+  "failedRounds": 1,
+  "failureRate": 1,
+  "maxConsecutiveFailures": 1,
+  "startedAt": "2026-09-07T13:16:14.126Z",
+  "endedAt": "2026-09-07T13:16:14.181Z",
+  "elapsedMs": 55,
+  "sessionId": null,
+  "latencyMs": {
+    "min": null,
+    "mean": null,
+    "p50": null,
+    "p95": null,
+    "max": null
+  },
+  "outputDir": "/Users/may/Documents/Academic/腾讯犀牛鸟/agent memory作业/memory-rhinobird-homework/wuyifan/week3/1-basic-soak/results/timeout-proof"
+}

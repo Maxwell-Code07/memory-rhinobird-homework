@@ -1,0 +1,17 @@
+Hermes memory-tencentdb 多轮记忆对话证据
+=======================================
+
+剧本：memory-prompts.json（虚构人物“林澈”的事实、偏好和经历）
+容器：hermes-week3-final-acceptance
+会话：20260909_142725_e66c63
+
+status: pass
+configuredRounds: 10
+completedRounds: 10
+successfulRounds: 10
+failedRounds: 0
+failureRate: 0
+stopReason: round_limit
+elapsedMs: 1085003
+
+结论：Hermes 在同一 session 中自动完成十轮富含事实的连续对话。

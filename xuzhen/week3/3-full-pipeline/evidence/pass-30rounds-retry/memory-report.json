@@ -1,0 +1,28 @@
+{
+  "status": "PASS",
+  "checked_at": "2026-09-08T15:44:08.689937+00:00",
+  "root": "xuzhen\\week3\\3-full-pipeline\\evidence\\pass-30rounds-retry\\memory-data",
+  "layers": {
+    "L0": {
+      "present": true,
+      "path": "xuzhen\\week3\\3-full-pipeline\\evidence\\pass-30rounds-retry\\memory-data\\conversations"
+    },
+    "L1": {
+      "present": true,
+      "path": "xuzhen\\week3\\3-full-pipeline\\evidence\\pass-30rounds-retry\\memory-data\\records"
+    },
+    "L2": {
+      "present": true,
+      "path": "xuzhen\\week3\\3-full-pipeline\\evidence\\pass-30rounds-retry\\memory-data\\scene_blocks"
+    },
+    "L3": {
+      "present": true,
+      "path": "xuzhen\\week3\\3-full-pipeline\\evidence\\pass-30rounds-retry\\memory-data\\persona.md"
+    }
+  },
+  "recall": {
+    "file": null,
+    "keywords": [],
+    "missing_keywords": []
+  }
+}

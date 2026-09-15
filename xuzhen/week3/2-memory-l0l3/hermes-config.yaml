@@ -1,0 +1,3 @@
+memory:
+  provider: memory_tencentdb
+  memory_enabled: true

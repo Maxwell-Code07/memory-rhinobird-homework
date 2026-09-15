@@ -1,0 +1,35 @@
+{
+  "status": "FAIL",
+  "started_at": "2026-09-08T15:07:13.727857+00:00",
+  "finished_at": "2026-09-08T15:08:48.180746+00:00",
+  "config": {
+    "rounds": 5,
+    "interval_seconds": 0.0,
+    "duration_seconds": 180.0,
+    "timeout_seconds": 30.0,
+    "hermes_command": "hermes",
+    "dry_run": false
+  },
+  "statistics": {
+    "requested_rounds": 5,
+    "completed_rounds": 5,
+    "passed_rounds": 0,
+    "failed_rounds": 5,
+    "elapsed_ms": 94453,
+    "latency_ms": [
+      19078,
+      17377,
+      18617,
+      19533,
+      19839
+    ],
+    "latency_summary_ms": {
+      "min": 17377,
+      "max": 19839,
+      "avg": 18889,
+      "p50": 19078,
+      "p95": 19839
+    }
+  },
+  "rounds_file": "xuzhen\\week3\\1-basic-soak\\evidence\\invalid-api-key-5rounds\\rounds.jsonl"
+}

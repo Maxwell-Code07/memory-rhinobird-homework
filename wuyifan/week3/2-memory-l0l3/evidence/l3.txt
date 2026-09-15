@@ -1,0 +1,10 @@
+Hermes memory-tencentdb 落库证据：L3
+==================================
+
+容器：hermes-week3-submission-pass
+会话：20260909_152328_ae1890
+
+L3 persona.md
+status=pass  non_empty_files=1  total_bytes=3351
+
+结论：用户画像 persona.md 已生成且非空。

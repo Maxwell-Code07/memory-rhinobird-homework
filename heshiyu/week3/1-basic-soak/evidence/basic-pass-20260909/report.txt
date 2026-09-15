@@ -1,0 +1,18 @@
+Hermes Standalone Soak Report
+============================
+Result: PASS
+Started: 2026-09-08T18:31:46.902Z
+Elapsed: 190.70s
+Session: soak-1788892306902
+Scenario: basic-soak
+Rounds: requested=3, executed=3, passed=3, failed=0
+Latency: p50=36.85s, p95=132.77s, avg=58.18s
+Memory probes: enabled=true, passed=1/1, failed=0
+Driver RSS: initial=57335808, peak=58490880, final=58109952
+Log monitor: enabled=false, errors=0, warnings=0
+Termination: completed
+
+JSONL: conversations.jsonl
+Resources: resources.jsonl
+Probes: probes.json
+Meta: meta.json

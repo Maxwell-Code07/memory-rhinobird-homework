@@ -1,0 +1,15 @@
+[
+  {
+    "label": "greeting",
+    "message": "你好！请用一句话介绍你能提供什么帮助。"
+  },
+  {
+    "label": "calculation",
+    "message": "请计算 17 × 23，并简要说明计算过程。"
+  },
+  {
+    "label": "stability",
+    "message": "我们正在进行自动化稳定性测试。请确认你仍能正常回复。"
+  }
+]
+

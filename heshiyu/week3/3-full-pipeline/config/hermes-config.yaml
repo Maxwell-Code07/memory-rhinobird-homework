@@ -1,0 +1,30 @@
+model:
+  default: ${HERMES_SOAK_MODEL}
+  provider: custom
+  base_url: ${HERMES_SOAK_BASE_URL}
+  api_key: ${HERMES_SOAK_API_KEY}
+  api_mode: chat_completions
+
+agent:
+  max_turns: 1
+  reasoning_effort: low
+
+display:
+  streaming: false
+
+memory:
+  memory_enabled: true
+  user_profile_enabled: true
+  provider: memory_tencentdb
+
+plugins:
+  enabled:
+    - memory_tencentdb
+  disabled: []
+  entries:
+    memory_tencentdb:
+      allow_tool_override: false
+
+platform_toolsets:
+  cli:
+    - memory
