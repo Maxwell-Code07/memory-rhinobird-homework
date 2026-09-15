@@ -1,0 +1,47 @@
+{
+  "checked_at": "2026-09-14 11:03:53",
+  "levels": {
+    "L0": {
+      "ok": true,
+      "jsonl_files": 1,
+      "conversation_lines": 12,
+      "sample": "{\"sessionKey\":\"20260914_105823_cf05ff\",\"sessionId\":\"\",\"recordedAt\":\"2026-09-14T10:59:25.414Z\",\"id\":\"msg_1789383565412_b28d4b\",\"role\":\"user\",\"content\":\"我叫小巫，是一名后端开发工程师，主要用 Go 语言写服务端程序，在深圳工作。\",\"timestamp\":1789383565412}\n{\"sessionKey\":\"20260914_105823_cf05ff\",\"sessionId\":\"\",\"recordedAt\":\"2026-09-14T10:59:25.414Z\",\"id\":\"msg_1789383565412_495a13\",\"role\":\"assistant\",\"content\":\"你好，小巫。有什么可以帮你的?\",\"timestamp\":1789383565412}\n{\"sessionKey\":\"20260914_105934_7a5d48\",\"sessionId\":\"\",\"recordedAt\":\"2026-09-14T11:"
+    },
+    "L1": {
+      "ok": true,
+      "memory_files": 1,
+      "sample": "用户（小巫）是一名后端开发工程师，主要使用 Go 语言编写服务端程序，目前在深圳工作。\n"
+    },
+    "L2": {
+      "ok": true,
+      "scene_files": 2,
+      "sample": "-----META-START-----\ncreated: 2026-09-14T11:02:02.971Z\nupdated: 2026-09-14T11:02:02.971Z\nsummary: 小巫养了一只两岁半的布偶猫\"雪球\"，性格粘人，会在他加班晚归时到门口等待，构成其高压职业生活之外的情感锚点。\nheat: 1\n-----META-END-----\n\n## 用户基础信息\n- 宠物：布偶猫，名\"雪球\"，2 岁半\n- 养宠时间：约两年（雪球幼时起）\n\n## 用户核心特征\n-----META-START-----\ncreated: 2026-09-14T10:59:38.722Z\nupdated: 2026-09-14T11:01:37.857Z\nsummary: 小巫是深圳的 Go 后端工程师，8 人团队维护日均千万级交易的支付网关系统，技术栈 Go/Redis/Kafka/MySQL（分库分表）；主导下单接口优化使 P99 从 800ms 降至约 200ms，重视单测覆盖率与代码评审。\nheat: 5\n-----META-END-----\n\n## 用户基础信息\n- 姓名：小巫\n- 职业：后端开发工程师\n- 居住地/工作地：深圳\n- 主要技术栈：Go（服务端程序）、Redis、Kafka、MySQL（已分库分表）\n"
+    },
+    "L3": {
+      "ok": true,
+      "persona_lines": 57,
+      "anchor_hits": {
+        "小巫": true,
+        "后端": true,
+        "Go": true,
+        "咖啡": false,
+        "羽毛球": false
+      },
+      "sample": "# User Narrative Profile\n\n> **Archetype (核心原型)**: 一位身处深圳、以 Go 语言构建服务端的后端工程师——注重性能与系统化的\"务实建造者\"。\n\n> **基本信息**\n - 姓名：小巫\n - 职业：后端开发工程师\n - 居住/工作地：深圳\n - 主要技术栈：Go（服务端程序）\n\n> **长期偏好**\n    - 技术选型偏向性能与并发（主动选择 Go，而非随团队）\n    - 关注服务端逻辑的系统化构建（API、中间件、高并发场景）\n\n## 📖 Chapter 1: Context & Current State (全景语境)\n**小巫是一名在深圳工作的后端开发工程师，以 Go 语言编写服务端程序为核心工作内容。** 深圳的互联网/云服务产业属性与其职业方向天然契合。目前掌握的仅是身份基线，关于其工作年限、公司类型（大厂/中小团队/创业）以及项目经验仍待补充，这些将成为后续理解其职业语境的支点。\n\n## 🎨 Chapter 2: The Texture of Life (生活的肌理)\n**目前信息有限。** 唯一可观察的\"品味线索\"在于技术选型本身：他主动提及 Go 与\"服务端程序\"而非泛泛的后端岗位，透露出对性能与并发模型的偏好。其余生活层面的兴趣、消费与习惯尚未浮现。\n\n## 🤖 Chapter 3: Interaction & C"
+    }
+  },
+  "recall": {
+    "ok": true,
+    "query": "小巫 后端开发 Go 咖啡 羽毛球",
+    "hit_count": 1,
+    "strategy": "keyword",
+    "anchor_hits": [
+      "小巫",
+      "后端",
+      "Go"
+    ],
+    "context_chars": 2160,
+    "context_snippet": "<user-persona>\n# User Narrative Profile\n\n> **Archetype (核心原型)**: 一位身处深圳、以 Go 语言构建服务端的后端工程师——注重性能与系统化的\"务实建造者\"。\n\n> **基本信息**\n - 姓名：小巫\n - 职业：后端开发工程师\n - 居住/工作地：深圳\n - 主要技术栈：Go（服务端程序）\n\n> **长期偏好**\n    - 技术选型偏向性能与并发（主动选择 Go，而非随团队）\n    - 关注服务端逻辑的系统化构建（API、中间件、高并发场景）\n\n## 📖 Chapter 1: Context & Current State (全景语境)\n**小巫是一名在深圳工作的后端开发工程师，以 Go 语言编写服务端程序为核心工作内容。** 深圳的互联网/云服务产业属性与其职业方向天然契合。目前掌握的仅是身份基线，关于其工作年限、公司类型"
+  },
+  "verdict": "pass"
+}

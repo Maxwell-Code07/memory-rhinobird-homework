@@ -53,19 +53,36 @@ RUN set -eux; \
 
 # ============================================================
 # 安装 TDAI Memory Gateway（npm 包 @tencentdb-agent-memory/memory-tencentdb）
+# 版本参数化：--build-arg MEMORY_PLUGIN_VERSION=0.3.6（默认 latest，行为不变）
 # ============================================================
 WORKDIR /opt/tdai-gateway
+
+ARG MEMORY_PLUGIN_VERSION=latest
 
 RUN echo '{"name":"tdai-memory-standalone","version":"1.0.0","type":"module","private":true}' > package.json && \
     set -eux; \
     for i in 1 2 3 4 5 6; do \
         if npm install --no-audit --no-fund --maxsockets=10 \
                --fetch-retries=5 --fetch-retry-mintimeout=10000 --fetch-retry-maxtimeout=120000 \
-               @tencentdb-agent-memory/memory-tencentdb@latest tsx; then \
+               "@tencentdb-agent-memory/memory-tencentdb@${MEMORY_PLUGIN_VERSION}" tsx > /tmp/npm-install.log 2>&1; then \
             break; \
         fi; \
-        echo "[npm] attempt $i failed, retry in 10s"; sleep 10; \
+        # 版本不存在时 npm 报 ETARGET/No matching version —— 立即明确失败，不做无谓重试
+        if grep -qE "No matching version found|ETARGET|notarget" /tmp/npm-install.log; then \
+            echo "ERROR: memory-tencentdb 版本 ${MEMORY_PLUGIN_VERSION} 在 npm 上不存在" >&2; \
+            tail -20 /tmp/npm-install.log >&2; exit 1; \
+        fi; \
+        echo "[npm] attempt $i failed, retry in 10s"; tail -5 /tmp/npm-install.log; sleep 10; \
     done; \
+    # ---- 校验：实际安装版本 == 请求版本（latest 例外，记录实际装到的版本）----
+    INSTALLED="$(node -p "require('/opt/tdai-gateway/node_modules/@tencentdb-agent-memory/memory-tencentdb/package.json').version")" && \
+    echo "==> MEMORY_PLUGIN_VERSION requested: ${MEMORY_PLUGIN_VERSION}" && \
+    echo "==> memory-tencentdb installed: ${INSTALLED}" && \
+    if [ "${MEMORY_PLUGIN_VERSION}" != "latest" ] && [ "${INSTALLED}" != "${MEMORY_PLUGIN_VERSION}" ]; then \
+        echo "ERROR: installed ${INSTALLED} != requested ${MEMORY_PLUGIN_VERSION}" >&2; exit 1; \
+    fi; \
+    # 把实际版本写进镜像，运行时随时可查
+    printf '%s\n' "${INSTALLED}" > /opt/memory-tencentdb.version && \
     npm cache clean --force
 
 # ============================================================
@@ -98,7 +115,8 @@ RUN curl -fsSL --retry 10 --retry-all-errors --retry-delay 3 https://raw.githubu
     printf '%s\n' "${HERMES_VERSION}" > /opt/hermes-agent.version
 
 LABEL org.opencontainers.image.title="hermes-agent (pinned) + memory_tencentdb gateway" \
-      hermes.version="${HERMES_VERSION}"
+      hermes.version="${HERMES_VERSION}" \
+      memory_plugin.version="${MEMORY_PLUGIN_VERSION}"
 
 # Hermes 数据目录（用户无关，volume 持久化）
 ENV HERMES_HOME=/opt/data
@@ -130,6 +148,12 @@ ENV TDAI_DATA_DIR=/opt/data/tdai-memory
 ENV MEMORY_TENCENTDB_GATEWAY_HOST=127.0.0.1
 ENV MEMORY_TENCENTDB_GATEWAY_PORT=8420
 
+# tdai-memory（Gateway）日志落盘目录：
+#   $MEMORY_TENCENTDB_LOG_DIR/gateway.stdout.log  —— 日常日志（DEBUG/INFO）
+#   $MEMORY_TENCENTDB_LOG_DIR/gateway.stderr.log  —— 错误日志（异常/崩溃）
+# 默认放在已挂载的卷 /opt/data 下（持久化，重建容器不丢）；运行时可 -e 覆盖。
+ENV MEMORY_TENCENTDB_LOG_DIR=/opt/data/logs/tdai
+
 HEALTHCHECK --interval=30s --timeout=5s --retries=3 \
   CMD curl -sf http://localhost:8420/health || exit 1
 
@@ -139,6 +163,8 @@ VOLUME ["/opt/data"]
 # ============================================================
 # CMD：同步 MODEL_* → 生成配置文件 → 前台启动 Gateway（容器常驻）
 #      对话方式：docker exec -it <container> hermes
+#      Gateway 日志落盘到 $MEMORY_TENCENTDB_LOG_DIR（默认 /opt/data/logs/tdai），
+#      分「日常(gateway.stdout.log)」/「错误(gateway.stderr.log)」两个文件
 # ============================================================
 CMD ["bash", "-c", "\
   mkdir -p /opt/data/tdai-memory && \
@@ -149,10 +175,15 @@ CMD ["bash", "-c", "\
   export TDAI_LLM_API_KEY=\"${MODEL_API_KEY}\" && \
   printf \"model:\\n  default: \\\"${MODEL_NAME}\\\"\\n  provider: \\\"${MODEL_PROVIDER}\\\"\\n  base_url: \\\"${MODEL_BASE_URL}\\\"\\n  api_key: \\\"${MODEL_API_KEY}\\\"\\n\\nmemory:\\n  provider: memory_tencentdb\\n\" > \"$CFG\" && \
   printf \"OPENAI_API_KEY=${MODEL_API_KEY}\\n\" > \"$ENVFILE\" && \
+  LOG_DIR=\"${MEMORY_TENCENTDB_LOG_DIR:-/opt/data/logs/tdai}\" && \
+  mkdir -p \"$LOG_DIR\" && \
   echo \"=== hermes-agent version: $(cat /opt/hermes-agent.version) ===\" && \
+  echo \"=== memory-tencentdb version: $(cat /opt/memory-tencentdb.version) ===\" && \
   echo \"=== Config: model=${MODEL_NAME}, provider=${MODEL_PROVIDER}, url=${MODEL_BASE_URL} ===\" && \
+  echo \"=== tdai-memory logs -> $LOG_DIR/gateway.stdout.log | $LOG_DIR/gateway.stderr.log ===\" && \
   echo \"=== Gateway starting... ===\" && \
   echo \"=== Use: docker exec -it <container> hermes  to start a conversation ===\" && \
   exec node --import tsx/esm \
     /opt/tdai-gateway/node_modules/@tencentdb-agent-memory/memory-tencentdb/src/gateway/server.ts \
+    >> \"$LOG_DIR/gateway.stdout.log\" 2>> \"$LOG_DIR/gateway.stderr.log\" \
 "]
